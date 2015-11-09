@@ -1,0 +1,166 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".mainActivity.MainActivity"
+    android:minHeight="?android:attr/listPreferredItemHeight">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:cacheColorHint="#00000000">
+            </ListView>
+
+            <TextView
+                android:id="@+id/tvFloatLetter"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:background="#BB000000"
+                android:gravity="center"
+                android:textSize="40sp"
+                android:visibility="gone"
+                android:textColor="#33CCCC"/>
+
+            <com.warchaser.musicplayer.mainActivity.SlideBar
+                android:id="@+id/slideBar"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|bottom" />
+
+        </FrameLayout>
+
+
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.25"
+        android:background="#EDEDED"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingLeft="5dip">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center"
+            android:background="@mipmap/disc"
+            android:contentDescription="image"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:id="@+id/progress"
+                android:layout_width="fill_parent"
+                android:layout_height="15dip"
+                android:layout_marginTop="3dip"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:maxHeight="15dip"
+                android:minHeight="15dip"
+                android:progressDrawable="@drawable/progress_style"
+                android:thumbOffset="0dip"
+                android:thumb="@mipmap/seekbar_thumb"
+                android:indeterminate="false" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="17dip"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/bottomBarTvTitle"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="显示歌曲名"/>
+                    <TextView
+                        android:id="@+id/bottomBarTvArtist"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="显示艺术家名"
+                        android:layout_gravity="bottom"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="right|center"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:clickable="true"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:id="@+id/lyBtnState">
+
+                        <Button
+                            android:id="@+id/btnState"
+                            android:layout_width="33dip"
+                            android:layout_height="33dip"
+                            android:background="@mipmap/run"
+                            android:gravity="right"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:id="@+id/lyBtnNext">
+
+                        <Button
+                            android:id="@+id/btnNext"
+                            android:layout_width="33dip"
+                            android:layout_height="33dip"
+                            android:gravity="right"
+                            android:background="@mipmap/next" />
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
