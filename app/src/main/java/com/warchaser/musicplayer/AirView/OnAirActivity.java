@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.mainActivity;
+package com.warchaser.musicplayer.AirView;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -36,7 +36,8 @@ import android.widget.Toast;
 
 import com.ant.liao.GifView;
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.displayActivity.DisplayActivity;
+import com.warchaser.musicplayer.DisplayView.DisplayActivity;
+import com.warchaser.musicplayer.material.Material;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
@@ -315,6 +316,12 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
                 myBinder = null;
             }
         }
+
+        if(id == R.id.action_settings)
+        {
+            this.startActivity(new Intent(this, Material.class));
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

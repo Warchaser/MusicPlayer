@@ -17,7 +17,7 @@ import android.os.Message;
 import android.widget.Toast;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.AirView.OnAirActivity;
 
 import java.io.IOException;
 import java.util.List;

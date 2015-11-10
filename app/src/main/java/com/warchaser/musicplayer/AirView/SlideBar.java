@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.mainActivity;
+package com.warchaser.musicplayer.AirView;
 
 import android.content.Context;
 import android.graphics.Canvas;

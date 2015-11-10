@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.AirView.OnAirActivity;
 
 /**
  * Created by Wu on 2014/12/15.
