@@ -12,10 +12,16 @@ public class Material extends ActionBarActivity {
 
     private RecyclerView mRecyclerView;
 
+    private RecyclerAdapter mAdapter;
+
+    private String mData[];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.material);
+
+        initializeView();
     }
 
     @Override
@@ -38,5 +44,16 @@ public class Material extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initializeData(){
+        mData = new String[]{"item1","item2"};
+    }
+
+    private void initializeView(){
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        mAdapter = new RecyclerAdapter(this, mData);
+
     }
 }
