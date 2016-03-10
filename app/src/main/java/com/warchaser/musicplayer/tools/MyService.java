@@ -262,7 +262,7 @@ public class MyService extends Service {
                     play(0,0);
                 }
                 else{
-                    play(iCurrentMusic + 1,0);
+                    play(iCurrentMusic,0);
                 }
                 break;
             case MODE_ALL_LOOP:
@@ -292,7 +292,7 @@ public class MyService extends Service {
         switch(currentMode){
             case MODE_ONE_LOOP:
                 if(iCurrentMusic == 0){
-                    play(musicInfoList.size() - 1,0);
+                    play(musicInfoList.size(),0);
                 }
                 else{
                     play(iCurrentMusic - 1,0);
