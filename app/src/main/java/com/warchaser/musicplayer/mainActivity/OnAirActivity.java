@@ -135,6 +135,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     private MusicInfo beanTmps = null;
     //SlideBar部分
 
+    private boolean mIsBind = false;
+
     /**
      * 绑定服务
      * */
@@ -156,7 +158,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
     private void connectToMyService(){
         Intent intent = new Intent(this,MyService.class);
-        this.getApplicationContext().bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        mIsBind = this.getApplicationContext().bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -176,9 +178,9 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         setProgressReceiver();
 
         //取得电话管理服务
-        TelephonyManager telephonyMangager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         //注册监听对象，对电话的来电状态进行监听
-        telephonyMangager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
+        telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
     }
 
     //初始化各个List
@@ -255,8 +257,9 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(myBinder != null){
-            unbindService(serviceConnection);
+        if(myBinder != null && mIsBind){
+            unregisterReceiver(progressReceiver);
+            this.getApplicationContext().unbindService(serviceConnection);
             myBinder = null;
         }
     }

@@ -184,7 +184,18 @@ public class MyService extends Service {
             @Override
             public void onCompletion(MediaPlayer pMediaPlayer) {
                 if(isPlaying){
-                    switch (currentMode){
+
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+
+                    if(isEmptyInFile(currentPosition))
+                    {
+                        mediaPlayer.seekTo(currentPosition + 1000);
+                        mediaPlayer.start();
+                        return ;
+                    }
+
+                    switch (currentMode)
+                    {
                         case MODE_ONE_LOOP:
                             mediaPlayer.start();
                             break;
@@ -219,6 +230,16 @@ public class MyService extends Service {
             }
         });
 
+    }
+
+    private boolean isEmptyInFile(int currentPosition)
+    {
+        if(currentPosition < mediaPlayer.getDuration())
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void setCurrentMusic(int pCurrentMusic){
