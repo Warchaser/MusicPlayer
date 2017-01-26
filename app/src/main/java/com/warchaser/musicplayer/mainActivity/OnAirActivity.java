@@ -37,11 +37,13 @@ import android.widget.Toast;
 import com.ant.liao.GifView;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.displayActivity.DisplayActivity;
+import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
+import com.warchaser.musicplayer.tools.UIObserver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +67,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
      * Serve for SlideBar to locate the index of music.
      * */
     private List<String> musicListTmps;
-
-    /************Service part**************/
-    /**
-     * ProgressReceiver
-     * */
-    private ProgressReceiver progressReceiver;
 
     /**
      * Service binder
@@ -170,12 +166,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 //        getWindow().setFlags(0x08000000, 0x08000000);
 
         getList();
-
         playExternal();
-
         initComponent();
-
-        setProgressReceiver();
 
         //取得电话管理服务
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
@@ -258,7 +250,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     protected void onDestroy() {
         super.onDestroy();
         if(myBinder != null && mIsBind){
-            unregisterReceiver(progressReceiver);
             this.getApplicationContext().unbindService(serviceConnection);
             myBinder = null;
         }
@@ -313,7 +304,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         if(id == R.id.action_exit){
             finish();
             if(myBinder != null){
-                unregisterReceiver(progressReceiver);
                 this.getApplicationContext().unbindService(serviceConnection);
                 myBinder = null;
             }
@@ -355,17 +345,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             myBinder.startPlay(position,iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
-    }
-
-    private void setProgressReceiver(){
-        progressReceiver = new ProgressReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MyService.ACTION_UPDATE_CURRENT_MUSIC);
-        intentFilter.addAction(MyService.ACTION_UPDATE_DURATION);
-        intentFilter.addAction(MyService.ACTION_UPDATE_PROGRESS);
-//        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-//        intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
-        registerReceiver(progressReceiver, intentFilter);
     }
 
     private void initComponent(){
@@ -471,14 +450,16 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
         v = lvSongs.getChildAt(0);
 
+        UIUpdateObserver observer = new UIUpdateObserver();
+        CallObserver.setObserver(observer);
     }
 
-    public final class ProgressReceiver extends BroadcastReceiver {
-        ProgressReceiver(){
-            super();
-        }
+    private class UIUpdateObserver implements UIObserver
+    {
+
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void notifySeekBar2Update(Intent intent)
+        {
             String sAction = intent.getAction();
             if(MyService.ACTION_UPDATE_PROGRESS.equals(sAction)){
                 int iProgress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS,0);

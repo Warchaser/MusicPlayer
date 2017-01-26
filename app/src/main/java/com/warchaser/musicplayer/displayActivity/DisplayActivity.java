@@ -1,11 +1,8 @@
 package com.warchaser.musicplayer.displayActivity;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -22,10 +19,12 @@ import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
+import com.warchaser.musicplayer.tools.UIObserver;
 
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class DisplayActivity extends Activity implements OnClickListener {
     private int iCurrentMusic;
     private int iCurrentPosition;
 
-    private ProgressReceiver progressReceiver;
     private MyBinder myBinder;
 
     private SeekBar SeekProgress;
@@ -57,6 +55,8 @@ public class DisplayActivity extends Activity implements OnClickListener {
     private LinearLayout lyBtnDisplayPrevious;
     private LinearLayout lyBtnDisplayState;
     private LinearLayout lyBtnDisplayNext;
+
+    private UIUpdateObserver mObserver;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -117,18 +117,18 @@ public class DisplayActivity extends Activity implements OnClickListener {
         if(myBinder != null){
             unbindService(serviceConnection);
         }
+
+        CallObserver.removeSingleObserver(mObserver);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(progressReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initReceiver();
     }
 
     @Override
@@ -247,17 +247,9 @@ public class DisplayActivity extends Activity implements OnClickListener {
 
         lyBtnDisplayNext = (LinearLayout) findViewById(R.id.lyBtnDisplayNext);
         lyBtnDisplayNext.setOnClickListener(this);
-    }
 
-    private void initReceiver(){
-        progressReceiver = new ProgressReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MyService.ACTION_UPDATE_PROGRESS);
-        intentFilter.addAction(MyService.ACTION_UPDATE_DURATION);
-        intentFilter.addAction(MyService.ACTION_UPDATE_CURRENT_MUSIC);
-        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        intentFilter.setPriority(10000);
-        registerReceiver(progressReceiver, intentFilter);
+        mObserver = new UIUpdateObserver();
+        CallObserver.setObserver(mObserver);
     }
 
     private void play(int position){
@@ -270,10 +262,12 @@ public class DisplayActivity extends Activity implements OnClickListener {
         }
     }
 
-    class ProgressReceiver extends BroadcastReceiver {
+    private class UIUpdateObserver implements UIObserver
+    {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void notifySeekBar2Update(Intent intent)
+        {
             String action = intent.getAction();
             if(MyService.ACTION_UPDATE_PROGRESS.equals(action)){
                 int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, iCurrentPosition);

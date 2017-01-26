@@ -121,7 +121,9 @@ public class MyService extends Service {
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
             intent.putExtra(ACTION_UPDATE_PROGRESS,i);
-            sendBroadcast(intent);
+
+            CallObserver.callObserver(intent);
+
             //每1秒发送一次广播，进度条每秒更新
             handler.sendEmptyMessageDelayed(updateProgress, 1000);
         }
@@ -153,7 +155,7 @@ public class MyService extends Service {
         notification.flags |= Notification.FLAG_NO_CLEAR;
         startForeground(1, notification);
 
-        sendBroadcast(intent);
+        CallObserver.callObserver(intent);
     }
 
     private void toUpdateDuration(){
@@ -162,7 +164,8 @@ public class MyService extends Service {
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_DURATION);
             intent.putExtra(ACTION_UPDATE_DURATION,duration);
-            sendBroadcast(intent);
+
+            CallObserver.callObserver(intent);
         }
     }
 
