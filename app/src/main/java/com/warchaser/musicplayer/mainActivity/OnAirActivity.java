@@ -1,10 +1,7 @@
 package com.warchaser.musicplayer.mainActivity;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -133,6 +130,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
     private boolean mIsBind = false;
 
+    private UIUpdateObserver mObserver;
+
     /**
      * 绑定服务
      * */
@@ -253,6 +252,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             this.getApplicationContext().unbindService(serviceConnection);
             myBinder = null;
         }
+
+        CallObserver.removeSingleObserver(mObserver);
     }
 
     @Override
@@ -450,8 +451,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
         v = lvSongs.getChildAt(0);
 
-        UIUpdateObserver observer = new UIUpdateObserver();
-        CallObserver.setObserver(observer);
+        mObserver = new UIUpdateObserver();
+        CallObserver.setObserver(mObserver);
     }
 
     private class UIUpdateObserver implements UIObserver
