@@ -1,9 +1,11 @@
 package com.warchaser.musicplayer.mainActivity;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
@@ -13,6 +15,7 @@ import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -36,6 +40,7 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.displayActivity.DisplayActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
+import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
@@ -115,6 +120,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
     private TextView tvBottomTitle;
     private TextView tvBottomArtist;
+    private ImageView mBottomBarDisc;
     private ListView lvSongs;
     private SeekBar SeekProgress;
     public static Button btnState;///
@@ -372,11 +378,14 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
         tvBottomTitle = (TextView) findViewById(R.id.bottomBarTvTitle);
         tvBottomArtist = (TextView) findViewById(R.id.bottomBarTvArtist);
+        mBottomBarDisc = (ImageView) findViewById(R.id.bottomBar_disc);
 
         if(musicInfoList.size() != 0)
         {
-            tvBottomTitle.setText(musicInfoList.get(iCurrentMusic).getTitle());
-            tvBottomArtist.setText(musicInfoList.get(iCurrentMusic).getArtist());
+            MusicInfo bean = musicInfoList.get(iCurrentMusic);
+            tvBottomTitle.setText(bean.getTitle());
+            tvBottomArtist.setText(bean.getArtist());
+            setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
         }
 
 
@@ -474,8 +483,10 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
                 iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC,0);
                 if(musicInfoList.size() != 0)
                 {
-                    tvBottomTitle.setText(FormatHelper.formatTitle(musicInfoList.get(iCurrentMusic).getTitle(), 35));
-                    tvBottomArtist.setText(musicInfoList.get(iCurrentMusic).getArtist());
+                    MusicInfo bean = musicInfoList.get(iCurrentMusic);
+                    setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
+                    tvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
+                    tvBottomArtist.setText(bean.getArtist());
                 }
                 lvSongs.setSelection(iCurrentMusic);
                 adapter.notifyDataSetChanged();
@@ -493,6 +504,25 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
                 play(iCurrentMusic);
             }
         }
+    }
+
+    private void setBottomBarDisc(Context context, String uri)
+    {
+        Drawable drawable;
+        if(!TextUtils.isEmpty(uri))
+        {
+            drawable = ImageUtil.getCoverDrawableFromMusicFile(uri, OnAirActivity.this, getResources().getDimension(R.dimen.bottom_bar_disc_width_and_height));
+            if(drawable == null)
+            {
+                drawable = ImageUtil.getDrawableFromRes(context, R.mipmap.disc);
+            }
+        }
+        else
+        {
+            drawable = ImageUtil.getDrawableFromRes(context, R.mipmap.disc);
+        }
+
+        ImageUtil.setBackground(mBottomBarDisc, drawable);
     }
 
     private final class TelListener extends PhoneStateListener {

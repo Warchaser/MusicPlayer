@@ -60,8 +60,9 @@
         android:paddingLeft="5dip">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/bottomBar_disc"
+            android:layout_width="@dimen/bottom_bar_disc_width_and_height"
+            android:layout_height="@dimen/bottom_bar_disc_width_and_height"
             android:layout_gravity="start|center"
             android:background="@mipmap/disc"
             android:contentDescription="image"/>
@@ -77,8 +78,8 @@
                 android:layout_height="15dip"
                 android:layout_marginTop="3dip"
                 style="?android:attr/progressBarStyleHorizontal"
-                android:maxHeight="15dip"
-                android:minHeight="15dip"
+                android:maxHeight="1dip"
+                android:minHeight="1dip"
                 android:progressDrawable="@drawable/progress_style"
                 android:thumbOffset="0dip"
                 android:thumb="@mipmap/seekbar_thumb"

@@ -53,6 +53,7 @@ public class MusicList {
             else{
                 int displayNameCol = cursor.getColumnIndex(Media.TITLE);
                 int albumCol = cursor.getColumnIndex(Media.ALBUM);
+                int albumIdCol = cursor.getColumnIndex(Media.ALBUM_ID);
                 int idCol = cursor.getColumnIndex(Media._ID);
                 int durationCol = cursor.getColumnIndex(Media.DURATION);
                 int sizeCol = cursor.getColumnIndex(Media.SIZE);
@@ -61,6 +62,7 @@ public class MusicList {
                 do{
                     String title = cursor.getString(displayNameCol);
                     String album = cursor.getString(albumCol);
+                    long albumId = cursor.getLong(albumIdCol);
                     long id = cursor.getLong(idCol);
                     int duration = cursor.getInt(durationCol);
                     long size = cursor.getLong(sizeCol);
@@ -68,10 +70,25 @@ public class MusicList {
                     String url = cursor.getString(urlCol);
                     MusicInfo musicInfo = new MusicInfo(id, title);
                     musicInfo.setAlbum(album);
+                    musicInfo.setAlbumId(albumId);
                     musicInfo.setDuration(duration);
                     musicInfo.setSize(size);
                     musicInfo.setArtist(artist);
                     musicInfo.setUrl(url);
+
+                    if(id > 0)
+                    {
+                        musicInfo.setUriWithCoverPic("content://media/external/audio/media/" + id + "/albumart");
+                    }
+                    else if(albumId > 0)
+                    {
+                        musicInfo.setUriWithCoverPic(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId));
+                    }
+                    else
+                    {
+                        musicInfo.setUriWithCoverPic("");
+                    }
+
 //                    musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0,1).toUpperCase());
                     musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0,1));
                     if(musicInfo.getDuration() / 1000 > 60){

@@ -1,5 +1,6 @@
 package com.warchaser.musicplayer.tools;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,12 +12,14 @@ public class MusicInfo implements Parcelable {
     private long lId;
     private String sTitle;
     private String sAlbum;
+    private long mAlbumId;
     private int iDuration;
     private long lSize;
     private String sArtist;
     private String sUrl;
     private String pinyinInitial;
     private String pinyinTitle;
+    private String mUriWithCoverPic;
 
     //Getters & setters
 
@@ -24,12 +27,15 @@ public class MusicInfo implements Parcelable {
         lId = in.readLong();
         sTitle = in.readString();
         sAlbum = in.readString();
+        mAlbumId = in.readLong();
         iDuration = in.readInt();
         lSize = in.readLong();
         sArtist = in.readString();
         sUrl = in.readString();
         pinyinInitial = in.readString();
         pinyinTitle = in.readString();
+        mUriWithCoverPic = in.readString();
+
     }
 
     public static final Creator<MusicInfo> CREATOR = new Creator<MusicInfo>() {
@@ -66,6 +72,16 @@ public class MusicInfo implements Parcelable {
 
     public void setAlbum(String album) {
         this.sAlbum = album;
+    }
+
+    public long getAlbumId()
+    {
+        return mAlbumId;
+    }
+
+    public void setAlbumId(long albumId)
+    {
+        this.mAlbumId = albumId;
     }
 
     public int getDuration() {
@@ -116,6 +132,21 @@ public class MusicInfo implements Parcelable {
         this.pinyinTitle = pinyinTitle;
     }
 
+    public String getUriWithCoverPic()
+    {
+        return mUriWithCoverPic;
+    }
+
+    public void setUriWithCoverPic(String uri)
+    {
+        this.mUriWithCoverPic = uri;
+    }
+
+    public void setUriWithCoverPic(Uri uri)
+    {
+        this.mUriWithCoverPic = uri.toString();
+    }
+
     public MusicInfo(){
 
     }
@@ -135,10 +166,12 @@ public class MusicInfo implements Parcelable {
         parcel.writeLong(lId);
         parcel.writeString(sTitle);
         parcel.writeString(sAlbum);
+        parcel.writeLong(mAlbumId);
         parcel.writeInt(iDuration);
         parcel.writeLong(lSize);
         parcel.writeString(sArtist);
         parcel.writeString(sUrl);
+        parcel.writeString(mUriWithCoverPic);
     }
 
     public static final Creator<MusicInfo>
@@ -149,10 +182,12 @@ public class MusicInfo implements Parcelable {
             musicInfo.setId(parcel.readLong());
             musicInfo.setTitle(parcel.readString());
             musicInfo.setAlbum(parcel.readString());
+            musicInfo.setAlbumId(parcel.readLong());
             musicInfo.setArtist(parcel.readString());
             musicInfo.setUrl(parcel.readString());
             musicInfo.setDuration(parcel.readInt());
             musicInfo.setSize(parcel.readLong());
+            musicInfo.setUriWithCoverPic(parcel.readString());
             return musicInfo;
         }
 
