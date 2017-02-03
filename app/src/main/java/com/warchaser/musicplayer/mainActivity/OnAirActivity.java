@@ -339,7 +339,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         int id = item.getItemId();
         if(id == R.id.action_exit){
             finish();
-            if(myBinder != null){
+            if(myBinder != null && mIsBind){
                 this.getApplicationContext().unbindService(serviceConnection);
                 myBinder = null;
             }
