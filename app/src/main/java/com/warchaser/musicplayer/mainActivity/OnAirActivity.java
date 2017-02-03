@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -12,6 +13,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -201,9 +203,36 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         int musicInfoListSize = musicInfoList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
-        if(null != uri){
-            path = uri.getPath();
+
+        if(uri != null)
+        {
+            if("content".equals(uri.getScheme()))
+            {
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = null;
+                try
+                {
+                    cursor = getContentResolver().query(uri,
+                            filePathColumn, null, null, null);
+                    if(cursor != null)
+                    {
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        path = cursor.getString(columnIndex);
+                        cursor.close();
+                    }
+                }
+                catch (Exception | Error e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                path = uri.getPath();
+            }
         }
+
         //从外部传歌曲名
         if(path != null){
             for(int i = 0;i < musicInfoListSize;i++){
