@@ -125,7 +125,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     private ImageView mBottomBarDisc;
     private ListView lvSongs;
     private SeekBar SeekProgress;
-    public static Button btnState;///
+    private Button btnState;///
     private Button btnNext;
 
     private String path = null;
@@ -149,7 +149,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             myBinder = (MyBinder) iBinder;
             //判断外部（外存）传来的路径是否为空，不为空就在绑定成功之后立即播放
             if(null != path){
-                play(iCurrentMusic);
+                play();
             }
         }
 
@@ -300,10 +300,15 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
         index = lvSongs.getFirstVisiblePosition();
         top = (v == null) ? 0 : v.getTop();
+        if(mObserver != null)
+        {
+            mObserver.setObserverEnabled(false);
+        }
     }
 
     @Override
@@ -321,7 +326,10 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         }
 
         lvSongs.setSelectionFromTop(index,top);
-
+        if(mObserver != null)
+        {
+            mObserver.setObserverEnabled(true);
+        }
     }
 
     @Override
@@ -352,7 +360,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         switch (view.getId()){
             case R.id.lyBtnState:
             case R.id.btnState:
-                play(iCurrentMusic);
+                play();
                 break;
 
             case R.id.lyBtnNext:
@@ -373,12 +381,12 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         }
     }
 
-    public static void play(int position){
+    private void play(){
         if(myBinder.getIsPlaying()){
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
         }else{
-            myBinder.startPlay(position,iCurrentPosition);
+            myBinder.startPlay(iCurrentMusic,iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
@@ -495,6 +503,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
     private class UIUpdateObserver implements UIObserver
     {
+        private boolean mIsEnabled;
 
         @Override
         public void notifySeekBar2Update(Intent intent)
@@ -530,8 +539,26 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
             else
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction)) {
-                play(iCurrentMusic);
+                play();
             }
+        }
+
+        @Override
+        public void notify2Play()
+        {
+            play();
+        }
+
+        @Override
+        public void setObserverEnabled(boolean enabled)
+        {
+            this.mIsEnabled = enabled;
+        }
+
+        @Override
+        public boolean getObserverEnabled()
+        {
+            return mIsEnabled;
         }
     }
 

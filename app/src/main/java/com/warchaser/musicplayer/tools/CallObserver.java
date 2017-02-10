@@ -31,9 +31,25 @@ public class CallObserver
             for(int i = 0; i < size; i++)
             {
                 UIObserver observer = mObservers.get(i);
-                if(observer != null)
+                if(observer != null && observer.getObserverEnabled())
                 {
                     observer.notifySeekBar2Update(intent);
+                }
+            }
+        }
+    }
+
+    public static void callPlay()
+    {
+        int size;
+        if(mObservers != null && (size = mObservers.size()) > 0)
+        {
+            for(int i = 0; i < size; i++)
+            {
+                UIObserver observer = mObservers.get(i);
+                if(observer != null && observer.getObserverEnabled())
+                {
+                    observer.notify2Play();
                 }
             }
         }

@@ -31,7 +31,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                     if(KeyEvent.ACTION_UP == action){
-                        OnAirActivity.play(OnAirActivity.iCurrentMusic);
+                        CallObserver.callPlay();
 //                        buttonUpTime = SystemClock.currentThreadTimeMillis();
 //                        System.out.println("actionUp: " + buttonUpTime);
                     }

@@ -122,13 +122,23 @@ public class DisplayActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
+        if(mObserver != null)
+        {
+            mObserver.setObserverEnabled(false);
+        }
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
+        if(mObserver != null)
+        {
+            mObserver.setObserverEnabled(true);
+        }
     }
 
     @Override
@@ -141,7 +151,7 @@ public class DisplayActivity extends Activity implements OnClickListener {
         switch (v.getId()) {
             case R.id.lyBtnDisplayState:
             case R.id.btnDisplayState:
-                play(iCurrentMusic);
+                play();
                 break;
 
             case R.id.lyBtnDisplayNext:
@@ -252,19 +262,19 @@ public class DisplayActivity extends Activity implements OnClickListener {
         CallObserver.setObserver(mObserver);
     }
 
-    private void play(int position){
+    private void play(){
         if(myBinder.getIsPlaying()){
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
         }else{
-            myBinder.startPlay(position,iCurrentPosition);
+            myBinder.startPlay(iCurrentMusic,iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
     private class UIUpdateObserver implements UIObserver
     {
-
+        private boolean mIsEnabled;
         @Override
         public void notifySeekBar2Update(Intent intent)
         {
@@ -287,8 +297,25 @@ public class DisplayActivity extends Activity implements OnClickListener {
                 tvDuration.setText(FormatHelper.formatDuration(duration));
                 SeekProgress.setMax(duration / 1000);
             }else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                play(iCurrentMusic);
+                play();
             }
+        }
+
+        @Override
+        public void notify2Play() {
+            play();
+        }
+
+        @Override
+        public void setObserverEnabled(boolean enabled)
+        {
+            this.mIsEnabled = enabled;
+        }
+
+        @Override
+        public boolean getObserverEnabled()
+        {
+            return mIsEnabled;
         }
     }
 }

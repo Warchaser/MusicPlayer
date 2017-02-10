@@ -10,4 +10,10 @@ import android.content.Intent;
 public interface UIObserver
 {
     void notifySeekBar2Update(Intent intent);
+
+    void notify2Play();
+
+    void setObserverEnabled(boolean enabled);
+
+    boolean getObserverEnabled();
 }
