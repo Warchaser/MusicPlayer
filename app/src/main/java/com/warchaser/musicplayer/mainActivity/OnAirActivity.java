@@ -75,7 +75,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     /**
      * Service binder
      * */
-    public static MyBinder myBinder;////
+    public MyBinder myBinder;////
     /************Service part**************/
 
     /*********Current music part***********/
@@ -329,6 +329,11 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         if(mObserver != null)
         {
             mObserver.setObserverEnabled(true);
+        }
+
+        if(myBinder != null)
+        {
+            myBinder.rebindObeserverOnResume();
         }
     }
 

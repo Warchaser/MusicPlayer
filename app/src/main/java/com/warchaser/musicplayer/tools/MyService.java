@@ -237,12 +237,8 @@ public class MyService extends Service {
 
     private boolean isEmptyInFile(int currentPosition)
     {
-        if(currentPosition < mediaPlayer.getDuration())
-        {
-            return true;
-        }
+        return currentPosition < mediaPlayer.getDuration();
 
-        return false;
     }
 
     private void setCurrentMusic(int pCurrentMusic){
@@ -251,8 +247,7 @@ public class MyService extends Service {
     }
 
     private int getRandomPosition(){
-        int iRandom = (int)(Math.random() * (musicInfoList.size() - 1));
-        return iRandom;
+        return (int)(Math.random() * (musicInfoList.size() - 1));
     }
 
     private void play(int CurrentMusic, int CurrentPosition){
@@ -405,6 +400,12 @@ public class MyService extends Service {
                     play(iCurrentMusic,iCurrentPosition);
                 }
             }
+        }
+
+        public void rebindObeserverOnResume()
+        {
+            toUpdateCurrentMusic();
+            toUpdateDuration();
         }
     }
 }
