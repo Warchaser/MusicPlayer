@@ -63,11 +63,6 @@ import java.util.List;
 public class OnAirActivity extends ActionBarActivity implements View.OnClickListener{
 
     /**
-     * List of information of music.
-     * */
-    public static List<MusicInfo> musicInfoList;
-
-    /**
      * Serve for SlideBar to locate the index of music.
      * */
     private List<String> musicListTmps;
@@ -77,23 +72,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
      * */
     public MyBinder myBinder;////
     /************Service part**************/
-
-    /*********Current music part***********/
-    /**
-     * The music which is playing.
-     * */
-    public static int iCurrentMusic;
-
-    /**
-     *The position of the music is playing.
-     * */
-    public static int iCurrentPosition;
-
-    /**
-     * The length of each music;
-     * */
-    private int iCurrentMax;
-    /*********Current music part***********/
 
     /**Save the position of list on pause**/
     /**
@@ -118,7 +96,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     private LinearLayout lyBtnState;
     private LinearLayout lyBtnNext;
 
-    final MyListViewAdapter adapter = new MyListViewAdapter();
+    private MyListViewAdapter adapter = new MyListViewAdapter();
 
     private TextView tvBottomTitle;
     private TextView tvBottomArtist;
@@ -185,14 +163,13 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
     //初始化各个List
     private void getList(){
 
-        MusicList musicList = MusicList.instance(getContentResolver());
-        musicInfoList = musicList.getMusicList();
+        MusicList.instance(getContentResolver());
 
         musicListTmps = new ArrayList<String>();
-        int musicInfoListSize = musicInfoList.size();
+        int musicInfoListSize = MusicList.musicInfoList.size();
         for(int i = 0;i < musicInfoListSize;i++){
 //            musicListTmps.add(musicInfoList.get(i).getPinyinInitial().toUpperCase());//用于除英文以外的版本
-            musicListTmps.add(musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
+            musicListTmps.add(MusicList.musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
         }
 
         beanTmps = new MusicInfo();
@@ -200,7 +177,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
     //处理外存传过来的路径，以播放
     private void playExternal(){
-        int musicInfoListSize = musicInfoList.size();
+        int musicInfoListSize = MusicList.musicInfoList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
 
@@ -236,15 +213,15 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         //从外部传歌曲名
         if(path != null){
             for(int i = 0;i < musicInfoListSize;i++){
-                if(musicInfoList.get(i).getUrl().equals(path)){
-                    iCurrentMusic = i;
+                if(MusicList.musicInfoList.get(i).getUrl().equals(path)){
+                    MusicList.iCurrentMusic = i;
                     FileFound = true;
                 }
             }
             if(!FileFound){
                 getMetaData(path);
                 updateDataBase(path);
-                iCurrentMusic = musicInfoList.size() - 1;
+                MusicList.iCurrentMusic = MusicList.musicInfoList.size() - 1;
             }
         }
         //绑定服务
@@ -277,7 +254,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         musicInfo.setDuration(Integer.parseInt(
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
         musicInfo.setUrl(filePath);
-        musicInfoList.add(musicInfo);
+        MusicList.musicInfoList.add(musicInfo);
+
     }
 
     @Override
@@ -289,6 +267,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         }
 
         CallObserver.removeSingleObserver(mObserver);
+        clearOnDestroy();
     }
 
     @Override
@@ -322,7 +301,6 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             else {
                 btnState.setBackgroundResource(R.mipmap.run);
             }
-            myBinder.notifyActivity();
         }
 
         lvSongs.setSelectionFromTop(index,top);
@@ -333,7 +311,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
         if(myBinder != null)
         {
-            myBinder.rebindObeserverOnResume();
+            myBinder.notifyActivity();
         }
     }
 
@@ -378,12 +356,41 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
             case R.id.bottomBar:
                 Intent intent = new Intent(OnAirActivity.this,DisplayActivity.class);
-                intent.putExtra(DisplayActivity.MUSIC_LENGTH, iCurrentMax);
-                intent.putExtra(DisplayActivity.CURRENT_MUSIC, iCurrentMusic);
-                intent.putExtra(DisplayActivity.CURRENT_POSITION, iCurrentPosition);
                 startActivity(intent);
                 break;
         }
+    }
+
+    private void clearOnDestroy()
+    {
+        if(musicListTmps != null)
+        {
+            musicListTmps.clear();
+            musicListTmps = null;
+        }
+
+        v = null;
+
+        displayLayout = null;
+
+        lyBtnState = null;
+        lyBtnNext = null;
+
+        adapter = null;
+
+        tvBottomTitle = null;
+        tvBottomArtist = null;
+        mBottomBarDisc = null;
+        lvSongs = null;
+        SeekProgress = null;
+        btnState = null;
+        btnNext = null;
+
+        path = null;
+        mSlideBar = null;
+        tvFloatLetter = null;
+        beanTmps = null;
+        mObserver = null;
     }
 
     private void play(){
@@ -391,7 +398,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
         }else{
-            myBinder.startPlay(iCurrentMusic,iCurrentPosition);
+            myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
@@ -422,9 +429,9 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
         tvBottomArtist = (TextView) findViewById(R.id.bottomBarTvArtist);
         mBottomBarDisc = (ImageView) findViewById(R.id.bottomBar_disc);
 
-        if(musicInfoList.size() != 0)
+        if(MusicList.musicInfoList.size() != 0)
         {
-            MusicInfo bean = musicInfoList.get(iCurrentMusic);
+            MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
             tvBottomTitle.setText(bean.getTitle());
             tvBottomArtist.setText(bean.getArtist());
             setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
@@ -454,8 +461,8 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                iCurrentMusic = i;
-                myBinder.startPlay(iCurrentMusic, 0);
+                MusicList.iCurrentMusic = i;
+                myBinder.startPlay(MusicList.iCurrentMusic, 0);
                 if (myBinder.getIsPlaying()) {
                     btnState.setBackgroundResource(R.mipmap.pausedetail);
                 } else {
@@ -517,29 +524,28 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             if(MyService.ACTION_UPDATE_PROGRESS.equals(sAction)){
                 int iProgress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS,0);
                 if(iProgress > 0){
-                    iCurrentPosition = iProgress;
-                    SeekProgress.setProgress(iCurrentPosition / 1000);
+                    MusicList.iCurrentPosition = iProgress;
+                    SeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             }
             else
             if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)){
-                iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC,0);
-                if(musicInfoList.size() != 0)
+                MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC,0);
+                if(MusicList.musicInfoList.size() != 0)
                 {
-                    MusicInfo bean = musicInfoList.get(iCurrentMusic);
+                    MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
                     setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
                     tvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     tvBottomArtist.setText(bean.getArtist());
                 }
-                lvSongs.setSelection(iCurrentMusic);
+                lvSongs.setSelection(MusicList.iCurrentMusic);
                 adapter.notifyDataSetChanged();
 
             }
             else
             if(MyService.ACTION_UPDATE_DURATION.equals(sAction)){
-                iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION,0);
-                int iMax = iCurrentMax / 1000;
-                SeekProgress.setMax(iMax);
+                MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION,0);
+                SeekProgress.setMax(MusicList.iCurrentMax / 1000);
             }
 
             else
@@ -601,7 +607,7 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
             if(state == TelephonyManager.CALL_STATE_IDLE){//挂断状态(即非来电状态)
                 if(myBinder != null){
                     if(!myBinder.getIsPlaying()){
-                        myBinder.startPlay(iCurrentMusic,iCurrentPosition);
+                        myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
                         btnState.setBackgroundResource(R.mipmap.pausedetail);
                     }
                 }
@@ -613,17 +619,17 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
 
         @Override
         public int getCount() {
-            return musicInfoList.size();
+            return MusicList.musicInfoList.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return musicInfoList.get(i);
+            return MusicList.musicInfoList.get(i);
         }
 
         @Override
         public long getItemId(int i) {
-            return musicInfoList.get(i).getId();
+            return MusicList.musicInfoList.get(i).getId();
         }
 
         @Override
@@ -644,15 +650,15 @@ public class OnAirActivity extends ActionBarActivity implements View.OnClickList
                 viewHolder = (ViewHolderItem) view.getTag();
             }
 
-            viewHolder.tvItemTitle.setText(musicInfoList.get(i).getTitle());
-            viewHolder.tvItemDuration.setText(FormatHelper.formatDuration(musicInfoList.get(i).getDuration()));
+            viewHolder.tvItemTitle.setText(MusicList.musicInfoList.get(i).getTitle());
+            viewHolder.tvItemDuration.setText(FormatHelper.formatDuration(MusicList.musicInfoList.get(i).getDuration()));
 
             viewHolder.tvItemTitle.setTextColor(Color.argb(255,0,0,0));
             viewHolder.tvItemDuration.setTextColor(Color.argb(255,0,0,0));
 
             viewHolder.gfGo.setVisibility(View.GONE);
 
-            if(i == iCurrentMusic){
+            if(i == MusicList.iCurrentMusic){
                 viewHolder.tvItemTitle.setTextColor(Color.RED);
                 viewHolder.tvItemDuration.setTextColor(Color.RED);
                 viewHolder.gfGo.setVisibility(View.VISIBLE);

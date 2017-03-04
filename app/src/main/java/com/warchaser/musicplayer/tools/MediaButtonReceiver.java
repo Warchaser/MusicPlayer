@@ -31,7 +31,20 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                     if(KeyEvent.ACTION_UP == action){
-                        CallObserver.callPlay();
+                        if(!CallObserver.callPlay())
+                        {
+                            if(MusicList.mMyBinder != null)
+                            {
+                                if(MusicList.mMyBinder.getIsPlaying())
+                                {
+                                    MusicList.mMyBinder.stopPlay();
+                                }
+                                else
+                                {
+                                    MusicList.mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+                                }
+                            }
+                        }
 //                        buttonUpTime = SystemClock.currentThreadTimeMillis();
 //                        System.out.println("actionUp: " + buttonUpTime);
                     }

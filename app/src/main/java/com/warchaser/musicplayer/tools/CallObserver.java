@@ -39,9 +39,10 @@ public class CallObserver
         }
     }
 
-    public static void callPlay()
+    public static boolean callPlay()
     {
         int size;
+        boolean isOneUIEnabled = false;
         if(mObservers != null && (size = mObservers.size()) > 0)
         {
             for(int i = 0; i < size; i++)
@@ -50,9 +51,12 @@ public class CallObserver
                 if(observer != null && observer.getObserverEnabled())
                 {
                     observer.notify2Play();
+                    isOneUIEnabled = true;
                 }
             }
         }
+
+        return isOneUIEnabled;
     }
 
     public static void removeAllObservers()

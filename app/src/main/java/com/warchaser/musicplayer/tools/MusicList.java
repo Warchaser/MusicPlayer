@@ -14,11 +14,28 @@ import java.util.List;
  */
 public class MusicList {
 
-    private static List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
+    public static List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
     private static MusicList musicList;
     private static ContentResolver contentResolver;
     private Uri contentUri = Media.EXTERNAL_CONTENT_URI;
     private String order = "title COLLATE LOCALIZED";
+
+    /**
+     * The music which is playing.
+     * */
+    public static int iCurrentMusic;
+
+    /**
+     *The position of the music is playing.
+     * */
+    public static int iCurrentPosition;
+
+    /**
+     * The length of each music;
+     * */
+    public static int iCurrentMax;
+
+    public static MyService.MyBinder mMyBinder;
 
     private String[] projection = {
             Media._ID,

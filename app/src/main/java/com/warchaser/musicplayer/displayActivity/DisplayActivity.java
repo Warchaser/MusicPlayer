@@ -22,6 +22,7 @@ import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
+import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
@@ -32,15 +33,6 @@ import java.util.List;
  * Created by Wu on 2014/10/22.
  */
 public class DisplayActivity extends Activity implements OnClickListener {
-
-    public static final String MUSIC_LENGTH = "com.warchaser.MusicPlayer.DisplayActivity.MUSIC_LENGTH";
-    public static final String CURRENT_POSITION = "com.warchaser.MusicPlayer.DisplayActivity.CURRENT_POSITION";
-    public static final String CURRENT_MUSIC = "com.warchaser.MusicPlayer.DisplayActivity.CURRENT_MUSIC";
-
-    private List<MusicInfo> musicInfoList;
-
-    private int iCurrentMusic;
-    private int iCurrentPosition;
 
     private MyBinder myBinder;
 
@@ -68,14 +60,7 @@ public class DisplayActivity extends Activity implements OnClickListener {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             myBinder = (MyBinder) service;
-            if(myBinder.getIsPlaying()){
-                btnState = (Button) findViewById(R.id.btnDisplayState);
-                btnState.setBackgroundResource(R.mipmap.pausedetail);
-            }
-            else{
-                btnState = (Button) findViewById(R.id.btnDisplayState);
-                btnState.setBackgroundResource(R.mipmap.run);
-            }
+            updatePlayButton();
 
             switch (myBinder.getCurrentMode()){
                 case 0:
@@ -104,7 +89,6 @@ public class DisplayActivity extends Activity implements OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        musicInfoList = OnAirActivity.musicInfoList;
         setContentView(R.layout.display);
 //        getWindow().setFlags(0x08000000, 0x08000000);
         connectToMyService();
@@ -135,9 +119,17 @@ public class DisplayActivity extends Activity implements OnClickListener {
     protected void onResume()
     {
         super.onResume();
+
+        updatePlayButton();
+
         if(mObserver != null)
         {
             mObserver.setObserverEnabled(true);
+        }
+
+        if(myBinder != null)
+        {
+            myBinder.notifyActivity();
         }
     }
 
@@ -196,15 +188,13 @@ public class DisplayActivity extends Activity implements OnClickListener {
     private void initComponent(){
         //Current title
         tvTitle = (TextView) findViewById(R.id.tvDisplayCurrentTitle);
-        iCurrentMusic = getIntent().getIntExtra(CURRENT_MUSIC,0);
-        if(musicInfoList.size() != 0)
+        if(MusicList.musicInfoList.size() != 0)
         {
-            tvTitle.setText(FormatHelper.formatTitle(musicInfoList.get(iCurrentMusic).getTitle(), 25));
+            tvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
         }
         //Current title duration(the right-side TextView)
         tvDuration = (TextView) findViewById(R.id.tvDisplayDuration);
-        int iMax = getIntent().getIntExtra(MUSIC_LENGTH,0);
-        tvDuration.setText(FormatHelper.formatDuration(iMax));
+        tvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
         //DisplayActivity seekBar
         SeekProgress = (SeekBar) findViewById(R.id.progress);
         SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
@@ -226,13 +216,12 @@ public class DisplayActivity extends Activity implements OnClickListener {
 
             }
         });
-        SeekProgress.setMax(iMax / 1000);
-        iCurrentPosition = getIntent().getIntExtra(CURRENT_POSITION,0);
-        SeekProgress.setProgress(iCurrentPosition / 1000);
+        SeekProgress.setMax(MusicList.iCurrentMax / 1000);
+        SeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
 
         //Current title elapse(the left-side TextView)
         tvTimeElapsed = (TextView) findViewById(R.id.tvDisplayTimeElapsed);
-        tvTimeElapsed.setText(FormatHelper.formatDuration(iCurrentPosition));
+        tvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.iCurrentPosition));
 
         ivMode = (ImageView) findViewById(R.id.ivMode);
         ivMode.setOnClickListener(this);
@@ -267,8 +256,23 @@ public class DisplayActivity extends Activity implements OnClickListener {
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
         }else{
-            myBinder.startPlay(iCurrentMusic,iCurrentPosition);
+            myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
+        }
+    }
+
+    private void updatePlayButton()
+    {
+        if(myBinder != null)
+        {
+            if(myBinder.getIsPlaying()){
+                btnState = (Button) findViewById(R.id.btnDisplayState);
+                btnState.setBackgroundResource(R.mipmap.pausedetail);
+            }
+            else{
+                btnState = (Button) findViewById(R.id.btnDisplayState);
+                btnState.setBackgroundResource(R.mipmap.run);
+            }
         }
     }
 
@@ -280,16 +284,16 @@ public class DisplayActivity extends Activity implements OnClickListener {
         {
             String action = intent.getAction();
             if(MyService.ACTION_UPDATE_PROGRESS.equals(action)){
-                int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, iCurrentPosition);
+                int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.iCurrentPosition);
                 if(progress > 0){
-                    iCurrentPosition = progress; // Remember the current position
+                    MusicList.iCurrentPosition = progress; // Remember the current position
                     tvTimeElapsed.setText(FormatHelper.formatDuration(progress));
                     SeekProgress.setProgress(progress / 1000);
                 }
-            }else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && musicInfoList.size() != 0){
+            }else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0){
                 //Retrieve the current music and get the title to show on top of the screen.
-                iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
-                tvTitle.setText(FormatHelper.formatTitle(musicInfoList.get(iCurrentMusic).getTitle(), 25));
+                MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+                tvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
             }else if(MyService.ACTION_UPDATE_DURATION.equals(action)){
                 //Receive the duration and show under the progress bar
                 //Why do this ? because from the ContentResolver, the duration is zero.

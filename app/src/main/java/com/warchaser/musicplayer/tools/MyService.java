@@ -29,10 +29,6 @@ public class MyService extends Service {
 
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
-    private List<MusicInfo> musicInfoList;
-
-    private int iCurrentMusic;
-    private int iCurrentPosition;//每首歌曲的当前播放进度
 
     private static final int updateProgress = 1;
     private static final int updateCurrentMusic = 2;
@@ -51,23 +47,15 @@ public class MyService extends Service {
 
     private Binder myBinder = new MyBinder();
 
-    public AudioManager mAudioManager;
-    public ComponentName rec;
+    private AudioManager mAudioManager;
+    private ComponentName rec;
 
     PendingIntent pendingIntent;
 
-    ////控件部分
-
-    ////控件部分
-
     @Override
     public void onCreate() {
-
-        iCurrentMusic = OnAirActivity.iCurrentMusic;
-
         initMediaPlayer();
 
-        musicInfoList = MusicList.instance(getContentResolver()).getMusicList();
         super.onCreate();
         //将ACTION_MEDIA_BUTTON注册到AudioManager，目前只能这么干(2014.12.24)
         mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -132,17 +120,17 @@ public class MyService extends Service {
     private void toUpdateCurrentMusic(){
         Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
-        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC,iCurrentMusic);
+        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
 
         String notificationTitle = "";
 
-        if(musicInfoList.size() == 0)
+        if(MusicList.musicInfoList.size() == 0)
         {
             notificationTitle = "Mr.Song is not here for now……";
         }
         else
         {
-            notificationTitle = musicInfoList.get(iCurrentMusic).getTitle();
+            notificationTitle = MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle();
         }
 
         Notification notification = new Notification.Builder(MyService.this)
@@ -176,7 +164,7 @@ public class MyService extends Service {
 
             @Override
             public void onPrepared(MediaPlayer pMediaPlayer) {
-                mediaPlayer.seekTo(iCurrentPosition);
+                mediaPlayer.seekTo(MusicList.iCurrentPosition);
                 mediaPlayer.start();
                 handler.sendEmptyMessage(updateDuration);
             }
@@ -203,13 +191,13 @@ public class MyService extends Service {
                             mediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((iCurrentMusic + 1) % musicInfoList.size(),0);
+                            play((MusicList.iCurrentMusic + 1) % MusicList.musicInfoList.size(),0);
                             break;
                         case MODE_RANDOM:
                             play(getRandomPosition(),0);
                             break;
                         case MODE_SEQUENCE:
-                            if(iCurrentMusic == musicInfoList.size() - 1){
+                            if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
                                 play(0,0);
                             }
                             else{
@@ -242,24 +230,24 @@ public class MyService extends Service {
     }
 
     private void setCurrentMusic(int pCurrentMusic){
-        iCurrentMusic = pCurrentMusic;
+        MusicList.iCurrentMusic = pCurrentMusic;
         handler.sendEmptyMessage(updateCurrentMusic);
     }
 
     private int getRandomPosition(){
-        return (int)(Math.random() * (musicInfoList.size() - 1));
+        return (int)(Math.random() * (MusicList.musicInfoList.size() - 1));
     }
 
     private void play(int CurrentMusic, int CurrentPosition){
-        iCurrentPosition = CurrentPosition;
+        MusicList.iCurrentPosition = CurrentPosition;
         setCurrentMusic(CurrentMusic);
 
         mediaPlayer.reset();
 
         try {
-            if(musicInfoList.size() != 0)
+            if(MusicList.musicInfoList.size() != 0)
             {
-                mediaPlayer.setDataSource(musicInfoList.get(iCurrentMusic).getUrl());
+                mediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
                 mediaPlayer.prepareAsync();
                 handler.sendEmptyMessage(updateProgress);
                 isPlaying = true;
@@ -277,28 +265,28 @@ public class MyService extends Service {
     private void next(){
         switch(currentMode){
             case MODE_ONE_LOOP:
-                if(iCurrentMusic == musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
                     play(0,0);
                 }
                 else{
-                    play(iCurrentMusic + 1,0);
+                    play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(iCurrentMusic == musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
                     play(0,0);
                 }
                 else{
-                    play(iCurrentMusic + 1,0);
+                    play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(iCurrentMusic == musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
                     Toast.makeText(this, "最后一首歌曲了，亲，即将播放第一首歌曲～", Toast.LENGTH_SHORT).show();
                     play(0,0);
                 }
                 else{
-                    play(iCurrentMusic + 1,0);
+                    play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
             case MODE_RANDOM:
@@ -310,28 +298,28 @@ public class MyService extends Service {
     private void previous(){
         switch(currentMode){
             case MODE_ONE_LOOP:
-                if(iCurrentMusic == 0){
-                    play(musicInfoList.size() - 1,0);
+                if(MusicList.iCurrentMusic == 0){
+                    play(MusicList.musicInfoList.size() - 1,0);
                 }
                 else{
-                    play(iCurrentMusic - 1,0);
+                    play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(iCurrentMusic == 0){
-                    play(musicInfoList.size() - 1,0);
+                if(MusicList.iCurrentMusic == 0){
+                    play(MusicList.musicInfoList.size() - 1,0);
                 }
                 else{
-                    play(iCurrentMusic - 1,0);
+                    play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(iCurrentMusic == 0){
+                if(MusicList.iCurrentMusic == 0){
                     Toast.makeText(this, "已经是第一首歌了，亲，即将播放最后一首歌曲～", Toast.LENGTH_SHORT).show();
-                    play(musicInfoList.size() - 1,0);
+                    play(MusicList.musicInfoList.size() - 1,0);
                 }
                 else{
-                    play(iCurrentMusic - 1,0);
+                    play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
             case MODE_RANDOM:
@@ -342,6 +330,7 @@ public class MyService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        MusicList.mMyBinder = (MyBinder) myBinder;
         return myBinder;
     }
 
@@ -393,16 +382,16 @@ public class MyService extends Service {
          * */
         public void changeProgress(int pProgress){
             if(mediaPlayer != null){
-                iCurrentPosition = pProgress * 1000;
+                MusicList.iCurrentPosition = pProgress * 1000;
                 if(isPlaying){
-                    mediaPlayer.seekTo(iCurrentPosition);
+                    mediaPlayer.seekTo(MusicList.iCurrentPosition);
                 }else{
-                    play(iCurrentMusic,iCurrentPosition);
+                    play(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
                 }
             }
         }
 
-        public void rebindObeserverOnResume()
+        public void rebindObserverOnResume()
         {
             toUpdateCurrentMusic();
             toUpdateDuration();
