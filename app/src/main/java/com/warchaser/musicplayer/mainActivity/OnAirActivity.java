@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -40,6 +39,7 @@ import android.widget.Toast;
 import com.ant.liao.GifView;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.displayActivity.DisplayActivity;
+import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
@@ -60,7 +60,7 @@ import java.util.List;
  * */
 
 
-public class OnAirActivity extends ActionBarActivity implements View.OnClickListener{
+public class OnAirActivity extends BaseActivity implements View.OnClickListener{
 
     /**
      * Serve for SlideBar to locate the index of music.

@@ -1,6 +1,5 @@
 package com.warchaser.musicplayer.displayActivity;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -18,21 +17,19 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
-import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
 
-import java.util.List;
 
 /**
  * Created by Wu on 2014/10/22.
  */
-public class DisplayActivity extends Activity implements OnClickListener {
+public class DisplayActivity extends BaseActivity implements OnClickListener {
 
     private MyBinder myBinder;
 

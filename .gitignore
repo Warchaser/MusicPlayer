@@ -10,3 +10,7 @@
 
 .idea
 /app/app.iml
+
+MusicPlayer.iml
+/*.iml
+/app/app.iml
