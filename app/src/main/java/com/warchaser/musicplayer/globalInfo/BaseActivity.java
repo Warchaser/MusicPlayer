@@ -16,26 +16,32 @@ import com.warchaser.musicplayer.R;
  * 基类，
  */
 
-public class BaseActivity extends AppCompatActivity{
+public class BaseActivity extends AppCompatActivity
+{
 
     protected final int CODE_FOR_WRITE_PERMISSION = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 //        checkUriPermission();
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
         clearMember();
     }
 
-    protected boolean checkUriPermission(){
-        if(android.os.Build.VERSION.SDK_INT >= 23){
+    protected boolean checkUriPermission()
+    {
+        if(android.os.Build.VERSION.SDK_INT >= 23)
+        {
             int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED)
+            {
                 BaseActivity activity = this;
                 ActivityCompat.requestPermissions(activity,new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         CODE_FOR_WRITE_PERMISSION);
@@ -49,19 +55,23 @@ public class BaseActivity extends AppCompatActivity{
         return true;
     }
 
-    protected void clearMember(){
+    protected void clearMember()
+    {
 
     }
 
-    protected void showToast(String message){
+    protected void showToast(String message)
+    {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    protected String getRestStrings(int resId){
+    protected String getRestStrings(int resId)
+    {
         return getResources().getString(resId);
     }
 
-    protected void startCertainActivity(Class<?> cls){
+    protected void startCertainActivity(Class<?> cls)
+    {
         startActivity(new Intent(this, cls));
     }
 }

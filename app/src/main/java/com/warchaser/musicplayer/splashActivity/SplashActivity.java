@@ -15,10 +15,12 @@ import com.warchaser.musicplayer.mainActivity.OnAirActivity;
  * Created by Administrator on 2014/11/6.
  *
  */
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity
+{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_startup);
@@ -27,12 +29,17 @@ public class SplashActivity extends BaseActivity {
 
         int SPLASH_DISPLAY_LENGTH = 3000;
 
-        new Handler().postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable()
+        {
             @Override
-            public void run() {
-                if(checkUriPermission()){
+            public void run()
+            {
+                if(checkUriPermission())
+                {
                     startOnAirActivity();
-                } else {
+                }
+                else
+                {
 
                 }
             }
@@ -42,14 +49,19 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
+        switch (requestCode)
+        {
             case CODE_FOR_WRITE_PERMISSION:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
                     // 用户成功授予权限
                     startOnAirActivity();
-                } else {
+                }
+                else
+                {
                     showToast(getRestStrings(R.string.uri_permission_not_granted));
                     finish();
                 }
@@ -59,7 +71,8 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private void startOnAirActivity(){
+    private void startOnAirActivity()
+    {
         startCertainActivity(OnAirActivity.class);
         finish();
     }

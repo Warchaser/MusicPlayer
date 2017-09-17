@@ -7,14 +7,16 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-public class StringHelper {
+public class StringHelper
+{
     /**
      * 得到 全拼
      *
      * @param src
      * @return
      */
-    public static String getPingYin(String src) {
+    public static String getPingYin(String src)
+    {
         char[] t1 = null;
         t1 = src.toCharArray();
         String[] t2 = null;
@@ -24,23 +26,29 @@ public class StringHelper {
         t3.setVCharType(HanyuPinyinVCharType.WITH_V);
         String t4 = "";
         int t0 = t1.length;
-        try {
-            for (int i = 0; i < t0; i++) {
+        try
+        {
+            for (int i = 0; i < t0; i++)
+            {
                 // 判断是否为汉字字符
-                if (java.lang.Character.toString(t1[i]).matches(
-                        "[\\u4E00-\\u9FA5]+")) {
+                if (java.lang.Character.toString(t1[i]).matches("[\\u4E00-\\u9FA5]+"))
+                {
                     t2 = PinyinHelper.toHanyuPinyinStringArray(t1[i], t3);
                     t4 += t2[0];
                 }
-                else
-                if(java.lang.Character.toString(t1[i]).matches("[\\u0030-\\u0039]+")){
+                else if(java.lang.Character.toString(t1[i]).matches("[\\u0030-\\u0039]+"))
+                {
                     t4 += "#";
-                }else {
+                }
+                else
+                {
                     t4 += java.lang.Character.toString(t1[i]);
                 }
             }
             return t4;
-        } catch (BadHanyuPinyinOutputFormatCombination e1) {
+        }
+        catch (BadHanyuPinyinOutputFormatCombination e1)
+        {
             e1.printStackTrace();
         }
         return t4;

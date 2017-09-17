@@ -4,11 +4,14 @@ import android.app.Application;
 
 /**
  * Created by Administrator on 2014/12/26.
+ *
  */
-public class AppData extends Application {
+public class AppData extends Application
+{
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
     }
 

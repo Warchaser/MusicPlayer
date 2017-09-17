@@ -28,8 +28,10 @@ import com.warchaser.musicplayer.tools.UIObserver;
 
 /**
  * Created by Wu on 2014/10/22.
+ *
  */
-public class DisplayActivity extends BaseActivity implements OnClickListener {
+public class DisplayActivity extends BaseActivity implements OnClickListener
+{
 
     private MyBinder myBinder;
 
@@ -47,19 +49,23 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
 
     private UIUpdateObserver mObserver;
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private ServiceConnection serviceConnection = new ServiceConnection()
+    {
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
+        public void onServiceDisconnected(ComponentName name)
+        {
 
         }
 
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
             myBinder = (MyBinder) service;
             updatePlayButton();
 
-            switch (myBinder.getCurrentMode()){
+            switch (myBinder.getCurrentMode())
+            {
                 case 0:
                     ivMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
                     break;
@@ -76,13 +82,15 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         }
     };
 
-    private void connectToMyService(){
+    private void connectToMyService()
+    {
         Intent intent = new Intent(DisplayActivity.this,MyService.class);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -93,9 +101,11 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
-        if(myBinder != null){
+        if(myBinder != null)
+        {
             unbindService(serviceConnection);
         }
 
@@ -136,7 +146,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
         switch (v.getId()) {
             case R.id.lyBtnDisplayState:
             case R.id.btnDisplayState:
@@ -146,7 +157,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             case R.id.lyBtnDisplayNext:
             case R.id.btnDisplayNext:
                 myBinder.playNext();
-                if(myBinder.getIsPlaying()){
+                if(myBinder.getIsPlaying())
+                {
                     btnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
@@ -154,7 +166,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             case R.id.lyBtnDisplayPrevious:
             case R.id.btnDisplayPrevious:
                 myBinder.playPrevious();
-                if(myBinder.getIsPlaying()){
+                if(myBinder.getIsPlaying())
+                {
                     btnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
@@ -162,7 +175,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             case R.id.lyIvMode:
             case R.id.ivMode:
                 myBinder.changeMode();
-                switch (myBinder.getCurrentMode()){
+                switch (myBinder.getCurrentMode())
+                {
                     case 0:
                         ivMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
                         break;
@@ -194,22 +208,26 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         tvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
         //DisplayActivity seekBar
         SeekProgress = (SeekBar) findViewById(R.id.progress);
-        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        {
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+            {
                 if(b){
                     myBinder.changeProgress(i);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
 
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
 
             }
         });
@@ -249,10 +267,13 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     private void play(){
-        if(myBinder.getIsPlaying()){
+        if(myBinder.getIsPlaying())
+        {
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
-        }else{
+        }
+        else
+        {
             myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
@@ -266,7 +287,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
                 btnState = (Button) findViewById(R.id.btnDisplayState);
                 btnState.setBackgroundResource(R.mipmap.pausedetail);
             }
-            else{
+            else
+            {
                 btnState = (Button) findViewById(R.id.btnDisplayState);
                 btnState.setBackgroundResource(R.mipmap.run);
             }
@@ -280,24 +302,32 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         public void notifySeekBar2Update(Intent intent)
         {
             String action = intent.getAction();
-            if(MyService.ACTION_UPDATE_PROGRESS.equals(action)){
+            if(MyService.ACTION_UPDATE_PROGRESS.equals(action))
+            {
                 int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.iCurrentPosition);
-                if(progress > 0){
+                if(progress > 0)
+                {
                     MusicList.iCurrentPosition = progress; // Remember the current position
                     tvTimeElapsed.setText(FormatHelper.formatDuration(progress));
                     SeekProgress.setProgress(progress / 1000);
                 }
-            }else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0){
+            }
+            else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0)
+            {
                 //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 tvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
-            }else if(MyService.ACTION_UPDATE_DURATION.equals(action)){
+            }
+            else if(MyService.ACTION_UPDATE_DURATION.equals(action))
+            {
                 //Receive the duration and show under the progress bar
                 //Why do this ? because from the ContentResolver, the duration is zero.
                 int duration = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
                 tvDuration.setText(FormatHelper.formatDuration(duration));
                 SeekProgress.setMax(duration / 1000);
-            }else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+            }
+            else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action))
+            {
                 play();
             }
         }

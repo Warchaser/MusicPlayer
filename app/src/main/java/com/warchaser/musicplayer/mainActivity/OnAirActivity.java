@@ -60,7 +60,8 @@ import java.util.List;
  * */
 
 
-public class OnAirActivity extends BaseActivity implements View.OnClickListener{
+public class OnAirActivity extends BaseActivity implements View.OnClickListener
+{
 
     /**
      * Serve for SlideBar to locate the index of music.
@@ -121,29 +122,35 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     /**
      * 绑定服务
      * */
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private ServiceConnection serviceConnection = new ServiceConnection()
+    {
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder)
+        {
             myBinder = (MyBinder) iBinder;
             //判断外部（外存）传来的路径是否为空，不为空就在绑定成功之后立即播放
-            if(null != path){
+            if(null != path)
+            {
                 play();
             }
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName componentName) {
+        public void onServiceDisconnected(ComponentName componentName)
+        {
 
         }
     };
 
-    private void connectToMyService(){
+    private void connectToMyService()
+    {
         Intent intent = new Intent(this,MyService.class);
         mIsBind = this.getApplicationContext().bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -167,7 +174,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
 
         musicListTmps = new ArrayList<String>();
         int musicInfoListSize = MusicList.musicInfoList.size();
-        for(int i = 0;i < musicInfoListSize;i++){
+        for(int i = 0;i < musicInfoListSize; i++)
+        {
 //            musicListTmps.add(musicInfoList.get(i).getPinyinInitial().toUpperCase());//用于除英文以外的版本
             musicListTmps.add(MusicList.musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
         }
@@ -176,7 +184,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     //处理外存传过来的路径，以播放
-    private void playExternal(){
+    private void playExternal()
+    {
         int musicInfoListSize = MusicList.musicInfoList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
@@ -211,31 +220,41 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         }
 
         //从外部传歌曲名
-        if(path != null){
-            for(int i = 0;i < musicInfoListSize;i++){
-                if(MusicList.musicInfoList.get(i).getUrl().equals(path)){
+        if(path != null)
+        {
+            for(int i = 0;i < musicInfoListSize;i++)
+            {
+                if(MusicList.musicInfoList.get(i).getUrl().equals(path))
+                {
                     MusicList.iCurrentMusic = i;
                     FileFound = true;
                 }
             }
-            if(!FileFound){
+
+            if(!FileFound)
+            {
                 getMetaData(path);
                 updateDataBase(path);
                 MusicList.iCurrentMusic = MusicList.musicInfoList.size() - 1;
             }
         }
+
         //绑定服务
-        if(myBinder == null){
+        if(myBinder == null)
+        {
             connectToMyService();
         }
     }
 
     //更新数据库
-    private void updateDataBase(String filename){
+    private void updateDataBase(String filename)
+    {
         MediaScannerConnection.scanFile(this,
                 new String[]{filename}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
+                new MediaScannerConnection.OnScanCompletedListener()
+                {
+                    public void onScanCompleted(String path, Uri uri)
+                    {
                         Toast.makeText(OnAirActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -243,7 +262,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
 
 
     //获取数据库中没有的文件的各种信息，并显示在列表的尾部
-    private void getMetaData(String filePath) {
+    private void getMetaData(String filePath)
+    {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(filePath);
         //对于无法通过文件获取到title，album，artist的文件，可以用别的方法解决。
@@ -259,9 +279,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
-        if(myBinder != null && mIsBind){
+        if(myBinder != null && mIsBind)
+        {
             this.getApplicationContext().unbindService(serviceConnection);
             myBinder = null;
         }
@@ -271,7 +293,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         Intent intent = new Intent();
         intent.setAction("android.intent.action.MAIN");
         intent.addCategory("android.intent.category.HOME");
@@ -295,10 +318,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         super.onResume();
 
         if(myBinder != null){
-            if(myBinder.getIsPlaying()){
+            if(myBinder.getIsPlaying())
+            {
                 btnState.setBackgroundResource(R.mipmap.pausedetail);
             }
-            else {
+            else
+            {
                 btnState.setBackgroundResource(R.mipmap.run);
             }
         }
@@ -316,7 +341,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -328,9 +354,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if(id == R.id.action_exit){
+        if(id == R.id.action_exit)
+        {
             finish();
-            if(myBinder != null && mIsBind){
+            if(myBinder != null && mIsBind)
+            {
                 this.getApplicationContext().unbindService(serviceConnection);
                 myBinder = null;
             }
@@ -339,7 +367,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(View view)
+    {
         switch (view.getId()){
             case R.id.lyBtnState:
             case R.id.btnState:
@@ -349,7 +378,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
             case R.id.lyBtnNext:
             case R.id.btnNext:
                 myBinder.playNext();
-                if(myBinder.getIsPlaying()){
+                if(myBinder.getIsPlaying())
+                {
                     btnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
@@ -394,33 +424,42 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private void play(){
-        if(myBinder.getIsPlaying()){
+        if(myBinder.getIsPlaying())
+        {
             myBinder.stopPlay();
             btnState.setBackgroundResource(R.mipmap.run);
-        }else{
+        }
+        else
+        {
             myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
             btnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
-    private void initComponent(){
+    private void initComponent()
+    {
         SeekProgress = (SeekBar) findViewById(R.id.progress);
-        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        {
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(b){
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b)
+            {
+                if(b)
+                {
                     myBinder.changeProgress(i);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
 
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
 
             }
         });
@@ -457,15 +496,20 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         lvSongs.setAdapter(adapter);
         lvSongs.setFocusable(true);
 
-        lvSongs.setOnItemClickListener(new OnItemClickListener() {
+        lvSongs.setOnItemClickListener(new OnItemClickListener()
+        {
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
                 MusicList.iCurrentMusic = i;
                 myBinder.startPlay(MusicList.iCurrentMusic, 0);
-                if (myBinder.getIsPlaying()) {
+                if (myBinder.getIsPlaying())
+                {
                     btnState.setBackgroundResource(R.mipmap.pausedetail);
-                } else {
+                }
+                else
+                {
                     btnState.setBackgroundResource(R.mipmap.run);
                 }
 
@@ -480,27 +524,35 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         alp.setDuration(1500);
         tvFloatLetter.setAnimation(alp);
 
-        alp.setAnimationListener(new Animation.AnimationListener(){
+        alp.setAnimationListener(new Animation.AnimationListener()
+        {
 
             public void onAnimationStart(Animation animation){}
             public void onAnimationRepeat(Animation animation){}
-            public void onAnimationEnd(Animation animation){
+            public void onAnimationEnd(Animation animation)
+            {
 
                 tvFloatLetter.setVisibility(View.GONE);
             }
         });
 
         mSlideBar = (SlideBar) findViewById(R.id.slideBar);
-        mSlideBar.setOnLetterTouchChangeListener(new SlideBar.OnLetterTouchChangeListener() {
+        mSlideBar.setOnLetterTouchChangeListener(new SlideBar.OnLetterTouchChangeListener()
+        {
             @Override
-            public void onLetterTouchChange(boolean isTouched, String s) {
+            public void onLetterTouchChange(boolean isTouched, String s)
+            {
 
                 beanTmps.setPinyinInitial(s);
                 tvFloatLetter.setText(s);
                 if (isTouched)
+                {
                     tvFloatLetter.setVisibility(View.VISIBLE);
+                }
                 else
+                {
                     tvFloatLetter.startAnimation(alp);
+                }
 
                 int index = musicListTmps.indexOf(beanTmps.getPinyinInitial());
                 lvSongs.setSelection(index);
@@ -521,15 +573,17 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         public void notifySeekBar2Update(Intent intent)
         {
             String sAction = intent.getAction();
-            if(MyService.ACTION_UPDATE_PROGRESS.equals(sAction)){
+            if(MyService.ACTION_UPDATE_PROGRESS.equals(sAction))
+            {
                 int iProgress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS,0);
-                if(iProgress > 0){
+                if(iProgress > 0)
+                {
                     MusicList.iCurrentPosition = iProgress;
                     SeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             }
-            else
-            if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)){
+            else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction))
+            {
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC,0);
                 if(MusicList.musicInfoList.size() != 0)
                 {
@@ -542,14 +596,13 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
                 adapter.notifyDataSetChanged();
 
             }
-            else
-            if(MyService.ACTION_UPDATE_DURATION.equals(sAction)){
+            else if(MyService.ACTION_UPDATE_DURATION.equals(sAction))
+            {
                 MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION,0);
                 SeekProgress.setMax(MusicList.iCurrentMax / 1000);
             }
-
-            else
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction)) {
+            else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction))
+            {
                 play();
             }
         }
@@ -592,21 +645,30 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         ImageUtil.setBackground(mBottomBarDisc, drawable);
     }
 
-    private final class TelListener extends PhoneStateListener {
-        public void onCallStateChanged(int state, String incomingNumber) {
+    private final class TelListener extends PhoneStateListener
+    {
+        public void onCallStateChanged(int state, String incomingNumber)
+        {
             super.onCallStateChanged(state, incomingNumber);
-            if(state == TelephonyManager.CALL_STATE_RINGING){//来电状态
-                if(myBinder != null){
-                    if(myBinder.getIsPlaying()){
+            //来电状态
+            if(state == TelephonyManager.CALL_STATE_RINGING)
+            {
+                if(myBinder != null)
+                {
+                    if(myBinder.getIsPlaying())
+                    {
                         myBinder.stopPlay();
                         btnState.setBackgroundResource(R.mipmap.run);
                     }
                 }
             }
-            else
-            if(state == TelephonyManager.CALL_STATE_IDLE){//挂断状态(即非来电状态)
-                if(myBinder != null){
-                    if(!myBinder.getIsPlaying()){
+            else if(state == TelephonyManager.CALL_STATE_IDLE)
+            {
+                //挂断状态(即非来电状态)
+                if(myBinder != null)
+                {
+                    if(!myBinder.getIsPlaying())
+                    {
                         myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
                         btnState.setBackgroundResource(R.mipmap.pausedetail);
                     }
@@ -615,7 +677,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         }
     }
 
-    public class MyListViewAdapter extends BaseAdapter {
+    public class MyListViewAdapter extends BaseAdapter
+    {
 
         @Override
         public int getCount() {
@@ -633,9 +696,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int i, View view, ViewGroup viewGroup)
+        {
             ViewHolderItem viewHolder;
-            if(null == view){
+            if(null == view)
+            {
                 viewHolder = new ViewHolderItem();
                 view = LayoutInflater.from(OnAirActivity.this).inflate(R.layout.item, null);
                 viewHolder.tvItemTitle = (TextView) view.findViewById(R.id.tvItemTitle);
@@ -646,7 +711,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
 
                 view.setTag(viewHolder);
             }
-            else{
+            else
+            {
                 viewHolder = (ViewHolderItem) view.getTag();
             }
 
@@ -658,7 +724,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
 
             viewHolder.gfGo.setVisibility(View.GONE);
 
-            if(i == MusicList.iCurrentMusic){
+            if(i == MusicList.iCurrentMusic)
+            {
                 viewHolder.tvItemTitle.setTextColor(Color.RED);
                 viewHolder.tvItemDuration.setTextColor(Color.RED);
                 viewHolder.gfGo.setVisibility(View.VISIBLE);
@@ -670,10 +737,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener{
         }
     }
 
-    public class ViewHolderItem{
-        public TextView tvItemTitle;
-        public TextView tvItemDuration;
-        public GifView gfGo;
+    private class ViewHolderItem
+    {
+        private TextView tvItemTitle;
+        private TextView tvItemDuration;
+        private GifView gfGo;
     }
 
 }

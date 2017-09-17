@@ -5,22 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
-
 /**
  * Created by Wu on 2014/12/15.
+ *
  */
-public class MediaButtonReceiver extends BroadcastReceiver {
+public class MediaButtonReceiver extends BroadcastReceiver
+{
 
     long buttonDownTime;//
     long buttonUpTime;//
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         String intentAction = intent.getAction();
-        if(Intent.ACTION_MEDIA_BUTTON.equalsIgnoreCase(intentAction)){
+        if(Intent.ACTION_MEDIA_BUTTON.equalsIgnoreCase(intentAction))
+        {
             KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (event == null) {
+            if (event == null)
+            {
                 return;
             }
             int keycode = event.getKeyCode();
@@ -30,7 +33,8 @@ public class MediaButtonReceiver extends BroadcastReceiver {
 
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                    if(KeyEvent.ACTION_UP == action){
+                    if(KeyEvent.ACTION_UP == action)
+                    {
                         if(!CallObserver.callPlay())
                         {
                             if(MusicList.mMyBinder != null)

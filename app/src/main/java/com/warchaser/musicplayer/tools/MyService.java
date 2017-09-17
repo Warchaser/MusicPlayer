@@ -20,12 +20,14 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 
 import java.io.IOException;
-import java.util.List;
+import java.lang.ref.WeakReference;
 
 /**
  * Created by Wu on 2014/10/20.
+ *
  */
-public class MyService extends Service {
+public class MyService extends Service
+{
 
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
@@ -46,6 +48,7 @@ public class MyService extends Service {
     public static final int MODE_SEQUENCE = 3;
 
     private Binder myBinder = new MyBinder();
+    private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
     private ComponentName rec;
@@ -53,7 +56,10 @@ public class MyService extends Service {
     PendingIntent pendingIntent;
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
+        mMessageHandler = new MessageHandler(this);
+
         initMediaPlayer();
 
         super.onCreate();
@@ -75,9 +81,11 @@ public class MyService extends Service {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         super.onDestroy();
-        if(mediaPlayer != null){
+        if(mediaPlayer != null)
+        {
             mediaPlayer.release();
             mediaPlayer = null;
             mAudioManager.unregisterMediaButtonEventReceiver(rec);
@@ -85,26 +93,40 @@ public class MyService extends Service {
         }
     }
 
-    private Handler handler = new Handler() {
+    private static class MessageHandler extends Handler
+    {
 
-        public void handleMessage(Message msg){
-            switch (msg.what){
+        private WeakReference<MyService> mServiceWeakReference;
+
+        public MessageHandler(MyService service)
+        {
+            mServiceWeakReference = new WeakReference<MyService>(service);
+        }
+
+        public void handleMessage(Message msg)
+        {
+            final MyService service = mServiceWeakReference.get();
+
+            switch (msg.what)
+            {
                 case updateProgress:
-                    toUpdateProgress();
+                    service.toUpdateProgress();
                     break;
                 case updateCurrentMusic:
-                    toUpdateCurrentMusic();
+                    service.toUpdateCurrentMusic();
                     break;
                 case updateDuration:
-                    toUpdateDuration();
+                    service.toUpdateDuration();
                     break;
             }
         }
 
     };
 
-    private void toUpdateProgress(){
-        if(mediaPlayer != null && isPlaying){
+    private void toUpdateProgress()
+    {
+        if(mediaPlayer != null && isPlaying)
+        {
             int i = mediaPlayer.getCurrentPosition();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
@@ -113,11 +135,12 @@ public class MyService extends Service {
             CallObserver.callObserver(intent);
 
             //每1秒发送一次广播，进度条每秒更新
-            handler.sendEmptyMessageDelayed(updateProgress, 1000);
+            mMessageHandler.sendEmptyMessageDelayed(updateProgress, 1000);
         }
     }
 
-    private void toUpdateCurrentMusic(){
+    private void toUpdateCurrentMusic()
+    {
         Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
@@ -146,8 +169,10 @@ public class MyService extends Service {
         CallObserver.callObserver(intent);
     }
 
-    private void toUpdateDuration(){
-        if(mediaPlayer != null){
+    private void toUpdateDuration()
+    {
+        if(mediaPlayer != null)
+        {
             int duration = mediaPlayer.getDuration();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_DURATION);
@@ -157,24 +182,30 @@ public class MyService extends Service {
         }
     }
 
-    public void initMediaPlayer(){
+    public void initMediaPlayer()
+    {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnPreparedListener(new OnPreparedListener(){
+        mediaPlayer.setOnPreparedListener(new OnPreparedListener()
+        {
 
             @Override
-            public void onPrepared(MediaPlayer pMediaPlayer) {
+            public void onPrepared(MediaPlayer pMediaPlayer)
+            {
                 mediaPlayer.seekTo(MusicList.iCurrentPosition);
                 mediaPlayer.start();
-                handler.sendEmptyMessage(updateDuration);
+                mMessageHandler.sendEmptyMessage(updateDuration);
             }
         });
 
-        mediaPlayer.setOnCompletionListener(new OnCompletionListener(){
+        mediaPlayer.setOnCompletionListener(new OnCompletionListener()
+        {
 
             @Override
-            public void onCompletion(MediaPlayer pMediaPlayer) {
-                if(isPlaying){
+            public void onCompletion(MediaPlayer pMediaPlayer)
+            {
+                if(isPlaying)
+                {
 
                     int currentPosition = mediaPlayer.getCurrentPosition();
 
@@ -211,9 +242,11 @@ public class MyService extends Service {
             }
         });
 
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener()
+        {
             @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i2)
+            {
 
                 System.out.println("MediaPlayer has met a problem!" + i);
 
@@ -229,29 +262,34 @@ public class MyService extends Service {
 
     }
 
-    private void setCurrentMusic(int pCurrentMusic){
+    private void setCurrentMusic(int pCurrentMusic)
+    {
         MusicList.iCurrentMusic = pCurrentMusic;
-        handler.sendEmptyMessage(updateCurrentMusic);
+        mMessageHandler.sendEmptyMessage(updateCurrentMusic);
     }
 
-    private int getRandomPosition(){
+    private int getRandomPosition()
+    {
         return (int)(Math.random() * (MusicList.musicInfoList.size() - 1));
     }
 
-    private void play(int CurrentMusic, int CurrentPosition){
+    private void play(int CurrentMusic, int CurrentPosition)
+    {
         MusicList.iCurrentPosition = CurrentPosition;
         setCurrentMusic(CurrentMusic);
 
         mediaPlayer.reset();
 
         try {
+
             if(MusicList.musicInfoList.size() != 0)
             {
                 mediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
                 mediaPlayer.prepareAsync();
-                handler.sendEmptyMessage(updateProgress);
+                mMessageHandler.sendEmptyMessage(updateProgress);
                 isPlaying = true;
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -262,30 +300,38 @@ public class MyService extends Service {
         isPlaying = false;
     }
 
-    private void next(){
-        switch(currentMode){
+    private void next()
+    {
+        switch(currentMode)
+        {
             case MODE_ONE_LOOP:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
+                {
                     play(0,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
+                {
                     play(0,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
+                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
+                {
                     Toast.makeText(this, "最后一首歌曲了，亲，即将播放第一首歌曲～", Toast.LENGTH_SHORT).show();
                     play(0,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic + 1,0);
                 }
                 break;
@@ -295,30 +341,38 @@ public class MyService extends Service {
         }
     }
 
-    private void previous(){
-        switch(currentMode){
+    private void previous()
+    {
+        switch(currentMode)
+        {
             case MODE_ONE_LOOP:
-                if(MusicList.iCurrentMusic == 0){
+                if(MusicList.iCurrentMusic == 0)
+                {
                     play(MusicList.musicInfoList.size() - 1,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(MusicList.iCurrentMusic == 0){
+                if(MusicList.iCurrentMusic == 0)
+                {
                     play(MusicList.musicInfoList.size() - 1,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(MusicList.iCurrentMusic == 0){
+                if(MusicList.iCurrentMusic == 0)
+                {
                     Toast.makeText(this, "已经是第一首歌了，亲，即将播放最后一首歌曲～", Toast.LENGTH_SHORT).show();
                     play(MusicList.musicInfoList.size() - 1,0);
                 }
-                else{
+                else
+                {
                     play(MusicList.iCurrentMusic - 1,0);
                 }
                 break;
@@ -329,13 +383,16 @@ public class MyService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         MusicList.mMyBinder = (MyBinder) myBinder;
         return myBinder;
     }
 
-    public class MyBinder extends Binder {
-        public void startPlay(int CurrentMusic,int CurrentPosition){
+    public class MyBinder extends Binder
+    {
+        public void startPlay(int CurrentMusic,int CurrentPosition)
+        {
             play(CurrentMusic,CurrentPosition);
         }
 
@@ -372,7 +429,8 @@ public class MyService extends Service {
         /**
          * Notify Activities to update the current music and duration when current activity changes.
          */
-        public void notifyActivity(){
+        public void notifyActivity()
+        {
             toUpdateCurrentMusic();
             toUpdateDuration();
         }
@@ -380,7 +438,8 @@ public class MyService extends Service {
         /**
          * seekBar action
          * */
-        public void changeProgress(int pProgress){
+        public void changeProgress(int pProgress)
+        {
             if(mediaPlayer != null){
                 MusicList.iCurrentPosition = pProgress * 1000;
                 if(isPlaying){

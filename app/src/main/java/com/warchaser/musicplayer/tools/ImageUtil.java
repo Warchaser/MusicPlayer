@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 /**
  * Created by Wucn on 2017/2/3.
+ *
  */
 
 public class ImageUtil
@@ -28,9 +29,12 @@ public class ImageUtil
     public static void setBackground(View view, Drawable drawable)
     {
         int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+        {
             view.setBackgroundDrawable(drawable);
-        } else {
+        }
+        else
+        {
             view.setBackground(drawable);
         }
     }

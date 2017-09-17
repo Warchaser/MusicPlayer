@@ -11,8 +11,10 @@ import java.util.List;
 
 /**
  * Created by Wu on 2014/10/20.
+ *
  */
-public class MusicList {
+public class MusicList
+{
 
     public static List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
     private static MusicList musicList;
@@ -49,7 +51,8 @@ public class MusicList {
 
     private String sSortOrder = Media.DATA;
 
-    public static MusicList instance(ContentResolver pContentResolver){
+    public static MusicList instance(ContentResolver pContentResolver)
+    {
         if(null == musicList){
            contentResolver = pContentResolver;
             musicList = new MusicList();
@@ -57,17 +60,21 @@ public class MusicList {
         return musicList;
     }
 
-    private MusicList(){
+    private MusicList()
+    {
         Cursor cursor = null;
         try{
             cursor = contentResolver.query(contentUri,null,null,null, order);
-            if(null == cursor){
+            if(null == cursor)
+            {
                 return;
             }
-            else if(!cursor.moveToFirst()){
+            else if(!cursor.moveToFirst())
+            {
                 return;
             }
-            else{
+            else
+            {
                 int displayNameCol = cursor.getColumnIndex(Media.TITLE);
                 int albumCol = cursor.getColumnIndex(Media.ALBUM);
                 int albumIdCol = cursor.getColumnIndex(Media.ALBUM_ID);
@@ -76,7 +83,8 @@ public class MusicList {
                 int sizeCol = cursor.getColumnIndex(Media.SIZE);
                 int artistCol = cursor.getColumnIndex(Media.ARTIST);
                 int urlCol = cursor.getColumnIndex(Media.DATA);
-                do{
+                do
+                {
                     String title = cursor.getString(displayNameCol);
                     String album = cursor.getString(albumCol);
                     long albumId = cursor.getLong(albumIdCol);
