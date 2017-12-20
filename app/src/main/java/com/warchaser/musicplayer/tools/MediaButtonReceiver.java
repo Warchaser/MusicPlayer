@@ -49,27 +49,10 @@ public class MediaButtonReceiver extends BroadcastReceiver
                                 }
                             }
                         }
-//                        buttonUpTime = SystemClock.currentThreadTimeMillis();
-//                        System.out.println("actionUp: " + buttonUpTime);
+
                     }
-
-//                    if(KeyEvent.ACTION_DOWN == action){
-//                        buttonDownTime = SystemClock.currentThreadTimeMillis();
-//                        System.out.println("actionDown: " + buttonDownTime);
-//
-//                    }
-//
-//                    if(buttonUpTime - buttonDownTime > 10){
-//                        System.out.println(">10: " + "差: "+(buttonUpTime - buttonDownTime) + "," +
-//                                "buttonUpTime: " + buttonUpTime + "," + "buttonDownTime: " + buttonUpTime);
-//                        MainActivity.play(MainActivity.iCurrentMusic);
-//                    }else{
-//                        if(buttonUpTime - buttonDownTime < 5)
-//                            System.out.println("<5: " + "差: "+(buttonUpTime - buttonDownTime) + "," +
-//                                    "buttonUpTime: " + buttonUpTime + "," + "buttonDownTime: " + buttonUpTime);
-//                            MainActivity.play(MainActivity.iCurrentMusic + 1);
-//                    }
-
+                    break;
+                default:
                     break;
             }
         }

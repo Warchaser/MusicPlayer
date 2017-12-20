@@ -29,8 +29,8 @@ import java.lang.ref.WeakReference;
 public class MyService extends Service
 {
 
-    private MediaPlayer mediaPlayer;
-    private boolean isPlaying = false;
+    private MediaPlayer mMediaPlayer;
+    private boolean mIsPlaying = false;
 
     private static final int updateProgress = 1;
     private static final int updateCurrentMusic = 2;
@@ -40,20 +40,20 @@ public class MyService extends Service
     public static final String ACTION_UPDATE_DURATION = "com.warchaser.MusicPlayer.UPDATE_DURATION";
     public static final String ACTION_UPDATE_CURRENT_MUSIC = "com.warchaser.MusicPlayer.UPDATE_CURRENT_MUSIC";
 
-    private int currentMode = 3; //default sequence playing
+    private int mCurrentMode = 3; //default sequence playing
 
     public static final int MODE_ONE_LOOP = 0;
     public static final int MODE_ALL_LOOP = 1;
     public static final int MODE_RANDOM = 2;
     public static final int MODE_SEQUENCE = 3;
 
-    private Binder myBinder = new MyBinder();
+    private Binder mMyBinder = new MyBinder();
     private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
     private ComponentName rec;
 
-    PendingIntent pendingIntent;
+    PendingIntent mPendingIntent;
 
     @Override
     public void onCreate()
@@ -76,7 +76,7 @@ public class MyService extends Service
         //clear the top of the stack, this flag can forbid the possibility of the two activities
         //existing at the same time
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        pendingIntent = PendingIntent.getActivity(MyService.this, 0, intent, 0);
+        mPendingIntent = PendingIntent.getActivity(MyService.this, 0, intent, 0);
 
     }
 
@@ -84,10 +84,10 @@ public class MyService extends Service
     public void onDestroy()
     {
         super.onDestroy();
-        if(mediaPlayer != null)
+        if(mMediaPlayer != null)
         {
-            mediaPlayer.release();
-            mediaPlayer = null;
+            mMediaPlayer.release();
+            mMediaPlayer = null;
             mAudioManager.unregisterMediaButtonEventReceiver(rec);
             stopSelf();
         }
@@ -125,9 +125,9 @@ public class MyService extends Service
 
     private void toUpdateProgress()
     {
-        if(mediaPlayer != null && isPlaying)
+        if(mMediaPlayer != null && mIsPlaying)
         {
-            int i = mediaPlayer.getCurrentPosition();
+            int i = mMediaPlayer.getCurrentPosition();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
             intent.putExtra(ACTION_UPDATE_PROGRESS,i);
@@ -161,7 +161,7 @@ public class MyService extends Service
                 .setSmallIcon(R.mipmap.notification1)
                 .setContentTitle("Playing")
                 .setContentText(notificationTitle)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(mPendingIntent)
                 .getNotification();
         notification.flags |= Notification.FLAG_NO_CLEAR;
         startForeground(1, notification);
@@ -171,9 +171,9 @@ public class MyService extends Service
 
     private void toUpdateDuration()
     {
-        if(mediaPlayer != null)
+        if(mMediaPlayer != null)
         {
-            int duration = mediaPlayer.getDuration();
+            int duration = mMediaPlayer.getDuration();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_DURATION);
             intent.putExtra(ACTION_UPDATE_DURATION,duration);
@@ -184,42 +184,42 @@ public class MyService extends Service
 
     public void initMediaPlayer()
     {
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnPreparedListener(new OnPreparedListener()
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mMediaPlayer.setOnPreparedListener(new OnPreparedListener()
         {
 
             @Override
             public void onPrepared(MediaPlayer pMediaPlayer)
             {
-                mediaPlayer.seekTo(MusicList.iCurrentPosition);
-                mediaPlayer.start();
+                mMediaPlayer.seekTo(MusicList.iCurrentPosition);
+                mMediaPlayer.start();
                 mMessageHandler.sendEmptyMessage(updateDuration);
             }
         });
 
-        mediaPlayer.setOnCompletionListener(new OnCompletionListener()
+        mMediaPlayer.setOnCompletionListener(new OnCompletionListener()
         {
 
             @Override
             public void onCompletion(MediaPlayer pMediaPlayer)
             {
-                if(isPlaying)
+                if(mIsPlaying)
                 {
 
-                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    int currentPosition = mMediaPlayer.getCurrentPosition();
 
                     if(isEmptyInFile(currentPosition))
                     {
-                        mediaPlayer.seekTo(currentPosition + 1000);
-                        mediaPlayer.start();
+                        mMediaPlayer.seekTo(currentPosition + 1000);
+                        mMediaPlayer.start();
                         return ;
                     }
 
-                    switch (currentMode)
+                    switch (mCurrentMode)
                     {
                         case MODE_ONE_LOOP:
-                            mediaPlayer.start();
+                            mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
                             play((MusicList.iCurrentMusic + 1) % MusicList.musicInfoList.size(),0);
@@ -242,7 +242,7 @@ public class MyService extends Service
             }
         });
 
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener()
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener()
         {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i2)
@@ -258,7 +258,7 @@ public class MyService extends Service
 
     private boolean isEmptyInFile(int currentPosition)
     {
-        return currentPosition < mediaPlayer.getDuration();
+        return currentPosition < mMediaPlayer.getDuration();
 
     }
 
@@ -278,16 +278,16 @@ public class MyService extends Service
         MusicList.iCurrentPosition = CurrentPosition;
         setCurrentMusic(CurrentMusic);
 
-        mediaPlayer.reset();
+        mMediaPlayer.reset();
 
         try {
 
             if(MusicList.musicInfoList.size() != 0)
             {
-                mediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
-                mediaPlayer.prepareAsync();
+                mMediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
+                mMediaPlayer.prepareAsync();
                 mMessageHandler.sendEmptyMessage(updateProgress);
-                isPlaying = true;
+                mIsPlaying = true;
             }
 
         } catch (IOException e) {
@@ -296,13 +296,16 @@ public class MyService extends Service
     }
 
     private void stop(){
-        mediaPlayer.stop();
-        isPlaying = false;
+        
+        MusicList.iCurrentPosition = mMediaPlayer.getCurrentPosition();
+
+        mMediaPlayer.stop();
+        mIsPlaying = false;
     }
 
     private void next()
     {
-        switch(currentMode)
+        switch(mCurrentMode)
         {
             case MODE_ONE_LOOP:
                 if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
@@ -343,7 +346,7 @@ public class MyService extends Service
 
     private void previous()
     {
-        switch(currentMode)
+        switch(mCurrentMode)
         {
             case MODE_ONE_LOOP:
                 if(MusicList.iCurrentMusic == 0)
@@ -385,8 +388,8 @@ public class MyService extends Service
     @Override
     public IBinder onBind(Intent intent)
     {
-        MusicList.mMyBinder = (MyBinder) myBinder;
-        return myBinder;
+        MusicList.mMyBinder = (MyBinder) mMyBinder;
+        return mMyBinder;
     }
 
     public class MyBinder extends Binder
@@ -415,15 +418,15 @@ public class MyService extends Service
          * MODE_SEQUENCE = 4;
          */
         public void changeMode(){
-            currentMode = (currentMode + 1) % 4;
+            mCurrentMode = (mCurrentMode + 1) % 4;
         }
 
         public int getCurrentMode(){
-            return currentMode;
+            return mCurrentMode;
         }
 
         public boolean getIsPlaying(){
-            return isPlaying;
+            return mIsPlaying;
         }
 
         /**
@@ -440,10 +443,10 @@ public class MyService extends Service
          * */
         public void changeProgress(int pProgress)
         {
-            if(mediaPlayer != null){
+            if(mMediaPlayer != null){
                 MusicList.iCurrentPosition = pProgress * 1000;
-                if(isPlaying){
-                    mediaPlayer.seekTo(MusicList.iCurrentPosition);
+                if(mIsPlaying){
+                    mMediaPlayer.seekTo(MusicList.iCurrentPosition);
                 }else{
                     play(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
                 }
