@@ -11,7 +11,7 @@ public interface UIObserver
 {
     void notifySeekBar2Update(Intent intent);
 
-    void notify2Play();
+    void notify2Play(int repeatTime);
 
     void setObserverEnabled(boolean enabled);
 

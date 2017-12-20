@@ -372,11 +372,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
             case R.id.lyBtnNext:
             case R.id.btnNext:
-                mMyBinder.playNext();
-                if(mMyBinder.getIsPlaying())
-                {
-                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-                }
+                playNext();
                 break;
 
             case R.id.bottomBar:
@@ -395,6 +391,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 }
 
                 break;
+        }
+    }
+
+    private void playNext(){
+        mMyBinder.playNext();
+        if(mMyBinder.getIsPlaying())
+        {
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
@@ -625,9 +629,17 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
 
         @Override
-        public void notify2Play()
-        {
-            play();
+        public void notify2Play(int repeatTime) {
+            switch (repeatTime){
+                case 1:
+                    play();
+                    break;
+                case 2:
+                    playNext();
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override

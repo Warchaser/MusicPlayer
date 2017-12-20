@@ -157,20 +157,12 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
             case R.id.lyBtnDisplayNext:
             case R.id.btnDisplayNext:
-                mMyBinder.playNext();
-                if(mMyBinder.getIsPlaying())
-                {
-                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-                }
+                playNext();
                 break;
 
             case R.id.lyBtnDisplayPrevious:
             case R.id.btnDisplayPrevious:
-                mMyBinder.playPrevious();
-                if(mMyBinder.getIsPlaying())
-                {
-                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-                }
+                playPrevious();
                 break;
 
             case R.id.lyIvMode:
@@ -194,6 +186,22 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
                 break;
             default:
                 break;
+        }
+    }
+
+    private void playNext(){
+        mMyBinder.playNext();
+        if(mMyBinder.getIsPlaying())
+        {
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+        }
+    }
+
+    private void playPrevious(){
+        mMyBinder.playPrevious();
+        if(mMyBinder.getIsPlaying())
+        {
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
@@ -346,8 +354,17 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         }
 
         @Override
-        public void notify2Play() {
-            play();
+        public void notify2Play(int repeatTime) {
+            switch (repeatTime){
+                case 1:
+                    play();
+                    break;
+                case 2:
+                    playNext();
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override

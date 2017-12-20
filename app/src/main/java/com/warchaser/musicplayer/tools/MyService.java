@@ -81,6 +81,11 @@ public class MyService extends Service
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onDestroy()
     {
         super.onDestroy();
@@ -90,6 +95,11 @@ public class MyService extends Service
             mMediaPlayer = null;
             mAudioManager.unregisterMediaButtonEventReceiver(rec);
             stopSelf();
+        }
+
+        if(mMessageHandler != null){
+            mMessageHandler.removeCallbacksAndMessages(null);
+            mMessageHandler = null;
         }
     }
 

@@ -40,7 +40,7 @@ public class CallObserver
         }
     }
 
-    public static boolean callPlay()
+    public static boolean callPlay(int repeatTime)
     {
         int size;
         boolean isOneUIEnabled = false;
@@ -51,7 +51,7 @@ public class CallObserver
                 UIObserver observer = mObservers.get(i);
                 if(observer != null && observer.getObserverEnabled())
                 {
-                    observer.notify2Play();
+                    observer.notify2Play(repeatTime);
                     isOneUIEnabled = true;
                 }
             }
