@@ -84,7 +84,8 @@
                 android:progressDrawable="@drawable/progress_style"
                 android:thumbOffset="0dip"
                 android:thumb="@mipmap/seekbar_thumb"
-                android:indeterminate="false" />
+                android:indeterminate="false"
+                android:transitionName="seek_bar"/>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -135,7 +136,8 @@
                             android:layout_width="33dip"
                             android:layout_height="33dip"
                             android:background="@mipmap/run"
-                            android:gravity="right"/>
+                            android:gravity="right"
+                            android:transitionName="btn_state"/>
 
                     </LinearLayout>
 
@@ -153,7 +155,8 @@
                             android:layout_width="33dip"
                             android:layout_height="33dip"
                             android:gravity="right"
-                            android:background="@mipmap/next" />
+                            android:background="@mipmap/next"
+                            android:transitionName="btn_next"/>
 
                     </LinearLayout>
 

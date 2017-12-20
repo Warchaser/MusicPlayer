@@ -56,7 +56,8 @@
             android:progressDrawable="@drawable/progress_style"
             android:thumbOffset="0dip"
             android:thumb="@mipmap/seekbar_thumb"
-            android:indeterminate="false" />
+            android:indeterminate="false"
+            android:transitionName="seek_bar"/>
 
         <TextView
             android:id="@+id/tvDisplayDuration"
@@ -125,7 +126,8 @@
                 android:layout_width="33dip"
                 android:layout_height="33dip"
                 android:layout_gravity="center"
-                android:background="@mipmap/run"/>
+                android:background="@mipmap/run"
+                android:transitionName="btn_state"/>
 
         </LinearLayout>
 
@@ -143,7 +145,8 @@
                 android:layout_width="33dip"
                 android:layout_height="33dip"
                 android:layout_gravity="center"
-                android:background="@mipmap/next"/>
+                android:background="@mipmap/next"
+                android:transitionName="btn_next"/>
 
         </LinearLayout>
 

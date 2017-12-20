@@ -19,6 +19,7 @@ import android.support.annotation.RequiresApi;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -384,7 +385,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 intent.putExtra("uri", bean.getUriWithCoverPic());
                 int sdk = android.os.Build.VERSION.SDK_INT;
                 if(sdk >= Build.VERSION_CODES.LOLLIPOP){
-                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, mBottomBarDisc,"cover").toBundle());
+                    Pair p1 = Pair.create(mBottomBarDisc,"cover");
+                    Pair p2 = Pair.create(mBtnState, "btn_state");
+                    Pair p3 = Pair.create(mBtnNext, "btn_next");
+                    Pair p4 = Pair.create(mSeekBarProgress, "seek_bar");
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, p1,p2,p3,p4).toBundle());
                 } else {
                     startActivity(intent);
                 }
