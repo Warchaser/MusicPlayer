@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.InputStream;
 
@@ -118,6 +119,31 @@ public class ImageUtil
         matrix.postScale(scaleWidth, scaleHeight);
         return Bitmap.createBitmap(bitmap, 0, 0, (int) width,
                 (int) height, matrix, true);
+    }
+
+    public static void setBottomBarDisc(Context context, String uri, int imageHeightId, View imageView, int defaultImageId, boolean backgroundOrResource)
+    {
+        Drawable drawable;
+        if(!TextUtils.isEmpty(uri))
+        {
+            drawable = ImageUtil.getCoverDrawableFromMusicFile(uri, context, context.getResources().getDimension(imageHeightId));
+            if(drawable == null)
+            {
+                drawable = ImageUtil.getDrawableFromRes(context, defaultImageId);
+            }
+        }
+        else
+        {
+            drawable = ImageUtil.getDrawableFromRes(context, defaultImageId);
+        }
+
+        if(backgroundOrResource){
+            ImageUtil.setBackground(imageView, drawable);
+        } else {
+            if(imageView instanceof ImageView){
+                ((ImageView)imageView).setImageDrawable(drawable);
+            }
+        }
     }
 
 }

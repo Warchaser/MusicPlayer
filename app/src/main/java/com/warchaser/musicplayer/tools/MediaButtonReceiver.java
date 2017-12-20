@@ -12,9 +12,6 @@ import android.view.KeyEvent;
 public class MediaButtonReceiver extends BroadcastReceiver
 {
 
-    long buttonDownTime;//
-    long buttonUpTime;//
-
     @Override
     public void onReceive(Context context, Intent intent)
     {

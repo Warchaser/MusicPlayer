@@ -1,32 +1,31 @@
 package com.warchaser.musicplayer.mainActivity;
 
+import android.app.ActivityOptions;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +35,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ant.liao.GifView;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.displayActivity.DisplayActivity;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
@@ -66,53 +64,51 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     /**
      * Serve for SlideBar to locate the index of music.
      * */
-    private List<String> musicListTmps;
+    private List<String> mMusicListTmps;
 
     /**
      * Service binder
      * */
-    public MyBinder myBinder;////
+    public MyBinder mMyBinder;////
     /************Service part**************/
 
     /**Save the position of list on pause**/
     /**
      * View to convert.
      * */
-    private View v;
+    private View mView4SeekListView;
 
     /**
      * Index of current position of ListView.
      * */
-    private int index;
+    private int mIndex4SeekListView;
 
     /**
      * Top of the position of ListView.
      * */
-    private int top;
+    private int mTop4SeekListView;
     /**Save the position of list on pause**/
 
 
-    private LinearLayout displayLayout;
+    private LinearLayout mLyBottomBar;
 
-    private LinearLayout lyBtnState;
-    private LinearLayout lyBtnNext;
+    private LinearLayout mLyBtnState;
+    private LinearLayout mLyBtnNext;
 
-    private MyListViewAdapter adapter = new MyListViewAdapter();
+    private SongsAdapter mAdapter;
 
-    private TextView tvBottomTitle;
-    private TextView tvBottomArtist;
+    private TextView mTvBottomTitle;
+    private TextView mTvBottomArtist;
     private ImageView mBottomBarDisc;
-    private ListView lvSongs;
-    private SeekBar SeekProgress;
-    private Button btnState;///
-    private Button btnNext;
+    private ListView mListViewSongs;
+    private SeekBar mSeekBarProgress;
+    private Button mBtnState;///
+    private Button mBtnNext;
 
-    private String path = null;
-    private boolean FileFound = false;
+    private String mPath = null;
     //SlideBar部分
     private SlideBar mSlideBar;
-    private TextView tvFloatLetter;
-    private MusicInfo beanTmps = null;
+    private TextView mTvFloatLetter;
     //SlideBar部分
 
     private boolean mIsBind = false;
@@ -122,14 +118,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     /**
      * 绑定服务
      * */
-    private ServiceConnection serviceConnection = new ServiceConnection()
+    private ServiceConnection mServiceConnection = new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder)
         {
-            myBinder = (MyBinder) iBinder;
+            mMyBinder = (MyBinder) iBinder;
             //判断外部（外存）传来的路径是否为空，不为空就在绑定成功之后立即播放
-            if(null != path)
+            if(null != mPath)
             {
                 play();
             }
@@ -145,17 +141,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     private void connectToMyService()
     {
         Intent intent = new Intent(this,MyService.class);
-        mIsBind = this.getApplicationContext().bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        mIsBind = this.getApplicationContext().bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //show menu-key on the bottom virtual bar
-//        getWindow().setFlags(0x08000000, 0x08000000);
 
         getList();
         playExternal();
@@ -163,8 +156,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
         //取得电话管理服务
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        //注册监听对象，对电话的来电状态进行监听
-        telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
+        if(telephonyManager != null){
+            //注册监听对象，对电话的来电状态进行监听
+            telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
+        }
     }
 
     //初始化各个List
@@ -172,20 +167,19 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
         MusicList.instance(getContentResolver());
 
-        musicListTmps = new ArrayList<String>();
+        mMusicListTmps = new ArrayList<String>();
         int musicInfoListSize = MusicList.musicInfoList.size();
         for(int i = 0;i < musicInfoListSize; i++)
         {
 //            musicListTmps.add(musicInfoList.get(i).getPinyinInitial().toUpperCase());//用于除英文以外的版本
-            musicListTmps.add(MusicList.musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
+            mMusicListTmps.add(MusicList.musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
         }
-
-        beanTmps = new MusicInfo();
     }
 
     //处理外存传过来的路径，以播放
     private void playExternal()
     {
+        boolean isFileFound = false;
         int musicInfoListSize = MusicList.musicInfoList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
@@ -204,7 +198,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                     {
                         cursor.moveToFirst();
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        path = cursor.getString(columnIndex);
+                        mPath = cursor.getString(columnIndex);
                         cursor.close();
                     }
                 }
@@ -215,32 +209,32 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             }
             else
             {
-                path = uri.getPath();
+                mPath = uri.getPath();
             }
         }
 
         //从外部传歌曲名
-        if(path != null)
+        if(mPath != null)
         {
             for(int i = 0;i < musicInfoListSize;i++)
             {
-                if(MusicList.musicInfoList.get(i).getUrl().equals(path))
+                if(MusicList.musicInfoList.get(i).getUrl().equals(mPath))
                 {
                     MusicList.iCurrentMusic = i;
-                    FileFound = true;
+                    isFileFound = true;
                 }
             }
 
-            if(!FileFound)
+            if(!isFileFound)
             {
-                getMetaData(path);
-                updateDataBase(path);
+                getMetaData(mPath);
+                updateDataBase(mPath);
                 MusicList.iCurrentMusic = MusicList.musicInfoList.size() - 1;
             }
         }
 
         //绑定服务
-        if(myBinder == null)
+        if(mMyBinder == null)
         {
             connectToMyService();
         }
@@ -282,10 +276,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     protected void onDestroy()
     {
         super.onDestroy();
-        if(myBinder != null && mIsBind)
+        if(mMyBinder != null && mIsBind)
         {
-            this.getApplicationContext().unbindService(serviceConnection);
-            myBinder = null;
+            this.getApplicationContext().unbindService(mServiceConnection);
+            mMyBinder = null;
         }
 
         CallObserver.removeSingleObserver(mObserver);
@@ -305,8 +299,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     protected void onPause()
     {
         super.onPause();
-        index = lvSongs.getFirstVisiblePosition();
-        top = (v == null) ? 0 : v.getTop();
+        mIndex4SeekListView = mListViewSongs.getFirstVisiblePosition();
+        mTop4SeekListView = (mView4SeekListView == null) ? 0 : mView4SeekListView.getTop();
         if(mObserver != null)
         {
             mObserver.setObserverEnabled(false);
@@ -317,26 +311,26 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     protected void onResume() {
         super.onResume();
 
-        if(myBinder != null){
-            if(myBinder.getIsPlaying())
+        if(mMyBinder != null){
+            if(mMyBinder.getIsPlaying())
             {
-                btnState.setBackgroundResource(R.mipmap.pausedetail);
+                mBtnState.setBackgroundResource(R.mipmap.pausedetail);
             }
             else
             {
-                btnState.setBackgroundResource(R.mipmap.run);
+                mBtnState.setBackgroundResource(R.mipmap.run);
             }
         }
 
-        lvSongs.setSelectionFromTop(index,top);
+        mListViewSongs.setSelectionFromTop(mIndex4SeekListView, mTop4SeekListView);
         if(mObserver != null)
         {
             mObserver.setObserverEnabled(true);
         }
 
-        if(myBinder != null)
+        if(mMyBinder != null)
         {
-            myBinder.notifyActivity();
+            mMyBinder.notifyActivity();
         }
     }
 
@@ -357,10 +351,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         if(id == R.id.action_exit)
         {
             finish();
-            if(myBinder != null && mIsBind)
+            if(mMyBinder != null && mIsBind)
             {
-                this.getApplicationContext().unbindService(serviceConnection);
-                myBinder = null;
+                this.getApplicationContext().unbindService(mServiceConnection);
+                mMyBinder = null;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -377,69 +371,78 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
             case R.id.lyBtnNext:
             case R.id.btnNext:
-                myBinder.playNext();
-                if(myBinder.getIsPlaying())
+                mMyBinder.playNext();
+                if(mMyBinder.getIsPlaying())
                 {
-                    btnState.setBackgroundResource(R.mipmap.pausedetail);
+                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
 
             case R.id.bottomBar:
                 Intent intent = new Intent(OnAirActivity.this,DisplayActivity.class);
-                startActivity(intent);
+                MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+                intent.putExtra("uri", bean.getUriWithCoverPic());
+                int sdk = android.os.Build.VERSION.SDK_INT;
+                if(sdk >= Build.VERSION_CODES.LOLLIPOP){
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, mBottomBarDisc,"cover").toBundle());
+                } else {
+                    startActivity(intent);
+                }
+
                 break;
         }
     }
 
     private void clearOnDestroy()
     {
-        if(musicListTmps != null)
+        if(mMusicListTmps != null)
         {
-            musicListTmps.clear();
-            musicListTmps = null;
+            mMusicListTmps.clear();
+            mMusicListTmps = null;
         }
 
-        v = null;
+        mView4SeekListView = null;
 
-        displayLayout = null;
+        mLyBottomBar = null;
 
-        lyBtnState = null;
-        lyBtnNext = null;
+        mLyBtnState = null;
+        mLyBtnNext = null;
 
-        adapter = null;
+        mAdapter = null;
 
-        tvBottomTitle = null;
-        tvBottomArtist = null;
+        mTvBottomTitle = null;
+        mTvBottomArtist = null;
         mBottomBarDisc = null;
-        lvSongs = null;
-        SeekProgress = null;
-        btnState = null;
-        btnNext = null;
+        mListViewSongs = null;
+        mSeekBarProgress = null;
+        mBtnState = null;
+        mBtnNext = null;
 
-        path = null;
+        mPath = null;
         mSlideBar = null;
-        tvFloatLetter = null;
-        beanTmps = null;
+        mTvFloatLetter = null;
         mObserver = null;
     }
 
     private void play(){
-        if(myBinder.getIsPlaying())
+        if(mMyBinder.getIsPlaying())
         {
-            myBinder.stopPlay();
-            btnState.setBackgroundResource(R.mipmap.run);
+            mMyBinder.stopPlay();
+            mBtnState.setBackgroundResource(R.mipmap.run);
         }
         else
         {
-            myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
-            btnState.setBackgroundResource(R.mipmap.pausedetail);
+            mMyBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
     private void initComponent()
     {
-        SeekProgress = (SeekBar) findViewById(R.id.progress);
-        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        mAdapter = new SongsAdapter(this);
+
+        mSeekBarProgress = (SeekBar) findViewById(R.id.progress);
+        mSeekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
 
             @Override
@@ -447,7 +450,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             {
                 if(b)
                 {
-                    myBinder.changeProgress(i);
+                    mMyBinder.changeProgress(i);
                 }
             }
 
@@ -464,75 +467,84 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        tvBottomTitle = (TextView) findViewById(R.id.bottomBarTvTitle);
-        tvBottomArtist = (TextView) findViewById(R.id.bottomBarTvArtist);
+        mTvBottomTitle = (TextView) findViewById(R.id.bottomBarTvTitle);
+        mTvBottomArtist = (TextView) findViewById(R.id.bottomBarTvArtist);
         mBottomBarDisc = (ImageView) findViewById(R.id.bottomBar_disc);
 
         if(MusicList.musicInfoList.size() != 0)
         {
             MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-            tvBottomTitle.setText(bean.getTitle());
-            tvBottomArtist.setText(bean.getArtist());
-            setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
+            mTvBottomTitle.setText(bean.getTitle());
+            mTvBottomArtist.setText(bean.getArtist());
+            ImageUtil.setBottomBarDisc(this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);
         }
 
 
-        btnState = (Button) findViewById(R.id.btnState);
-        btnState.setOnClickListener(this);
+        mBtnState = (Button) findViewById(R.id.btnState);
+        mBtnState.setOnClickListener(this);
 
-        btnNext = (Button) findViewById(R.id.btnNext);
-        btnNext.setOnClickListener(this);
+        mBtnNext = (Button) findViewById(R.id.btnNext);
+        mBtnNext.setOnClickListener(this);
 
-        displayLayout = (LinearLayout) findViewById(R.id.bottomBar);
-        displayLayout.setOnClickListener(this);
+        mLyBottomBar = (LinearLayout) findViewById(R.id.bottomBar);
+        mLyBottomBar.setOnClickListener(this);
 
-        lyBtnState = (LinearLayout) findViewById(R.id.lyBtnState);
-        lyBtnState.setOnClickListener(this);
+        mLyBtnState = (LinearLayout) findViewById(R.id.lyBtnState);
+        mLyBtnState.setOnClickListener(this);
 
-        lyBtnNext = (LinearLayout) findViewById(R.id.lyBtnNext);
-        lyBtnNext.setOnClickListener(this);
+        mLyBtnNext = (LinearLayout) findViewById(R.id.lyBtnNext);
+        mLyBtnNext.setOnClickListener(this);
 
-        lvSongs = (ListView) findViewById(R.id.listView);
-        lvSongs.setAdapter(adapter);
-        lvSongs.setFocusable(true);
+        mListViewSongs = (ListView) findViewById(R.id.listView);
+        mListViewSongs.setAdapter(mAdapter);
+        mListViewSongs.setFocusable(true);
 
-        lvSongs.setOnItemClickListener(new OnItemClickListener()
+        mListViewSongs.setOnItemClickListener(new OnItemClickListener()
         {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
             {
                 MusicList.iCurrentMusic = i;
-                myBinder.startPlay(MusicList.iCurrentMusic, 0);
-                if (myBinder.getIsPlaying())
+                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+                if (mMyBinder.getIsPlaying())
                 {
-                    btnState.setBackgroundResource(R.mipmap.pausedetail);
+                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 else
                 {
-                    btnState.setBackgroundResource(R.mipmap.run);
+                    mBtnState.setBackgroundResource(R.mipmap.run);
                 }
 
-                adapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
 
             }
         });
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
-        tvFloatLetter = (TextView) findViewById(R.id.tvFloatLetter);
+        mTvFloatLetter = (TextView) findViewById(R.id.tvFloatLetter);
         final AlphaAnimation alp = new AlphaAnimation(1.0f,0.0f);
         alp.setDuration(1500);
-        tvFloatLetter.setAnimation(alp);
+        mTvFloatLetter.setAnimation(alp);
 
         alp.setAnimationListener(new Animation.AnimationListener()
         {
-
-            public void onAnimationStart(Animation animation){}
-            public void onAnimationRepeat(Animation animation){}
-            public void onAnimationEnd(Animation animation)
+            @Override
+            public void onAnimationStart(Animation animation)
             {
 
-                tvFloatLetter.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation)
+            {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation)
+            {
+                mTvFloatLetter.setVisibility(View.GONE);
             }
         });
 
@@ -542,24 +554,24 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void onLetterTouchChange(boolean isTouched, String s)
             {
-
-                beanTmps.setPinyinInitial(s);
-                tvFloatLetter.setText(s);
+                MusicInfo bean = new MusicInfo();
+                bean.setPinyinInitial(s);
+                mTvFloatLetter.setText(s);
                 if (isTouched)
                 {
-                    tvFloatLetter.setVisibility(View.VISIBLE);
+                    mTvFloatLetter.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    tvFloatLetter.startAnimation(alp);
+                    mTvFloatLetter.startAnimation(alp);
                 }
 
-                int index = musicListTmps.indexOf(beanTmps.getPinyinInitial());
-                lvSongs.setSelection(index);
+                int index = mMusicListTmps.indexOf(bean.getPinyinInitial());
+                mListViewSongs.setSelection(index);
             }
         });
 
-        v = lvSongs.getChildAt(0);
+        mView4SeekListView = mListViewSongs.getChildAt(0);
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
@@ -579,7 +591,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 if(iProgress > 0)
                 {
                     MusicList.iCurrentPosition = iProgress;
-                    SeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
+                    mSeekBarProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             }
             else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction))
@@ -588,18 +600,18 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 if(MusicList.musicInfoList.size() != 0)
                 {
                     MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-                    setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic());
-                    tvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
-                    tvBottomArtist.setText(bean.getArtist());
+                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);
+                    mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
+                    mTvBottomArtist.setText(bean.getArtist());
                 }
-                lvSongs.setSelection(MusicList.iCurrentMusic);
-                adapter.notifyDataSetChanged();
+                mListViewSongs.setSelection(MusicList.iCurrentMusic);
+                mAdapter.notifyDataSetChanged();
 
             }
             else if(MyService.ACTION_UPDATE_DURATION.equals(sAction))
             {
                 MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION,0);
-                SeekProgress.setMax(MusicList.iCurrentMax / 1000);
+                mSeekBarProgress.setMax(MusicList.iCurrentMax / 1000);
             }
             else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction))
             {
@@ -626,25 +638,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    private void setBottomBarDisc(Context context, String uri)
-    {
-        Drawable drawable;
-        if(!TextUtils.isEmpty(uri))
-        {
-            drawable = ImageUtil.getCoverDrawableFromMusicFile(uri, OnAirActivity.this, getResources().getDimension(R.dimen.bottom_bar_disc_width_and_height));
-            if(drawable == null)
-            {
-                drawable = ImageUtil.getDrawableFromRes(context, R.mipmap.disc);
-            }
-        }
-        else
-        {
-            drawable = ImageUtil.getDrawableFromRes(context, R.mipmap.disc);
-        }
-
-        ImageUtil.setBackground(mBottomBarDisc, drawable);
-    }
-
     private final class TelListener extends PhoneStateListener
     {
         public void onCallStateChanged(int state, String incomingNumber)
@@ -653,95 +646,30 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             //来电状态
             if(state == TelephonyManager.CALL_STATE_RINGING)
             {
-                if(myBinder != null)
+                if(mMyBinder != null)
                 {
-                    if(myBinder.getIsPlaying())
+                    if(mMyBinder.getIsPlaying())
                     {
-                        myBinder.stopPlay();
-                        btnState.setBackgroundResource(R.mipmap.run);
+                        mMyBinder.stopPlay();
+                        mBtnState.setBackgroundResource(R.mipmap.run);
                     }
                 }
             }
             else if(state == TelephonyManager.CALL_STATE_IDLE)
             {
                 //挂断状态(即非来电状态)
-                if(myBinder != null)
+                if(mMyBinder != null)
                 {
-                    if(!myBinder.getIsPlaying())
+                    if(!mMyBinder.getIsPlaying())
                     {
-                        myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
-                        btnState.setBackgroundResource(R.mipmap.pausedetail);
+                        mMyBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
+                        mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                     }
                 }
             }
         }
     }
 
-    public class MyListViewAdapter extends BaseAdapter
-    {
 
-        @Override
-        public int getCount() {
-            return MusicList.musicInfoList.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return MusicList.musicInfoList.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return MusicList.musicInfoList.get(i).getId();
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup)
-        {
-            ViewHolderItem viewHolder;
-            if(null == view)
-            {
-                viewHolder = new ViewHolderItem();
-                view = LayoutInflater.from(OnAirActivity.this).inflate(R.layout.item, null);
-                viewHolder.tvItemTitle = (TextView) view.findViewById(R.id.tvItemTitle);
-                viewHolder.tvItemDuration = (TextView) view.findViewById(R.id.tvItemDuration);
-                viewHolder.gfGo = (GifView) view.findViewById(R.id.gfGo);
-                viewHolder.gfGo.setGifImage(R.mipmap.ani);
-                viewHolder.gfGo.setGifImageType(GifView.GifImageType.COVER);
-
-                view.setTag(viewHolder);
-            }
-            else
-            {
-                viewHolder = (ViewHolderItem) view.getTag();
-            }
-
-            viewHolder.tvItemTitle.setText(MusicList.musicInfoList.get(i).getTitle());
-            viewHolder.tvItemDuration.setText(FormatHelper.formatDuration(MusicList.musicInfoList.get(i).getDuration()));
-
-            viewHolder.tvItemTitle.setTextColor(Color.argb(255,0,0,0));
-            viewHolder.tvItemDuration.setTextColor(Color.argb(255,0,0,0));
-
-            viewHolder.gfGo.setVisibility(View.GONE);
-
-            if(i == MusicList.iCurrentMusic)
-            {
-                viewHolder.tvItemTitle.setTextColor(Color.RED);
-                viewHolder.tvItemDuration.setTextColor(Color.RED);
-                viewHolder.gfGo.setVisibility(View.VISIBLE);
-//                viewHolder.gfGo.showAnimation();
-//                viewHolder.gfGo.showCover();
-            }
-
-            return view;
-        }
-    }
-
-    private class ViewHolderItem
-    {
-        private TextView tvItemTitle;
-        private TextView tvItemDuration;
-        private GifView gfGo;
-    }
 
 }

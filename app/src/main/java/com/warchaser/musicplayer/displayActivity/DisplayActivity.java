@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +19,7 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
+import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
@@ -33,23 +33,24 @@ import com.warchaser.musicplayer.tools.UIObserver;
 public class DisplayActivity extends BaseActivity implements OnClickListener
 {
 
-    private MyBinder myBinder;
+    private MyBinder mMyBinder;
 
-    private SeekBar SeekProgress;
-    private TextView tvTitle,tvTimeElapsed, tvDuration;
-    private ImageView ivMode;
-    private Button btnPrevious;
-    private Button btnNext;
-    private Button btnState;
+    private SeekBar mSeekProgress;
+    private TextView mTvTitle, mTvTimeElapsed, mTvDuration;
+    private ImageView mIvMode;
+    private ImageView mIvCover;
+    private Button mBtnPrevious;
+    private Button mBtnNext;
+    private Button mBtnState;
 
-    private LinearLayout lyBtnMode;
-    private LinearLayout lyBtnDisplayPrevious;
-    private LinearLayout lyBtnDisplayState;
-    private LinearLayout lyBtnDisplayNext;
+    private LinearLayout mLyBtnMode;
+    private LinearLayout mLyBtnDisplayPrevious;
+    private LinearLayout mLyBtnDisplayState;
+    private LinearLayout mLyBtnDisplayNext;
 
     private UIUpdateObserver mObserver;
 
-    private ServiceConnection serviceConnection = new ServiceConnection()
+    private ServiceConnection mServiceConnection = new ServiceConnection()
     {
 
         @Override
@@ -61,22 +62,22 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            myBinder = (MyBinder) service;
+            mMyBinder = (MyBinder) service;
             updatePlayButton();
 
-            switch (myBinder.getCurrentMode())
+            switch (mMyBinder.getCurrentMode())
             {
                 case 0:
-                    ivMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
+                    mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
                     break;
                 case 1:
-                    ivMode.setBackgroundResource(R.mipmap.mode_loop);
+                    mIvMode.setBackgroundResource(R.mipmap.mode_loop);
                     break;
                 case 2:
-                    ivMode.setBackgroundResource(R.mipmap.mode_random);
+                    mIvMode.setBackgroundResource(R.mipmap.mode_random);
                     break;
                 case 3:
-                    ivMode.setBackgroundResource(R.mipmap.mode_sequence);
+                    mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
                     break;
             }
         }
@@ -85,17 +86,15 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     private void connectToMyService()
     {
         Intent intent = new Intent(DisplayActivity.this,MyService.class);
-        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.display);
-//        getWindow().setFlags(0x08000000, 0x08000000);
         connectToMyService();
         initComponent();
     }
@@ -104,9 +103,9 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     protected void onDestroy()
     {
         super.onDestroy();
-        if(myBinder != null)
+        if(mMyBinder != null)
         {
-            unbindService(serviceConnection);
+            unbindService(mServiceConnection);
         }
 
         CallObserver.removeSingleObserver(mObserver);
@@ -134,9 +133,9 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
             mObserver.setObserverEnabled(true);
         }
 
-        if(myBinder != null)
+        if(mMyBinder != null)
         {
-            myBinder.notifyActivity();
+            mMyBinder.notifyActivity();
         }
     }
 
@@ -156,38 +155,38 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
             case R.id.lyBtnDisplayNext:
             case R.id.btnDisplayNext:
-                myBinder.playNext();
-                if(myBinder.getIsPlaying())
+                mMyBinder.playNext();
+                if(mMyBinder.getIsPlaying())
                 {
-                    btnState.setBackgroundResource(R.mipmap.pausedetail);
+                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
 
             case R.id.lyBtnDisplayPrevious:
             case R.id.btnDisplayPrevious:
-                myBinder.playPrevious();
-                if(myBinder.getIsPlaying())
+                mMyBinder.playPrevious();
+                if(mMyBinder.getIsPlaying())
                 {
-                    btnState.setBackgroundResource(R.mipmap.pausedetail);
+                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                 }
                 break;
 
             case R.id.lyIvMode:
             case R.id.ivMode:
-                myBinder.changeMode();
-                switch (myBinder.getCurrentMode())
+                mMyBinder.changeMode();
+                switch (mMyBinder.getCurrentMode())
                 {
                     case 0:
-                        ivMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
+                        mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
                         break;
                     case 1:
-                        ivMode.setBackgroundResource(R.mipmap.mode_loop);
+                        mIvMode.setBackgroundResource(R.mipmap.mode_loop);
                         break;
                     case 2:
-                        ivMode.setBackgroundResource(R.mipmap.mode_random);
+                        mIvMode.setBackgroundResource(R.mipmap.mode_random);
                         break;
                     case 3:
-                        ivMode.setBackgroundResource(R.mipmap.mode_sequence);
+                        mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
                         break;
                 }
                 break;
@@ -198,24 +197,24 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
     private void initComponent(){
         //Current title
-        tvTitle = (TextView) findViewById(R.id.tvDisplayCurrentTitle);
+        mTvTitle = (TextView) findViewById(R.id.tvDisplayCurrentTitle);
         if(MusicList.musicInfoList.size() != 0)
         {
-            tvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
+            mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
         }
         //Current title duration(the right-side TextView)
-        tvDuration = (TextView) findViewById(R.id.tvDisplayDuration);
-        tvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
+        mTvDuration = (TextView) findViewById(R.id.tvDisplayDuration);
+        mTvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
         //DisplayActivity seekBar
-        SeekProgress = (SeekBar) findViewById(R.id.progress);
-        SeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        mSeekProgress = (SeekBar) findViewById(R.id.progress);
+        mSeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b)
             {
                 if(b){
-                    myBinder.changeProgress(i);
+                    mMyBinder.changeProgress(i);
                 }
             }
 
@@ -231,66 +230,75 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
             }
         });
-        SeekProgress.setMax(MusicList.iCurrentMax / 1000);
-        SeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
+        mSeekProgress.setMax(MusicList.iCurrentMax / 1000);
+        mSeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
 
         //Current title elapse(the left-side TextView)
-        tvTimeElapsed = (TextView) findViewById(R.id.tvDisplayTimeElapsed);
-        tvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.iCurrentPosition));
+        mTvTimeElapsed = (TextView) findViewById(R.id.tvDisplayTimeElapsed);
+        mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.iCurrentPosition));
 
-        ivMode = (ImageView) findViewById(R.id.ivMode);
-        ivMode.setOnClickListener(this);
+        mIvMode = (ImageView) findViewById(R.id.ivMode);
+        mIvMode.setOnClickListener(this);
 
-        btnPrevious = (Button) findViewById(R.id.btnDisplayPrevious);
-        btnPrevious.setOnClickListener(this);
+        mBtnPrevious = (Button) findViewById(R.id.btnDisplayPrevious);
+        mBtnPrevious.setOnClickListener(this);
 
-        btnState = (Button) findViewById(R.id.btnDisplayState);
-        btnState.setOnClickListener(this);
+        mBtnState = (Button) findViewById(R.id.btnDisplayState);
+        mBtnState.setOnClickListener(this);
 
-        btnNext = (Button) findViewById(R.id.btnDisplayNext);
-        btnNext.setOnClickListener(this);
+        mBtnNext = (Button) findViewById(R.id.btnDisplayNext);
+        mBtnNext.setOnClickListener(this);
 
-        lyBtnMode = (LinearLayout) findViewById(R.id.lyIvMode);
-        lyBtnMode.setOnClickListener(this);
+        mLyBtnMode = (LinearLayout) findViewById(R.id.lyIvMode);
+        mLyBtnMode.setOnClickListener(this);
 
-        lyBtnDisplayPrevious = (LinearLayout) findViewById(R.id.lyBtnDisplayPrevious);
-        lyBtnDisplayPrevious.setOnClickListener(this);
+        mLyBtnDisplayPrevious = (LinearLayout) findViewById(R.id.lyBtnDisplayPrevious);
+        mLyBtnDisplayPrevious.setOnClickListener(this);
 
-        lyBtnDisplayState = (LinearLayout) findViewById(R.id.lyBtnDisplayState);
-        lyBtnDisplayState.setOnClickListener(this);
+        mLyBtnDisplayState = (LinearLayout) findViewById(R.id.lyBtnDisplayState);
+        mLyBtnDisplayState.setOnClickListener(this);
 
-        lyBtnDisplayNext = (LinearLayout) findViewById(R.id.lyBtnDisplayNext);
-        lyBtnDisplayNext.setOnClickListener(this);
+        mLyBtnDisplayNext = (LinearLayout) findViewById(R.id.lyBtnDisplayNext);
+        mLyBtnDisplayNext.setOnClickListener(this);
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
+
+        mIvCover = (ImageView) findViewById(R.id.iv_cover);
+
+        Intent intent = getIntent();
+        if (intent != null){
+            String uri = intent.getStringExtra("uri");
+            ImageUtil.setBottomBarDisc(this, uri, R.dimen.bottom_bar_disc_width_and_height, mIvCover, R.mipmap.disc, false);
+        }
+
     }
 
     private void play(){
-        if(myBinder.getIsPlaying())
+        if(mMyBinder.getIsPlaying())
         {
-            myBinder.stopPlay();
-            btnState.setBackgroundResource(R.mipmap.run);
+            mMyBinder.stopPlay();
+            mBtnState.setBackgroundResource(R.mipmap.run);
         }
         else
         {
-            myBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
-            btnState.setBackgroundResource(R.mipmap.pausedetail);
+            mMyBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
 
     private void updatePlayButton()
     {
-        if(myBinder != null)
+        if(mMyBinder != null)
         {
-            if(myBinder.getIsPlaying()){
-                btnState = (Button) findViewById(R.id.btnDisplayState);
-                btnState.setBackgroundResource(R.mipmap.pausedetail);
+            if(mMyBinder.getIsPlaying()){
+                mBtnState = (Button) findViewById(R.id.btnDisplayState);
+                mBtnState.setBackgroundResource(R.mipmap.pausedetail);
             }
             else
             {
-                btnState = (Button) findViewById(R.id.btnDisplayState);
-                btnState.setBackgroundResource(R.mipmap.run);
+                mBtnState = (Button) findViewById(R.id.btnDisplayState);
+                mBtnState.setBackgroundResource(R.mipmap.run);
             }
         }
     }
@@ -308,23 +316,23 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
                 if(progress > 0)
                 {
                     MusicList.iCurrentPosition = progress; // Remember the current position
-                    tvTimeElapsed.setText(FormatHelper.formatDuration(progress));
-                    SeekProgress.setProgress(progress / 1000);
+                    mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
+                    mSeekProgress.setProgress(progress / 1000);
                 }
             }
             else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0)
             {
                 //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
-                tvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
+                mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
             }
             else if(MyService.ACTION_UPDATE_DURATION.equals(action))
             {
                 //Receive the duration and show under the progress bar
                 //Why do this ? because from the ContentResolver, the duration is zero.
                 int duration = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
-                tvDuration.setText(FormatHelper.formatDuration(duration));
-                SeekProgress.setMax(duration / 1000);
+                mTvDuration.setText(FormatHelper.formatDuration(duration));
+                mSeekProgress.setMax(duration / 1000);
             }
             else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action))
             {
