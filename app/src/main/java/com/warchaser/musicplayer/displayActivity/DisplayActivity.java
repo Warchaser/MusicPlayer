@@ -17,9 +17,11 @@ import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
+import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
+import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
@@ -325,6 +327,9 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
                 //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
+                MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mIvCover, R.mipmap.disc, false);
+
             }
             else if(MyService.ACTION_UPDATE_DURATION.equals(action))
             {
