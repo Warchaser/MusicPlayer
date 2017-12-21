@@ -14,6 +14,8 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.warchaser.musicplayer.R;
@@ -47,7 +49,7 @@ public class MyService extends Service
     public static final int MODE_RANDOM = 2;
     public static final int MODE_SEQUENCE = 3;
 
-    private Binder mMyBinder = new MyBinder();
+    private MyBinder mMyBinder = new MyBinder();
     private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
@@ -78,6 +80,13 @@ public class MyService extends Service
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mPendingIntent = PendingIntent.getActivity(MyService.this, 0, intent, 0);
 
+        //取得电话管理服务
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        if(telephonyManager != null){
+            //注册监听对象，对电话的来电状态进行监听
+            telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
+        }
+
     }
 
     @Override
@@ -94,13 +103,14 @@ public class MyService extends Service
             mMediaPlayer.release();
             mMediaPlayer = null;
             mAudioManager.unregisterMediaButtonEventReceiver(rec);
-            stopSelf();
         }
 
         if(mMessageHandler != null){
             mMessageHandler.removeCallbacksAndMessages(null);
             mMessageHandler = null;
         }
+
+        stopSelf();
     }
 
     private static class MessageHandler extends Handler
@@ -400,6 +410,35 @@ public class MyService extends Service
     {
         MusicList.mMyBinder = (MyBinder) mMyBinder;
         return mMyBinder;
+    }
+
+    private class TelListener extends PhoneStateListener
+    {
+        public void onCallStateChanged(int state, String incomingNumber)
+        {
+            super.onCallStateChanged(state, incomingNumber);
+            //来电状态
+            if(state == TelephonyManager.CALL_STATE_RINGING)
+            {
+                if(!CallObserver.callPlay(1))
+                {
+                    if(mMyBinder.getIsPlaying())
+                    {
+                        mMyBinder.stopPlay();
+                    }
+                }
+            }
+            else if(state == TelephonyManager.CALL_STATE_IDLE)
+            {
+                if(!CallObserver.callPlay(1))
+                {
+                    if(!mMyBinder.getIsPlaying())
+                    {
+                        mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+                    }
+                }
+            }
+        }
     }
 
     public class MyBinder extends Binder

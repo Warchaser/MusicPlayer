@@ -13,6 +13,9 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Wucn on 2017/12/20.
  *
@@ -23,7 +26,7 @@ public class SongsAdapter extends BaseAdapter
 
     private Context mContext;
 
-    public SongsAdapter(Context context){
+    SongsAdapter(Context context){
         mContext = context;
     }
 
@@ -48,11 +51,8 @@ public class SongsAdapter extends BaseAdapter
         ViewHolderItem viewHolder;
         if(null == view)
         {
-            viewHolder = new ViewHolderItem();
-            view = LayoutInflater.from(mContext).inflate(R.layout.item, null);
-            viewHolder.tvItemTitle = (TextView) view.findViewById(R.id.tvItemTitle);
-            viewHolder.tvItemDuration = (TextView) view.findViewById(R.id.tvItemDuration);
-            viewHolder.gfGo = (GifView) view.findViewById(R.id.gfGo);
+            view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
+            viewHolder = new ViewHolderItem(view);
             viewHolder.gfGo.setGifImage(R.mipmap.ani);
             viewHolder.gfGo.setGifImageType(GifView.GifImageType.COVER);
 
@@ -76,18 +76,34 @@ public class SongsAdapter extends BaseAdapter
             viewHolder.tvItemTitle.setTextColor(Color.RED);
             viewHolder.tvItemDuration.setTextColor(Color.RED);
             viewHolder.gfGo.setVisibility(View.VISIBLE);
-//                viewHolder.gfGo.showAnimation();
-//                viewHolder.gfGo.showCover();
         }
 
         return view;
     }
 
-    private class ViewHolderItem
+    class ViewHolderItem
     {
-        private TextView tvItemTitle;
-        private TextView tvItemDuration;
-        private GifView gfGo;
+        /**
+         * TextView, Music Title
+         * */
+        @BindView(R.id.tvItemTitle)
+        TextView tvItemTitle;
+
+        /**
+         * TextView, Music Duration
+         * */
+        @BindView(R.id.tvItemDuration)
+        TextView tvItemDuration;
+
+        /**
+         * GifView, Tag a Gif on Current Music which is Playing
+         * */
+        @BindView(R.id.gfGo)
+        GifView gfGo;
+
+        ViewHolderItem(View view){
+            ButterKnife.bind(this,view);
+        }
     }
 }
 

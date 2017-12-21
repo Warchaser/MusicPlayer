@@ -13,8 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +45,10 @@ import com.warchaser.musicplayer.tools.UIObserver;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * MainActivity extends ActionBarActivity implements View.OnClickListener
  * Show the main-activity with title.
@@ -66,10 +68,9 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     /**
      * Service binder
      * */
-    public MyBinder mMyBinder;////
-    /************Service part**************/
+    public MyBinder mMyBinder;
 
-    /**Save the position of list on pause**/
+    //Save the position of list on pause
     /**
      * View to convert.
      * */
@@ -84,33 +85,88 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
      * Top of the position of ListView.
      * */
     private int mTop4SeekListView;
-    /**Save the position of list on pause**/
+    //Save the position of list on pause
 
+    /**
+     * Layout BottomBar
+     * */
+    @BindView(R.id.bottomBar)
+    LinearLayout mLyBottomBar;
 
-    private LinearLayout mLyBottomBar;
+    /**
+     * Layout Playing State
+     * */
+    @BindView(R.id.lyBtnState)
+    LinearLayout mLyBtnState;
 
-    private LinearLayout mLyBtnState;
-    private LinearLayout mLyBtnNext;
+    /**
+     * Layout Button Play Next
+     * */
+    @BindView(R.id.lyBtnNext)
+    LinearLayout mLyBtnNext;
 
     private SongsAdapter mAdapter;
 
-    private TextView mTvBottomTitle;
-    private TextView mTvBottomArtist;
-    private ImageView mBottomBarDisc;
-    private ListView mListViewSongs;
-    private SeekBar mSeekBarProgress;
-    private Button mBtnState;///
-    private Button mBtnNext;
+    /**
+     * TextView, Music Title on BottomBar
+     * */
+    @BindView(R.id.bottomBarTvTitle)
+    TextView mTvBottomTitle;
 
-    private String mPath = null;
-    //SlideBar部分
-    private SlideBar mSlideBar;
-    private TextView mTvFloatLetter;
-    //SlideBar部分
+    /**
+     * TextView, Music Artist on BottomBar
+     * */
+    @BindView(R.id.bottomBarTvArtist)
+    TextView mTvBottomArtist;
+
+    /**
+     * ImageView, Music Cover on BottomBar
+     * */
+    @BindView(R.id.bottomBar_disc)
+    ImageView mBottomBarDisc;
+
+    /**
+     * ListView, Songs List
+     * */
+    @BindView(R.id.listView)
+    ListView mListViewSongs;
+
+    /**
+     * SeekBar, Playing Progress
+     * */
+    @BindView(R.id.progress)
+    SeekBar mSeekBarProgress;
+
+    /**
+     * Button, Playing State
+     * */
+    @BindView(R.id.btnState)
+    Button mBtnState;
+
+    /**
+     * Button, Play Next
+     * */
+    @BindView(R.id.btnNext)
+    Button mBtnNext;
+
+    /**
+     * SlideBar, A IndexBar on Right;
+     * Allow Users to Drag
+     * */
+    @BindView(R.id.slideBar)
+    SlideBar mSlideBar;
+
+    /**
+     * TextView, A Floating Text, Which is Showing he Current Index.
+     * */
+    @BindView(R.id.tvFloatLetter)
+    TextView mTvFloatLetter;
 
     private boolean mIsBind = false;
 
     private UIUpdateObserver mObserver;
+
+    private String mPath = null;
 
     /**
      * 绑定服务
@@ -146,17 +202,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         getList();
         playExternal();
         initComponent();
-
-        //取得电话管理服务
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        if(telephonyManager != null){
-            //注册监听对象，对电话的来电状态进行监听
-            telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
-        }
     }
 
     //初始化各个List
@@ -164,7 +214,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
         MusicList.instance(getContentResolver());
 
-        mMusicListTmps = new ArrayList<String>();
+        mMusicListTmps = new ArrayList<>();
         int musicInfoListSize = MusicList.musicInfoList.size();
         for(int i = 0;i < musicInfoListSize; i++)
         {
@@ -186,7 +236,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             if("content".equals(uri.getScheme()))
             {
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = null;
+                Cursor cursor;
                 try
                 {
                     cursor = getContentResolver().query(uri,
@@ -284,15 +334,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     }
 
     @Override
-    public void onBackPressed()
-    {
-        Intent intent = new Intent();
-        intent.setAction("android.intent.action.MAIN");
-        intent.addCategory("android.intent.category.HOME");
-        startActivity(intent);
-    }
-
-    @Override
     protected void onPause()
     {
         super.onPause();
@@ -358,6 +399,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         return super.onOptionsItemSelected(item);
     }
 
+    @OnClick({R.id.bottomBar, R.id.lyBtnState, R.id.btnState, R.id.lyBtnNext, R.id.btnNext})
     @Override
     public void onClick(View view)
     {
@@ -447,7 +489,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     {
         mAdapter = new SongsAdapter(this);
 
-        mSeekBarProgress = (SeekBar) findViewById(R.id.progress);
         mSeekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
 
@@ -473,10 +514,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        mTvBottomTitle = (TextView) findViewById(R.id.bottomBarTvTitle);
-        mTvBottomArtist = (TextView) findViewById(R.id.bottomBarTvArtist);
-        mBottomBarDisc = (ImageView) findViewById(R.id.bottomBar_disc);
-
         if(MusicList.musicInfoList.size() != 0)
         {
             MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
@@ -485,23 +522,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             ImageUtil.setBottomBarDisc(this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);
         }
 
-
-        mBtnState = (Button) findViewById(R.id.btnState);
-        mBtnState.setOnClickListener(this);
-
-        mBtnNext = (Button) findViewById(R.id.btnNext);
-        mBtnNext.setOnClickListener(this);
-
-        mLyBottomBar = (LinearLayout) findViewById(R.id.bottomBar);
-        mLyBottomBar.setOnClickListener(this);
-
-        mLyBtnState = (LinearLayout) findViewById(R.id.lyBtnState);
-        mLyBtnState.setOnClickListener(this);
-
-        mLyBtnNext = (LinearLayout) findViewById(R.id.lyBtnNext);
-        mLyBtnNext.setOnClickListener(this);
-
-        mListViewSongs = (ListView) findViewById(R.id.listView);
         mListViewSongs.setAdapter(mAdapter);
         mListViewSongs.setFocusable(true);
 
@@ -528,7 +548,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         });
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
-        mTvFloatLetter = (TextView) findViewById(R.id.tvFloatLetter);
         final AlphaAnimation alp = new AlphaAnimation(1.0f,0.0f);
         alp.setDuration(1500);
         mTvFloatLetter.setAnimation(alp);
@@ -554,7 +573,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        mSlideBar = (SlideBar) findViewById(R.id.slideBar);
         mSlideBar.setOnLetterTouchChangeListener(new SlideBar.OnLetterTouchChangeListener()
         {
             @Override
@@ -652,37 +670,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    private final class TelListener extends PhoneStateListener
-    {
-        public void onCallStateChanged(int state, String incomingNumber)
-        {
-            super.onCallStateChanged(state, incomingNumber);
-            //来电状态
-            if(state == TelephonyManager.CALL_STATE_RINGING)
-            {
-                if(mMyBinder != null)
-                {
-                    if(mMyBinder.getIsPlaying())
-                    {
-                        mMyBinder.stopPlay();
-                        mBtnState.setBackgroundResource(R.mipmap.run);
-                    }
-                }
-            }
-            else if(state == TelephonyManager.CALL_STATE_IDLE)
-            {
-                //挂断状态(即非来电状态)
-                if(mMyBinder != null)
-                {
-                    if(!mMyBinder.getIsPlaying())
-                    {
-                        mMyBinder.startPlay(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
-                        mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-                    }
-                }
-            }
-        }
-    }
+
 
 
 

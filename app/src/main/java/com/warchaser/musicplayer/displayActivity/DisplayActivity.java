@@ -10,14 +10,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
@@ -26,6 +24,10 @@ import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -37,18 +39,71 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
     private MyBinder mMyBinder;
 
-    private SeekBar mSeekProgress;
-    private TextView mTvTitle, mTvTimeElapsed, mTvDuration;
-    private ImageView mIvMode;
-    private ImageView mIvCover;
-    private Button mBtnPrevious;
-    private Button mBtnNext;
-    private Button mBtnState;
+    /**
+     * SeekBar, Playing Progress
+     * */
+    @BindView(R.id.progress)
+    SeekBar mSeekProgress;
 
-    private LinearLayout mLyBtnMode;
-    private LinearLayout mLyBtnDisplayPrevious;
-    private LinearLayout mLyBtnDisplayState;
-    private LinearLayout mLyBtnDisplayNext;
+    /**
+     * TextView, Current Playing Music's Title
+     * */
+    @BindView(R.id.tvDisplayCurrentTitle)
+    TextView mTvTitle;
+
+    /**
+     * TextView, Current Playing Time Elapsed
+     * */
+    @BindView(R.id.tvDisplayTimeElapsed)
+    TextView mTvTimeElapsed;
+
+    /**
+     * TextView, Current Music Playing's Duration
+     * */
+    @BindView(R.id.tvDisplayDuration)
+    TextView mTvDuration;
+
+    /**
+     * ImageView, Current Playing Mode
+     * */
+    @BindView(R.id.ivMode)
+    ImageView mIvMode;
+
+    /**
+     * ImageView, Current Music's Cover
+     * */
+    @BindView(R.id.iv_cover)
+    ImageView mIvCover;
+
+//    /**
+//     * Button, Play Previous
+//     * */
+//    @BindView(R.id.btnDisplayPrevious)
+//    Button mBtnPrevious;
+//
+//    /**
+//     * Button, Play Next
+//     * */
+//    @BindView(R.id.btnDisplayNext)
+//    Button mBtnNext;
+
+    /**
+     * Button, Current Music Playing State
+     * */
+    @BindView(R.id.btnDisplayState)
+    Button mBtnState;
+
+//    @BindView(R.id.lyIvMode)
+//    LinearLayout mLyBtnMode;
+//
+//    @BindView(R.id.lyBtnDisplayPrevious)
+//    LinearLayout mLyBtnDisplayPrevious;
+//
+//    @BindView(R.id.lyBtnDisplayState)
+//    LinearLayout mLyBtnDisplayState;
+//
+//    @BindView(R.id.lyBtnDisplayNext)
+//    LinearLayout mLyBtnDisplayNext;
 
     private UIUpdateObserver mObserver;
 
@@ -95,8 +150,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.display);
+        ButterKnife.bind(this);
         connectToMyService();
         initComponent();
     }
@@ -146,6 +201,9 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         super.onSaveInstanceState(outState);
     }
 
+    @OnClick({R.id.lyBtnDisplayState,R.id.btnDisplayState,R.id.lyBtnDisplayNext,
+            R.id.btnDisplayNext,R.id.lyBtnDisplayPrevious,R.id.btnDisplayPrevious,
+            R.id.lyIvMode,R.id.ivMode})
     @Override
     public void onClick(View v)
     {
@@ -206,17 +264,12 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     }
 
     private void initComponent(){
-        //Current title
-        mTvTitle = (TextView) findViewById(R.id.tvDisplayCurrentTitle);
         if(MusicList.musicInfoList.size() != 0)
         {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
         }
-        //Current title duration(the right-side TextView)
-        mTvDuration = (TextView) findViewById(R.id.tvDisplayDuration);
+
         mTvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
-        //DisplayActivity seekBar
-        mSeekProgress = (SeekBar) findViewById(R.id.progress);
         mSeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
 
@@ -243,38 +296,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         mSeekProgress.setMax(MusicList.iCurrentMax / 1000);
         mSeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
 
-        //Current title elapse(the left-side TextView)
-        mTvTimeElapsed = (TextView) findViewById(R.id.tvDisplayTimeElapsed);
         mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.iCurrentPosition));
-
-        mIvMode = (ImageView) findViewById(R.id.ivMode);
-        mIvMode.setOnClickListener(this);
-
-        mBtnPrevious = (Button) findViewById(R.id.btnDisplayPrevious);
-        mBtnPrevious.setOnClickListener(this);
-
-        mBtnState = (Button) findViewById(R.id.btnDisplayState);
-        mBtnState.setOnClickListener(this);
-
-        mBtnNext = (Button) findViewById(R.id.btnDisplayNext);
-        mBtnNext.setOnClickListener(this);
-
-        mLyBtnMode = (LinearLayout) findViewById(R.id.lyIvMode);
-        mLyBtnMode.setOnClickListener(this);
-
-        mLyBtnDisplayPrevious = (LinearLayout) findViewById(R.id.lyBtnDisplayPrevious);
-        mLyBtnDisplayPrevious.setOnClickListener(this);
-
-        mLyBtnDisplayState = (LinearLayout) findViewById(R.id.lyBtnDisplayState);
-        mLyBtnDisplayState.setOnClickListener(this);
-
-        mLyBtnDisplayNext = (LinearLayout) findViewById(R.id.lyBtnDisplayNext);
-        mLyBtnDisplayNext.setOnClickListener(this);
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
-
-        mIvCover = (ImageView) findViewById(R.id.iv_cover);
 
         Intent intent = getIntent();
         if (intent != null){
@@ -302,12 +327,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         if(mMyBinder != null)
         {
             if(mMyBinder.getIsPlaying()){
-                mBtnState = (Button) findViewById(R.id.btnDisplayState);
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail);
             }
             else
             {
-                mBtnState = (Button) findViewById(R.id.btnDisplayState);
                 mBtnState.setBackgroundResource(R.mipmap.run);
             }
         }
