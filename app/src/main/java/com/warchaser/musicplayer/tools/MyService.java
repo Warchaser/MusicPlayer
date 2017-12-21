@@ -53,7 +53,7 @@ public class MyService extends Service
     private AudioManager mAudioManager;
     private ComponentName rec;
 
-    PendingIntent mPendingIntent;
+    private PendingIntent mPendingIntent;
 
     @Override
     public void onCreate()

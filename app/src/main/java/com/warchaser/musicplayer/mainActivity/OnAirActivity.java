@@ -2,11 +2,9 @@ package com.warchaser.musicplayer.mainActivity;
 
 import android.app.ActivityOptions;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
@@ -15,10 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -357,6 +353,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 this.getApplicationContext().unbindService(mServiceConnection);
                 mMyBinder = null;
             }
+            stopService(new Intent(this, MyService.class));
         }
         return super.onOptionsItemSelected(item);
     }

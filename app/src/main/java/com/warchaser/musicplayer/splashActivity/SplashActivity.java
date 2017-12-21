@@ -1,5 +1,6 @@
 package com.warchaser.musicplayer.splashActivity;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.view.WindowManager;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.tools.MyService;
 
 /**
  * Created by Administrator on 2014/11/6.
@@ -73,6 +75,9 @@ public class SplashActivity extends BaseActivity
 
     private void startOnAirActivity()
     {
+        Intent startService = new Intent(this, MyService.class);
+        startService(startService);
+
         startCertainActivity(OnAirActivity.class);
         finish();
     }
