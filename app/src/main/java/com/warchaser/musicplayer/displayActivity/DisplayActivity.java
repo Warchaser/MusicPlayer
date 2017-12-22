@@ -197,7 +197,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
     }
 
@@ -276,7 +277,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b)
             {
-                if(b){
+                if(b)
+                {
                     mMyBinder.changeProgress(i);
                 }
             }
@@ -302,7 +304,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         CallObserver.setObserver(mObserver);
 
         Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null)
+        {
             String uri = intent.getStringExtra("uri");
             ImageUtil.setBottomBarDisc(this, uri, R.dimen.bottom_bar_disc_width_and_height, mIvCover, R.mipmap.disc, false);
         }
@@ -326,7 +329,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     {
         if(mMyBinder != null)
         {
-            if(mMyBinder.getIsPlaying()){
+            if(mMyBinder.getIsPlaying())
+            {
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail);
             }
             else
@@ -377,8 +381,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         }
 
         @Override
-        public void notify2Play(int repeatTime) {
-            switch (repeatTime){
+        public void notify2Play(int repeatTime)
+        {
+            switch (repeatTime)
+            {
                 case 1:
                     play();
                     break;

@@ -82,7 +82,8 @@ public class MyService extends Service
 
         //取得电话管理服务
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        if(telephonyManager != null){
+        if(telephonyManager != null)
+        {
             //注册监听对象，对电话的来电状态进行监听
             telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
         }
@@ -118,9 +119,9 @@ public class MyService extends Service
 
         private WeakReference<MyService> mServiceWeakReference;
 
-        public MessageHandler(MyService service)
+        MessageHandler(MyService service)
         {
-            mServiceWeakReference = new WeakReference<MyService>(service);
+            mServiceWeakReference = new WeakReference<>(service);
         }
 
         public void handleMessage(Message msg)
@@ -141,7 +142,7 @@ public class MyService extends Service
             }
         }
 
-    };
+    }
 
     private void toUpdateProgress()
     {
@@ -165,7 +166,7 @@ public class MyService extends Service
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
 
-        String notificationTitle = "";
+        String notificationTitle;
 
         if(MusicList.musicInfoList.size() == 0)
         {
@@ -248,10 +249,12 @@ public class MyService extends Service
                             play(getRandomPosition(),0);
                             break;
                         case MODE_SEQUENCE:
-                            if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1){
+                            if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
+                            {
                                 play(0,0);
                             }
-                            else{
+                            else
+                            {
                                 next();
                             }
                             break;
@@ -300,7 +303,8 @@ public class MyService extends Service
 
         mMediaPlayer.reset();
 
-        try {
+        try
+        {
 
             if(MusicList.musicInfoList.size() != 0)
             {
@@ -315,7 +319,8 @@ public class MyService extends Service
         }
     }
 
-    private void stop(){
+    private void stop()
+    {
         
         MusicList.iCurrentPosition = mMediaPlayer.getCurrentPosition();
 
@@ -408,7 +413,7 @@ public class MyService extends Service
     @Override
     public IBinder onBind(Intent intent)
     {
-        MusicList.mMyBinder = (MyBinder) mMyBinder;
+        MusicList.mMyBinder = mMyBinder;
         return mMyBinder;
     }
 
@@ -502,13 +507,8 @@ public class MyService extends Service
             }
         }
 
-        public void notifyProgress(){
-            toUpdateDuration();
-        }
-
-        public void rebindObserverOnResume()
+        public void notifyProgress()
         {
-            toUpdateCurrentMusic();
             toUpdateDuration();
         }
     }
