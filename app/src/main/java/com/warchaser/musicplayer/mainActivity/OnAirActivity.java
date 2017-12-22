@@ -188,7 +188,17 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 } else {
                     play();
                 }
+            }
 
+            mMyBinder.notifyProgress();
+
+            if(mMyBinder.getIsPlaying())
+            {
+                mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+            }
+            else
+            {
+                mBtnState.setBackgroundResource(R.mipmap.run);
             }
         }
 
@@ -430,7 +440,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onClick(View view)
     {
-        switch (view.getId()){
+        switch (view.getId())
+        {
             case R.id.lyBtnState:
             case R.id.btnState:
                 play();
@@ -446,13 +457,16 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
                 intent.putExtra("uri", bean.getUriWithCoverPic());
                 int sdk = android.os.Build.VERSION.SDK_INT;
-                if(sdk >= Build.VERSION_CODES.LOLLIPOP){
+                if(sdk >= Build.VERSION_CODES.LOLLIPOP)
+                {
                     Pair p1 = Pair.create(mBottomBarDisc,"cover");
                     Pair p2 = Pair.create(mBtnState, "btn_state");
                     Pair p3 = Pair.create(mBtnNext, "btn_next");
                     Pair p4 = Pair.create(mSeekBarProgress, "seek_bar");
                     startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, p1,p2,p3,p4).toBundle());
-                } else {
+                }
+                else
+                {
                     startActivity(intent);
                 }
 
@@ -460,7 +474,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-    private void playNext(){
+    private void playNext()
+    {
         mMyBinder.playNext();
         if(mMyBinder.getIsPlaying())
         {
@@ -501,7 +516,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
     private void play(){
 
-        if(mMyBinder == null){
+        if(mMyBinder == null)
+        {
             return;
         }
 
@@ -676,8 +692,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
 
         @Override
-        public void notify2Play(int repeatTime) {
-            switch (repeatTime){
+        public void notify2Play(int repeatTime)
+        {
+            switch (repeatTime)
+            {
                 case 1:
                     play();
                     break;

@@ -502,6 +502,10 @@ public class MyService extends Service
             }
         }
 
+        public void notifyProgress(){
+            toUpdateDuration();
+        }
+
         public void rebindObserverOnResume()
         {
             toUpdateCurrentMusic();
