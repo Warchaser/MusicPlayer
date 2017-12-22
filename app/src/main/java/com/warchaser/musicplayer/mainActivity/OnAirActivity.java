@@ -168,6 +168,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
     private String mPath = null;
 
+    private boolean mIsFromExternal = false;
+
     /**
      * 绑定服务
      * */
@@ -180,7 +182,13 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             //判断外部（外存）传来的路径是否为空，不为空就在绑定成功之后立即播放
             if(null != mPath)
             {
-                play();
+                if(mIsFromExternal){
+                    mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+                } else {
+                    play();
+                }
+
             }
         }
 
@@ -230,6 +238,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         int musicInfoListSize = MusicList.musicInfoList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
+        mIsFromExternal = getIntent().getBooleanExtra("isFromExternal", false);
 
         if(uri != null)
         {
@@ -284,7 +293,25 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         if(mMyBinder == null)
         {
             connectToMyService();
+        } else {
+            mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+            if (mMyBinder.getIsPlaying())
+            {
+                mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+            }
+            else
+            {
+                mBtnState.setBackgroundResource(R.mipmap.run);
+            }
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        getIntent().setData(intent.getData());
+        getIntent().putExtra("isFromExternal", true);
+        playExternal();
     }
 
     //更新数据库
@@ -415,7 +442,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 break;
 
             case R.id.bottomBar:
-                Intent intent = new Intent(OnAirActivity.this,DisplayActivity.class);
+                Intent intent = new Intent(this,DisplayActivity.class);
                 MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
                 intent.putExtra("uri", bean.getUriWithCoverPic());
                 int sdk = android.os.Build.VERSION.SDK_INT;
@@ -473,6 +500,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void play(){
+
+        if(mMyBinder == null){
+            return;
+        }
+
         if(mMyBinder.getIsPlaying())
         {
             mMyBinder.stopPlay();
@@ -669,9 +701,4 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             return mIsEnabled;
         }
     }
-
-
-
-
-
 }

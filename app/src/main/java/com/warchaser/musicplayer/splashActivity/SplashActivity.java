@@ -2,6 +2,7 @@ package com.warchaser.musicplayer.splashActivity;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -78,7 +79,16 @@ public class SplashActivity extends BaseActivity
         Intent startService = new Intent(this, MyService.class);
         startService(startService);
 
-        startCertainActivity(OnAirActivity.class);
-        finish();
+        Uri uri = getIntent().getData();
+        if(uri != null){
+            Intent startActivity = new Intent(this, OnAirActivity.class);
+            startActivity.setData(uri);
+            startActivity.putExtra("isFromExternal", true);
+            startActivity(startActivity);
+            finish();
+        } else {
+            startCertainActivity(OnAirActivity.class);
+            finish();
+        }
     }
 }
