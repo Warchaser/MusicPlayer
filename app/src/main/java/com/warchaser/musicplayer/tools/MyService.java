@@ -60,6 +60,8 @@ public class MyService extends Service
     @Override
     public void onCreate()
     {
+        MusicList.instance(getContentResolver());
+
         mMessageHandler = new MessageHandler(this);
 
         initMediaPlayer();
@@ -497,11 +499,15 @@ public class MyService extends Service
          * */
         public void changeProgress(int pProgress)
         {
-            if(mMediaPlayer != null){
+            if(mMediaPlayer != null)
+            {
                 MusicList.iCurrentPosition = pProgress * 1000;
-                if(mIsPlaying){
+                if(mIsPlaying)
+                {
                     mMediaPlayer.seekTo(MusicList.iCurrentPosition);
-                }else{
+                }
+                else
+                {
                     play(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
                 }
             }

@@ -228,10 +228,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     }
 
     //初始化各个List
-    private void getList(){
-
-        MusicList.instance(getContentResolver());
-
+    private void getList()
+    {
         mMusicListTmps = new ArrayList<>();
         int musicInfoListSize = MusicList.musicInfoList.size();
         for(int i = 0;i < musicInfoListSize; i++)
