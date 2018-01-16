@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.widget.Toast;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
@@ -357,7 +356,7 @@ public class MyService extends Service
             case MODE_SEQUENCE:
                 if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
                 {
-                    Toast.makeText(this, "最后一首歌曲了，亲，即将播放第一首歌曲～", Toast.LENGTH_SHORT).show();
+                    CommonUtils.showShortToast(R.string.last_song_tip);
                     play(0,0);
                 }
                 else
@@ -398,7 +397,7 @@ public class MyService extends Service
             case MODE_SEQUENCE:
                 if(MusicList.iCurrentMusic == 0)
                 {
-                    Toast.makeText(this, "已经是第一首歌了，亲，即将播放最后一首歌曲～", Toast.LENGTH_SHORT).show();
+                    CommonUtils.showShortToast(R.string.first_song_tip);
                     play(MusicList.musicInfoList.size() - 1,0);
                 }
                 else

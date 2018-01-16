@@ -3,4 +3,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="uri_permission_not_granted">媒体读取权限获取失败，退出！</string>
+    <string name="database_sync_completed">同步完成</string>
+    <string name="last_song_tip">最后一首歌曲了，亲，即将播放第一首歌曲～</string>
+    <string name="first_song_tip">已经是第一首歌了，亲，即将播放最后一首歌曲～</string>
 </resources>

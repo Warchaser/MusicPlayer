@@ -4,11 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
-import com.warchaser.musicplayer.R;
 
 
 /**
@@ -58,11 +55,6 @@ public class BaseActivity extends AppCompatActivity
     protected void clearMember()
     {
 
-    }
-
-    protected void showToast(String message)
-    {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     protected String getRestStrings(int resId)

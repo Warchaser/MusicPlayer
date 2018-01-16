@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.MyService;
 
 /**
@@ -65,7 +66,7 @@ public class SplashActivity extends BaseActivity
                 }
                 else
                 {
-                    showToast(getRestStrings(R.string.uri_permission_not_granted));
+                    CommonUtils.showShortToast(R.string.uri_permission_not_granted);
                     finish();
                 }
                 break;

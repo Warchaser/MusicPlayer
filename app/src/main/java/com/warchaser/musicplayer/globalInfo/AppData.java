@@ -9,11 +9,17 @@ import android.app.Application;
 public class AppData extends Application
 {
 
+    private static AppData mThis;
+
     @Override
     public void onCreate()
     {
         super.onCreate();
+
+        mThis = this;
     }
 
-
+    public static AppData getApp() {
+        return mThis;
+    }
 }

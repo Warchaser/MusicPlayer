@@ -28,12 +28,12 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.displayActivity.DisplayActivity;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
+import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
@@ -298,10 +298,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
 
         //绑定服务
-        if(mMyBinder == null)
+        if(!getBinderStatute())
         {
             connectToMyService();
-        } else {
+        }
+        else
+        {
             mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
             if (mMyBinder.getIsPlaying())
             {
@@ -331,7 +333,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 {
                     public void onScanCompleted(String path, Uri uri)
                     {
-                        Toast.makeText(OnAirActivity.this,"同步完成", Toast.LENGTH_SHORT).show();
+                        CommonUtils.showShortToast(R.string.database_sync_completed);
                     }
                 });
     }
@@ -358,7 +360,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     protected void onDestroy()
     {
         super.onDestroy();
-        if(mMyBinder != null && mIsBind)
+        if(getBinderStatute() && mIsBind)
         {
             this.getApplicationContext().unbindService(mServiceConnection);
             mMyBinder = null;
@@ -384,7 +386,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     protected void onResume() {
         super.onResume();
 
-        if(mMyBinder != null){
+        if(getBinderStatute()){
             if(mMyBinder.getIsPlaying())
             {
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail);
@@ -401,7 +403,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             mObserver.setObserverEnabled(true);
         }
 
-        if(mMyBinder != null)
+        if(getBinderStatute())
         {
             mMyBinder.notifyActivity();
         }
@@ -424,7 +426,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         if(id == R.id.action_exit)
         {
             finish();
-            if(mMyBinder != null && mIsBind)
+            if(getBinderStatute() && mIsBind)
             {
                 this.getApplicationContext().unbindService(mServiceConnection);
                 mMyBinder = null;
@@ -514,7 +516,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
     private void play(){
 
-        if(mMyBinder == null)
+        if(!getBinderStatute())
         {
             return;
         }
@@ -645,6 +647,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
+    }
+    
+    /**
+     * return binder's statutes.
+     * @retrun binder is not null.
+     * */
+    private boolean getBinderStatute(){
+        return mMyBinder != null;
     }
 
     private class UIUpdateObserver implements UIObserver
