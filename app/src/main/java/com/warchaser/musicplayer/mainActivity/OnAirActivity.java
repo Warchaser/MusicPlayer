@@ -304,7 +304,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         }
         else
         {
-            mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+            if(mPath != null)
+            {
+                //这里在点击notification时，会有从新播放的bug
+                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+            }
+
             if (mMyBinder.getIsPlaying())
             {
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail);
@@ -314,6 +319,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 mBtnState.setBackgroundResource(R.mipmap.run);
             }
         }
+
+        mPath = null;
     }
 
     @Override
