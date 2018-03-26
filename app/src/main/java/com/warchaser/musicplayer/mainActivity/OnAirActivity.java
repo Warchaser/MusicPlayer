@@ -48,6 +48,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 /**
  * MainActivity extends ActionBarActivity implements View.OnClickListener
@@ -170,6 +171,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
     private boolean mIsFromExternal = false;
 
+    private Unbinder mUnbinder;
+
     /**
      * 绑定服务
      * */
@@ -220,7 +223,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
         getList();
         playExternal();
@@ -372,6 +375,13 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             this.getApplicationContext().unbindService(mServiceConnection);
             mMyBinder = null;
         }
+
+        if(mUnbinder != null)
+        {
+            mUnbinder.unbind();
+        }
+
+        mUnbinder = null;
 
         CallObserver.removeSingleObserver(mObserver);
         clearOnDestroy();

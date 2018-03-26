@@ -28,6 +28,7 @@ import com.warchaser.musicplayer.tools.UIObserver;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 
 /**
@@ -107,6 +108,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
     private UIUpdateObserver mObserver;
 
+    private Unbinder mUnbinder;
+
     private ServiceConnection mServiceConnection = new ServiceConnection()
     {
 
@@ -151,7 +154,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         connectToMyService();
         initComponent();
     }
@@ -164,6 +167,13 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         {
             unbindService(mServiceConnection);
         }
+
+        if(mUnbinder != null)
+        {
+            mUnbinder.unbind();
+        }
+
+        mUnbinder = null;
 
         CallObserver.removeSingleObserver(mObserver);
     }
