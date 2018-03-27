@@ -20,11 +20,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:27.1.0'
-    compile files('libs/pinyin4j-2.5.0.jar')
-    compile files('libs/GifView.jar')
-    compile 'com.jakewharton:butterknife:8.8.1'
+
+    implementation files('libs/pinyin4j-2.5.0.jar')
+    implementation files('libs/GifView.jar')
+    implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
