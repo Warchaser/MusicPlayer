@@ -1,21 +1,29 @@
 package com.warchaser.musicplayer.tools;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.widget.RemoteViews;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
@@ -41,6 +49,16 @@ public class MyService extends Service
     public static final String ACTION_UPDATE_DURATION = "com.warchaser.MusicPlayer.UPDATE_DURATION";
     public static final String ACTION_UPDATE_CURRENT_MUSIC = "com.warchaser.MusicPlayer.UPDATE_CURRENT_MUSIC";
 
+    public static final String PAUSE_OR_PLAY_ACTION = "com.warchaser.MusicPlayer.playOrPause";
+    public static final String NEXT_ACTION = "com.warchaser.MusicPlayer.next";
+    public static final String CLOSE_ACTION = "com.warchaser.MusicPlayer.close";
+
+    private final int PAUSE_FLAG = 0x11;
+    private final int NEXT_FLAG = 0x12;
+    private final int CLOSE_FLAG = 0x13;
+
+    private final int NOTIFICATION_ID = 1001;
+
     private int mCurrentMode = 3; //default sequence playing
 
     public static final int MODE_ONE_LOOP = 0;
@@ -56,12 +74,19 @@ public class MyService extends Service
 
     private PendingIntent mPendingIntent;
 
+    private RemoteViews mNotificationRemoteView;
+    private Notification mNotification;
+    private NotificationManager mNotificationManager;
+
+    private IntentReceiver mIntentReceiver;
+
     @Override
     public void onCreate()
     {
         MusicList.instance(getContentResolver());
 
         mMessageHandler = new MessageHandler(this);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         initMediaPlayer();
 
@@ -72,15 +97,6 @@ public class MyService extends Service
                 MediaButtonReceiver.class.getName());
         mAudioManager.registerMediaButtonEventReceiver(rec);
 
-//        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-//        mediaButtonIntent.setComponent(rec);
-
-        Intent intent = new Intent(MyService.this,OnAirActivity.class);
-        //clear the top of the stack, this flag can forbid the possibility of the two activities
-        //existing at the same time
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mPendingIntent = PendingIntent.getActivity(MyService.this, 0, intent, 0);
-
         //取得电话管理服务
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         if(telephonyManager != null)
@@ -88,6 +104,8 @@ public class MyService extends Service
             //注册监听对象，对电话的来电状态进行监听
             telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
         }
+
+        initializeReceiver();
 
     }
 
@@ -112,7 +130,19 @@ public class MyService extends Service
             mMessageHandler = null;
         }
 
+        unregisterReceiver(mIntentReceiver);
+
         stopSelf();
+    }
+
+    private void initializeReceiver(){
+        mIntentReceiver = new IntentReceiver();
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(PAUSE_OR_PLAY_ACTION);
+        intentFilter.addAction(NEXT_ACTION);
+        intentFilter.addAction(CLOSE_ACTION);
+
+        registerReceiver(mIntentReceiver, intentFilter);
     }
 
     private static class MessageHandler extends Handler
@@ -167,28 +197,102 @@ public class MyService extends Service
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
 
-        String notificationTitle;
+//        String notificationTitle;
+//
+//        if(MusicList.musicInfoList.size() == 0)
+//        {
+//            notificationTitle = "Mr.Song is not here for now……";
+//        }
+//        else
+//        {
+//            notificationTitle = MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle();
+//        }
+//
+//        Notification notification = new Notification.Builder(MyService.this)
+//                .setTicker("MusicPlayer")
+//                .setSmallIcon(R.mipmap.notification1)
+//                .setContentTitle("Playing")
+//                .setContentText(notificationTitle)
+//                .setContentIntent(mPendingIntent)
+//                .getNotification();
+//        notification.flags |= Notification.FLAG_NO_CLEAR;
+        startForeground(NOTIFICATION_ID, getNotification());
 
-        if(MusicList.musicInfoList.size() == 0)
+        CallObserver.callObserver(intent);
+    }
+
+    private Notification getNotification(){
+        final String notificationTitle;
+        if(mNotificationRemoteView == null){
+            mNotificationRemoteView = new RemoteViews(this.getPackageName(), R.layout.notification);
+        }
+
+        MusicInfo bean;
+
+        if(MusicList.musicInfoList.isEmpty())
         {
             notificationTitle = "Mr.Song is not here for now……";
+            mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
         }
         else
         {
-            notificationTitle = MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle();
+            bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+            notificationTitle = bean.getTitle();
+            String uriString = bean.getUriWithCoverPic();
+            if(TextUtils.isEmpty(uriString))
+            {
+                mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
+            }
+            else
+            {
+                Drawable drawable = ImageUtil.getCoverDrawableFromMusicFile(uriString, this, 70);
+                if(drawable == null)
+                {
+                    mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
+                }
+                else
+                {
+                    mNotificationRemoteView.setImageViewUri(R.id.fileImage, Uri.parse(uriString));
+                }
+            }
         }
 
-        Notification notification = new Notification.Builder(MyService.this)
-                .setTicker("MusicPlayer")
-                .setSmallIcon(R.mipmap.notification1)
-                .setContentTitle("Playing")
-                .setContentText(notificationTitle)
-                .setContentIntent(mPendingIntent)
-                .getNotification();
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        startForeground(1, notification);
+        mNotificationRemoteView.setTextViewText(R.id.fileName, notificationTitle);
 
-        CallObserver.callObserver(intent);
+        Intent pauseIntent = new Intent(PAUSE_OR_PLAY_ACTION);
+        pauseIntent.putExtra("FLAG", PAUSE_FLAG);
+        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
+        mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivPauseOrPlay, pausePendingIntent);
+
+        Intent nextIntent = new Intent(NEXT_ACTION);
+        nextIntent.putExtra("FLAG", NEXT_FLAG);
+        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
+        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivNext, nextPendingIntent);
+
+        Intent closeIntent = new Intent(CLOSE_ACTION);
+        closeIntent.putExtra("FLAG", CLOSE_FLAG);
+        PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
+        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
+
+        Intent activityIntent = new Intent(MyService.this,OnAirActivity.class);
+        //clear the top of the stack, this flag can forbid the possibility of the two activities
+        //existing at the same time
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(MyService.this, 0, activityIntent, 0);
+        mNotificationRemoteView.setOnClickPendingIntent(R.id.lyRoot, activityPendingIntent);
+
+        if(mNotification == null)
+        {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "com.warchaser.MusicPlayer.notification")
+                    .setContent(mNotificationRemoteView)
+                    .setSmallIcon(R.mipmap.notification1);
+
+            mNotification = builder.build();
+            mNotification.flags |= Notification.FLAG_NO_CLEAR;
+        }
+
+        return mNotification;
     }
 
     private void toUpdateDuration()
@@ -307,7 +411,7 @@ public class MyService extends Service
         try
         {
 
-            if(MusicList.musicInfoList.size() != 0)
+            if(!MusicList.musicInfoList.isEmpty())
             {
                 mMediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
                 mMediaPlayer.prepareAsync();
@@ -418,6 +522,64 @@ public class MyService extends Service
         return mMyBinder;
     }
 
+    public void startPlayNormal(){
+        play(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+    }
+
+    /**
+     * 设置通知栏播放状态按钮图标
+     * */
+    private void setRemoteViewPlayOrPause(){
+        if(mNotificationRemoteView != null){
+            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+        }
+
+        if(mNotificationManager != null){
+            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+        }
+    }
+
+    private void setRemoteViewPlayOrPausePassive(){
+        if(mNotificationRemoteView != null){
+            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+        }
+
+        if(mNotificationManager != null){
+            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+        }
+    }
+
+    /**
+     * 处理通知栏主动控制的消息
+     * */
+    private synchronized void handleIntentCommand(Intent intent){
+
+        if(intent == null){
+            return;
+        }
+
+        final String action = intent.getAction();
+        if(NEXT_ACTION.equals(action)){
+            setRemoteViewPlayOrPause();
+            if(!CallObserver.callPlay(2)){
+                next();
+            }
+        } else if(PAUSE_OR_PLAY_ACTION.equals(action)){
+            setRemoteViewPlayOrPause();
+            if(!CallObserver.callPlay(1)){
+                if(mMyBinder.getIsPlaying()){
+                    stop();
+                } else {
+                    startPlayNormal();
+                }
+            }
+
+        } else if(CLOSE_ACTION.equals(action)){
+
+        }
+
+    }
+
     private class TelListener extends PhoneStateListener
     {
         public void onCallStateChanged(int state, String incomingNumber)
@@ -440,7 +602,7 @@ public class MyService extends Service
                 {
                     if(!mMyBinder.getIsPlaying())
                     {
-                        mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+                        startPlayNormal();
                     }
                 }
             }
@@ -456,6 +618,10 @@ public class MyService extends Service
 
         public void stopPlay(){
             stop();
+        }
+
+        public void updateNotification(){
+            setRemoteViewPlayOrPausePassive();
         }
 
         public void playNext(){
@@ -480,7 +646,7 @@ public class MyService extends Service
             return mCurrentMode;
         }
 
-        public boolean getIsPlaying(){
+        public synchronized boolean getIsPlaying(){
             return mIsPlaying;
         }
 
@@ -507,7 +673,7 @@ public class MyService extends Service
                 }
                 else
                 {
-                    play(MusicList.iCurrentMusic,MusicList.iCurrentPosition);
+                    startPlayNormal();
                 }
             }
         }
@@ -515,6 +681,14 @@ public class MyService extends Service
         public void notifyProgress()
         {
             toUpdateDuration();
+        }
+    }
+
+    private class IntentReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handleIntentCommand(intent);
         }
     }
 }

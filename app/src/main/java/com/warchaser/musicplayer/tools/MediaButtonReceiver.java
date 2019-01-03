@@ -52,19 +52,19 @@ public class MediaButtonReceiver extends BroadcastReceiver
                                 mClickCounter = 0;
                             }
 
-                            mClickCounter++;
+                            mClickCounter ++;
                             if (mClickCounter >= 3) {
                                 mClickCounter = 0;
                             }
                             mLastClickTime = eventTime;
 
-                            if(mClickCounter == 2 && !CallObserver.callPlay(DOUBLE_CLICK))
+                            if(mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK))
                             {
                                 if(MusicList.mMyBinder != null)
                                 {
                                     MusicList.mMyBinder.playNext();
                                 }
-                            } else if(mClickCounter == 1 && !CallObserver.callPlay(SINGLE_CLICK)){
+                            } else if(mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)){
                                 if(MusicList.mMyBinder != null)
                                 {
                                     if(MusicList.mMyBinder.getIsPlaying())
@@ -75,7 +75,12 @@ public class MediaButtonReceiver extends BroadcastReceiver
                                     {
                                         MusicList.mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
                                     }
+
                                 }
+                            }
+
+                            if(MusicList.mMyBinder != null){
+                                MusicList.mMyBinder.updateNotification();
                             }
                         }
                     }

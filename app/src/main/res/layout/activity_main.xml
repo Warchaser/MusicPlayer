@@ -101,17 +101,21 @@
 
                     <TextView
                         android:id="@+id/bottomBarTvTitle"
-                        android:layout_width="150dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:text="显示歌曲名"/>
+                        android:text="显示歌曲名"
+                        android:maxLines="2"
+                        android:ellipsize="end"/>
                     <TextView
                         android:id="@+id/bottomBarTvArtist"
-                        android:layout_width="150dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="显示艺术家名"
-                        android:layout_gravity="bottom"/>
+                        android:layout_gravity="bottom"
+                        android:maxLines="1"
+                        android:ellipsize="end"/>
 
                 </LinearLayout>
 

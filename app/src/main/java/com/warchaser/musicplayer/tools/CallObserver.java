@@ -23,7 +23,7 @@ public class CallObserver
         mObservers.add(observer);
     }
 
-    public static void callObserver(Intent intent)
+    public synchronized static void callObserver(Intent intent)
     {
         int size;
         if(mObservers != null && (size = mObservers.size()) > 0)
@@ -40,7 +40,12 @@ public class CallObserver
         }
     }
 
-    public static boolean callPlay(int repeatTime)
+    /**
+     * 通知UI更新逻辑
+     * @param repeatTime 1 重复一次(playOrPause); 2重复两次(next)
+     * @return boolean 是否存在UI Observer
+     * */
+    public synchronized static boolean callPlay(int repeatTime)
     {
         int size;
         boolean isOneUIEnabled = false;

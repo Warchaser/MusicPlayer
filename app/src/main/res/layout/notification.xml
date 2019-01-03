@@ -1,52 +1,68 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-    　　<LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="4dip">
-            <ImageView
-                android:id="@+id/fileImage"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:src="@mipmap/disc"
-                android:layout_gravity="center"
-                android:paddingLeft="4dip"/>
-            <TextView
-                android:id="@+id/fileName"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:textSize="15sp"
-                android:textColor="#000000"
-                android:text="未知文件"
-                android:gravity="center"
-                android:paddingLeft="4dip"
-                android:singleLine="true"/>
-    　　</LinearLayout>
-    　　<LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="4dip">
-    　　<TextView
-            android:id="@+id/downCount"
-            android:layout_width="40dip"
-            android:layout_height="fill_parent"
-            android:textSize="15sp"
-            android:textColor="#000000"
-            android:text="0%"
-            android:paddingLeft="4dip"
+<RelativeLayout
+    android:id="@+id/lyRoot"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/lyOperation">
+
+        <ImageView
+            android:id="@+id/fileImage"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_gravity="center"
-            android:singleLine="true"
-            android:gravity="center"/>
-    　　<ProgressBar
-            android:id="@+id/downpb"
-            android:layout_width="260dip"
-            android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_gravity="center_vertical"
-            android:paddingLeft="4dip"/>
-    　　</LinearLayout>
-</LinearLayout>
+            android:paddingLeft="4dip"
+            android:src="@mipmap/disc" />
+
+        <TextView
+            android:id="@+id/fileName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dip"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="未知文件"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+        　　
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lyOperation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="5dp">
+
+        <ImageView
+            android:id="@+id/ivPauseOrPlay"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@mipmap/pausedetail"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:id="@+id/ivNext"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@mipmap/next"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@mipmap/icon_close"
+            android:layout_marginLeft="5dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -126,19 +126,19 @@ public class ImageUtil
         Drawable drawable;
         if(!TextUtils.isEmpty(uri))
         {
-            drawable = ImageUtil.getCoverDrawableFromMusicFile(uri, context, context.getResources().getDimension(imageHeightId));
+            drawable = getCoverDrawableFromMusicFile(uri, context, context.getResources().getDimension(imageHeightId));
             if(drawable == null)
             {
-                drawable = ImageUtil.getDrawableFromRes(context, defaultImageId);
+                drawable = getDrawableFromRes(context, defaultImageId);
             }
         }
         else
         {
-            drawable = ImageUtil.getDrawableFromRes(context, defaultImageId);
+            drawable = getDrawableFromRes(context, defaultImageId);
         }
 
         if(backgroundOrResource){
-            ImageUtil.setBackground(imageView, drawable);
+            setBackground(imageView, drawable);
         } else {
             if(imageView instanceof ImageView){
                 ((ImageView)imageView).setImageDrawable(drawable);
