@@ -579,7 +579,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        if(MusicList.musicInfoList.size() != 0)
+        if(!MusicList.musicInfoList.isEmpty())
         {
             MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
             mTvBottomTitle.setText(bean.getTitle());
@@ -694,7 +694,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             else if(MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction))
             {
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC,0);
-                if(MusicList.musicInfoList.size() != 0)
+                if(!MusicList.musicInfoList.isEmpty())
                 {
                     MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
                     ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);

@@ -556,7 +556,7 @@ public class MyService extends Service
             }
 
         } else if(CLOSE_ACTION.equals(action)){
-
+            //TODO 这里实现完全关闭还是只停止播放并撤销Notification
         }
 
     }

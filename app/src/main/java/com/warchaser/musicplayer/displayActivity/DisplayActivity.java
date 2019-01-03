@@ -275,7 +275,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
     }
 
     private void initComponent(){
-        if(MusicList.musicInfoList.size() != 0)
+        if(!MusicList.musicInfoList.isEmpty())
         {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
         }
