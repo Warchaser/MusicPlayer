@@ -2,31 +2,33 @@
     android:id="@+id/lyRoot"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp"
+    android:minHeight="70dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/lyOperation">
 
-        <ImageView
-            android:id="@+id/fileImage"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_gravity="center"
-            android:paddingLeft="4dip"
-            android:src="@mipmap/disc" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"/>
 
         <TextView
             android:id="@+id/fileName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:paddingLeft="5dip"
-            android:maxLines="1"
-            android:ellipsize="end"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:text="未知文件"
             android:textColor="#000000"
             android:textSize="15sp" />
@@ -40,28 +42,36 @@
         android:orientation="horizontal"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:paddingRight="5dp">
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/ivPauseOrPlay"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:src="@mipmap/pausedetail"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="15dp"/>
 
         <ImageView
             android:id="@+id/ivNext"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:src="@mipmap/next"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="15dp"/>
 
         <ImageView
             android:id="@+id/ivClose"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:src="@mipmap/icon_close"
-            android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:id="@+id/fileImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:paddingLeft="15dip"
+            android:src="@mipmap/disc" />
 
     </LinearLayout>
 

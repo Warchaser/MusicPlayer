@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.warchaser.musicplayer"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
         versionName "2.1"

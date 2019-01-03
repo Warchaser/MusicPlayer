@@ -41,6 +41,8 @@ public class MyService extends Service
     private MediaPlayer mMediaPlayer;
     private boolean mIsPlaying = false;
 
+    private final String CHANNEL_ID = "com.warchaser.MusicPlayer.notification";
+
     private static final int updateProgress = 1;
     private static final int updateCurrentMusic = 2;
     private static final int updateDuration = 3;
@@ -71,8 +73,6 @@ public class MyService extends Service
 
     private AudioManager mAudioManager;
     private ComponentName rec;
-
-    private PendingIntent mPendingIntent;
 
     private RemoteViews mNotificationRemoteView;
     private Notification mNotification;
@@ -197,25 +197,6 @@ public class MyService extends Service
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
 
-//        String notificationTitle;
-//
-//        if(MusicList.musicInfoList.size() == 0)
-//        {
-//            notificationTitle = "Mr.Song is not here for now……";
-//        }
-//        else
-//        {
-//            notificationTitle = MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle();
-//        }
-//
-//        Notification notification = new Notification.Builder(MyService.this)
-//                .setTicker("MusicPlayer")
-//                .setSmallIcon(R.mipmap.notification1)
-//                .setContentTitle("Playing")
-//                .setContentText(notificationTitle)
-//                .setContentIntent(mPendingIntent)
-//                .getNotification();
-//        notification.flags |= Notification.FLAG_NO_CLEAR;
         startForeground(NOTIFICATION_ID, getNotification());
 
         CallObserver.callObserver(intent);
@@ -284,7 +265,7 @@ public class MyService extends Service
 
         if(mNotification == null)
         {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "com.warchaser.MusicPlayer.notification")
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContent(mNotificationRemoteView)
                     .setSmallIcon(R.mipmap.notification1);
 
@@ -426,7 +407,7 @@ public class MyService extends Service
 
     private void stop()
     {
-        
+
         MusicList.iCurrentPosition = mMediaPlayer.getCurrentPosition();
 
         mMediaPlayer.stop();
