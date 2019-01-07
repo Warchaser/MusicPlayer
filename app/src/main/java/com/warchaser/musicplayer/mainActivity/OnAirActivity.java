@@ -743,5 +743,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
         {
             return mIsEnabled;
         }
+
+        @Override
+        public void resetUIonStop() {
+
+        }
     }
 }

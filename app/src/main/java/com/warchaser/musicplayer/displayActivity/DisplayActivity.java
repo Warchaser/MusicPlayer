@@ -417,5 +417,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         {
             return mIsEnabled;
         }
+
+        @Override
+        public void resetUIonStop() {
+
+        }
     }
 }

@@ -23,12 +23,14 @@ public class BaseActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 //        checkUriPermission();
+        AppManager.addActivity(this);
     }
 
     @Override
     protected void onDestroy()
     {
         super.onDestroy();
+        AppManager.removeActivity(this);
         clearMember();
     }
 

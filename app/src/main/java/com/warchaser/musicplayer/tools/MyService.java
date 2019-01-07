@@ -20,8 +20,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.widget.RemoteViews;
 
@@ -43,9 +41,14 @@ public class MyService extends Service
 
     private final String CHANNEL_ID = "com.warchaser.MusicPlayer.notification";
 
-    private static final int updateProgress = 1;
-    private static final int updateCurrentMusic = 2;
-    private static final int updateDuration = 3;
+    /**
+     * 用于Handler
+     * */
+    private static final int UPDATE_PROGRESS = 1;
+    private static final int UPDATE_CURRENT_MUSIC = 2;
+    private static final int UPDATE_DURATION = 3;
+    private static final int FOCUS_CHANGE = 4;
+    //用于Handler
 
     public static final String ACTION_UPDATE_PROGRESS = "com.warchaser.MusicPlayer.UPDATE_PROGRESS";
     public static final String ACTION_UPDATE_DURATION = "com.warchaser.MusicPlayer.UPDATE_DURATION";
@@ -53,11 +56,11 @@ public class MyService extends Service
 
     public static final String PAUSE_OR_PLAY_ACTION = "com.warchaser.MusicPlayer.playOrPause";
     public static final String NEXT_ACTION = "com.warchaser.MusicPlayer.next";
-    public static final String CLOSE_ACTION = "com.warchaser.MusicPlayer.close";
+    public static final String STOP_ACTION = "com.warchaser.MusicPlayer.close";
 
     private final int PAUSE_FLAG = 0x11;
     private final int NEXT_FLAG = 0x12;
-    private final int CLOSE_FLAG = 0x13;
+    private final int STOP_FLAG = 0x13;
 
     private final int NOTIFICATION_ID = 1001;
 
@@ -97,14 +100,6 @@ public class MyService extends Service
                 MediaButtonReceiver.class.getName());
         mAudioManager.registerMediaButtonEventReceiver(rec);
 
-        //取得电话管理服务
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        if(telephonyManager != null)
-        {
-            //注册监听对象，对电话的来电状态进行监听
-            telephonyManager.listen(new TelListener(), PhoneStateListener.LISTEN_CALL_STATE);
-        }
-
         initializeReceiver();
 
     }
@@ -122,12 +117,16 @@ public class MyService extends Service
         {
             mMediaPlayer.release();
             mMediaPlayer = null;
-            mAudioManager.unregisterMediaButtonEventReceiver(rec);
         }
 
         if(mMessageHandler != null){
             mMessageHandler.removeCallbacksAndMessages(null);
             mMessageHandler = null;
+        }
+
+        if(mAudioManager != null){
+            mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            mAudioManager.unregisterMediaButtonEventReceiver(rec);
         }
 
         unregisterReceiver(mIntentReceiver);
@@ -140,7 +139,7 @@ public class MyService extends Service
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(PAUSE_OR_PLAY_ACTION);
         intentFilter.addAction(NEXT_ACTION);
-        intentFilter.addAction(CLOSE_ACTION);
+        intentFilter.addAction(STOP_ACTION);
 
         registerReceiver(mIntentReceiver, intentFilter);
     }
@@ -161,33 +160,71 @@ public class MyService extends Service
 
             switch (msg.what)
             {
-                case updateProgress:
+                case UPDATE_PROGRESS:
                     service.toUpdateProgress();
                     break;
-                case updateCurrentMusic:
+                case UPDATE_CURRENT_MUSIC:
                     service.toUpdateCurrentMusic();
                     break;
-                case updateDuration:
+                case UPDATE_DURATION:
                     service.toUpdateDuration();
+                    break;
+                case FOCUS_CHANGE:
+                    service.handleAudioFocusChanged(msg.arg1);
+                    break;
+                default:
                     break;
             }
         }
 
     }
 
+    /**
+     * 处理音源焦点
+     * */
+    private synchronized void handleAudioFocusChanged(int type){
+        switch (type){
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                setRemoteViewPlayOrPause();
+                if(!CallObserver.callPlay(1)){
+                    stop();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                setRemoteViewPlayOrPause();
+                if(!CallObserver.callPlay(1)){
+                    stop();
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN:
+                setRemoteViewPlayOrPause();
+                if(!CallObserver.callPlay(1)){
+                    if(mMyBinder.getIsPlaying()){
+                        stop();
+                    } else {
+                        startPlayNormal();
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     private void toUpdateProgress()
     {
-        if(mMediaPlayer != null && mIsPlaying)
+        if(mMediaPlayer != null && mIsPlaying && CallObserver.isNeedCallObserver())
         {
-            int i = mMediaPlayer.getCurrentPosition();
+            int currentPosition = mMediaPlayer.getCurrentPosition();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
-            intent.putExtra(ACTION_UPDATE_PROGRESS,i);
+            intent.putExtra(ACTION_UPDATE_PROGRESS, currentPosition);
 
             CallObserver.callObserver(intent);
 
             //每1秒发送一次广播，进度条每秒更新
-            mMessageHandler.sendEmptyMessageDelayed(updateProgress, 1000);
+            mMessageHandler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 1000);
         }
     }
 
@@ -251,8 +288,8 @@ public class MyService extends Service
         PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivNext, nextPendingIntent);
 
-        Intent closeIntent = new Intent(CLOSE_ACTION);
-        closeIntent.putExtra("FLAG", CLOSE_FLAG);
+        Intent closeIntent = new Intent(STOP_ACTION);
+        closeIntent.putExtra("FLAG", STOP_FLAG);
         PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
 
@@ -301,7 +338,7 @@ public class MyService extends Service
             {
                 mMediaPlayer.seekTo(MusicList.iCurrentPosition);
                 mMediaPlayer.start();
-                mMessageHandler.sendEmptyMessage(updateDuration);
+                mMessageHandler.sendEmptyMessage(UPDATE_DURATION);
             }
         });
 
@@ -374,7 +411,7 @@ public class MyService extends Service
     private void setCurrentMusic(int pCurrentMusic)
     {
         MusicList.iCurrentMusic = pCurrentMusic;
-        mMessageHandler.sendEmptyMessage(updateCurrentMusic);
+        mMessageHandler.sendEmptyMessage(UPDATE_CURRENT_MUSIC);
     }
 
     private int getRandomPosition()
@@ -384,6 +421,13 @@ public class MyService extends Service
 
     private void play(int CurrentMusic, int CurrentPosition)
     {
+        int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+        if(status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+            return;
+        }
+
         MusicList.iCurrentPosition = CurrentPosition;
         setCurrentMusic(CurrentMusic);
 
@@ -391,12 +435,11 @@ public class MyService extends Service
 
         try
         {
-
             if(!MusicList.musicInfoList.isEmpty())
             {
                 mMediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
                 mMediaPlayer.prepareAsync();
-                mMessageHandler.sendEmptyMessage(updateProgress);
+                mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
                 mIsPlaying = true;
             }
 
@@ -555,40 +598,22 @@ public class MyService extends Service
                 }
             }
 
-        } else if(CLOSE_ACTION.equals(action)){
-            //TODO 这里实现完全关闭还是只停止播放并撤销Notification
+        } else if(STOP_ACTION.equals(action)){
+            //TODO 这里实现完全关闭or只停止播放并撤销Notification
+
         }
 
     }
 
-    private class TelListener extends PhoneStateListener
-    {
-        public void onCallStateChanged(int state, String incomingNumber)
-        {
-            super.onCallStateChanged(state, incomingNumber);
-            //来电状态
-            if(state == TelephonyManager.CALL_STATE_RINGING)
-            {
-                if(!CallObserver.callPlay(1))
-                {
-                    if(mMyBinder.getIsPlaying())
-                    {
-                        mMyBinder.stopPlay();
-                    }
-                }
-            }
-            else if(state == TelephonyManager.CALL_STATE_IDLE)
-            {
-                if(!CallObserver.callPlay(1))
-                {
-                    if(!mMyBinder.getIsPlaying())
-                    {
-                        startPlayNormal();
-                    }
-                }
+    private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        @Override
+        public void onAudioFocusChange(final int focusChange) {
+            if(mMessageHandler != null){
+                mMessageHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
             }
         }
-    }
+    };
 
     public class MyBinder extends Binder
     {
@@ -662,6 +687,7 @@ public class MyService extends Service
         public void notifyProgress()
         {
             toUpdateDuration();
+            toUpdateProgress();
         }
     }
 
