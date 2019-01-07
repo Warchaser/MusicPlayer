@@ -31,10 +31,8 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by Wu on 2014/10/20.
- *
  */
-public class MyService extends Service
-{
+public class MyService extends Service {
 
     private MediaPlayer mMediaPlayer;
     private boolean mIsPlaying = false;
@@ -43,7 +41,7 @@ public class MyService extends Service
 
     /**
      * 用于Handler
-     * */
+     */
     private static final int UPDATE_PROGRESS = 1;
     private static final int UPDATE_CURRENT_MUSIC = 2;
     private static final int UPDATE_DURATION = 3;
@@ -66,6 +64,9 @@ public class MyService extends Service
 
     private int mCurrentMode = 3; //default sequence playing
 
+    /**
+     * 播放模式
+     */
     public static final int MODE_ONE_LOOP = 0;
     public static final int MODE_ALL_LOOP = 1;
     public static final int MODE_RANDOM = 2;
@@ -75,7 +76,7 @@ public class MyService extends Service
     private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
-    private ComponentName rec;
+    private ComponentName mComponentName;
 
     private RemoteViews mNotificationRemoteView;
     private Notification mNotification;
@@ -84,8 +85,7 @@ public class MyService extends Service
     private IntentReceiver mIntentReceiver;
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         MusicList.instance(getContentResolver());
 
         mMessageHandler = new MessageHandler(this);
@@ -95,10 +95,9 @@ public class MyService extends Service
 
         super.onCreate();
         //将ACTION_MEDIA_BUTTON注册到AudioManager，目前只能这么干(2014.12.24)
-        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        rec = new ComponentName(getPackageName(),
-                MediaButtonReceiver.class.getName());
-        mAudioManager.registerMediaButtonEventReceiver(rec);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mComponentName = new ComponentName(getPackageName(), MediaButtonReceiver.class.getName());
+        mAudioManager.registerMediaButtonEventReceiver(mComponentName);
 
         initializeReceiver();
 
@@ -110,23 +109,21 @@ public class MyService extends Service
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
-        if(mMediaPlayer != null)
-        {
+        if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
 
-        if(mMessageHandler != null){
+        if (mMessageHandler != null) {
             mMessageHandler.removeCallbacksAndMessages(null);
             mMessageHandler = null;
         }
 
-        if(mAudioManager != null){
+        if (mAudioManager != null) {
             mAudioManager.abandonAudioFocus(mAudioFocusListener);
-            mAudioManager.unregisterMediaButtonEventReceiver(rec);
+            mAudioManager.unregisterMediaButtonEventReceiver(mComponentName);
         }
 
         unregisterReceiver(mIntentReceiver);
@@ -134,7 +131,7 @@ public class MyService extends Service
         stopSelf();
     }
 
-    private void initializeReceiver(){
+    private void initializeReceiver() {
         mIntentReceiver = new IntentReceiver();
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(PAUSE_OR_PLAY_ACTION);
@@ -144,22 +141,18 @@ public class MyService extends Service
         registerReceiver(mIntentReceiver, intentFilter);
     }
 
-    private static class MessageHandler extends Handler
-    {
+    private static class MessageHandler extends Handler {
 
         private WeakReference<MyService> mServiceWeakReference;
 
-        MessageHandler(MyService service)
-        {
+        MessageHandler(MyService service) {
             mServiceWeakReference = new WeakReference<>(service);
         }
 
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             final MyService service = mServiceWeakReference.get();
 
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case UPDATE_PROGRESS:
                     service.toUpdateProgress();
                     break;
@@ -181,26 +174,26 @@ public class MyService extends Service
 
     /**
      * 处理音源焦点
-     * */
-    private synchronized void handleAudioFocusChanged(int type){
-        switch (type){
+     */
+    private synchronized void handleAudioFocusChanged(int type) {
+        switch (type) {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 setRemoteViewPlayOrPause();
-                if(!CallObserver.callPlay(1)){
+                if (!CallObserver.callPlay(1)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 setRemoteViewPlayOrPause();
-                if(!CallObserver.callPlay(1)){
+                if (!CallObserver.callPlay(1)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 setRemoteViewPlayOrPause();
-                if(!CallObserver.callPlay(1)){
-                    if(mMyBinder.getIsPlaying()){
+                if (!CallObserver.callPlay(1)) {
+                    if (mMyBinder.getIsPlaying()) {
                         stop();
                     } else {
                         startPlayNormal();
@@ -212,10 +205,8 @@ public class MyService extends Service
         }
     }
 
-    private void toUpdateProgress()
-    {
-        if(mMediaPlayer != null && mIsPlaying && CallObserver.isNeedCallObserver())
-        {
+    private void toUpdateProgress() {
+        if (mMediaPlayer != null && mIsPlaying && CallObserver.isNeedCallObserver()) {
             int currentPosition = mMediaPlayer.getCurrentPosition();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
@@ -228,8 +219,7 @@ public class MyService extends Service
         }
     }
 
-    private void toUpdateCurrentMusic()
-    {
+    private void toUpdateCurrentMusic() {
         Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
@@ -239,37 +229,28 @@ public class MyService extends Service
         CallObserver.callObserver(intent);
     }
 
-    private Notification getNotification(){
+    private Notification getNotification() {
         final String notificationTitle;
-        if(mNotificationRemoteView == null){
+        if (mNotificationRemoteView == null) {
             mNotificationRemoteView = new RemoteViews(this.getPackageName(), R.layout.notification);
         }
 
         MusicInfo bean;
 
-        if(MusicList.musicInfoList.isEmpty())
-        {
+        if (MusicList.musicInfoList.isEmpty()) {
             notificationTitle = "Mr.Song is not here for now……";
             mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
-        }
-        else
-        {
+        } else {
             bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
             notificationTitle = bean.getTitle();
             String uriString = bean.getUriWithCoverPic();
-            if(TextUtils.isEmpty(uriString))
-            {
+            if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
-            }
-            else
-            {
+            } else {
                 Drawable drawable = ImageUtil.getCoverDrawableFromMusicFile(uriString, this, 70);
-                if(drawable == null)
-                {
+                if (drawable == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
-                }
-                else
-                {
+                } else {
                     mNotificationRemoteView.setImageViewUri(R.id.fileImage, Uri.parse(uriString));
                 }
             }
@@ -293,15 +274,14 @@ public class MyService extends Service
         PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
 
-        Intent activityIntent = new Intent(MyService.this,OnAirActivity.class);
+        Intent activityIntent = new Intent(MyService.this, OnAirActivity.class);
         //clear the top of the stack, this flag can forbid the possibility of the two activities
         //existing at the same time
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent activityPendingIntent = PendingIntent.getActivity(MyService.this, 0, activityIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.lyRoot, activityPendingIntent);
 
-        if(mNotification == null)
-        {
+        if (mNotification == null) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContent(mNotificationRemoteView)
                     .setSmallIcon(R.mipmap.notification1);
@@ -313,71 +293,58 @@ public class MyService extends Service
         return mNotification;
     }
 
-    private void toUpdateDuration()
-    {
-        if(mMediaPlayer != null)
-        {
+    private void toUpdateDuration() {
+        if (mMediaPlayer != null) {
             int duration = mMediaPlayer.getDuration();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_DURATION);
-            intent.putExtra(ACTION_UPDATE_DURATION,duration);
+            intent.putExtra(ACTION_UPDATE_DURATION, duration);
 
             CallObserver.callObserver(intent);
         }
     }
 
-    public void initMediaPlayer()
-    {
+    public void initMediaPlayer() {
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mMediaPlayer.setOnPreparedListener(new OnPreparedListener()
-        {
+        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 
             @Override
-            public void onPrepared(MediaPlayer pMediaPlayer)
-            {
+            public void onPrepared(MediaPlayer pMediaPlayer) {
                 mMediaPlayer.seekTo(MusicList.iCurrentPosition);
                 mMediaPlayer.start();
                 mMessageHandler.sendEmptyMessage(UPDATE_DURATION);
             }
         });
 
-        mMediaPlayer.setOnCompletionListener(new OnCompletionListener()
-        {
+        mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 
             @Override
-            public void onCompletion(MediaPlayer pMediaPlayer)
-            {
-                if(mIsPlaying)
-                {
+            public void onCompletion(MediaPlayer pMediaPlayer) {
+                if (mIsPlaying) {
 
                     int currentPosition = mMediaPlayer.getCurrentPosition();
 
-                    if(isEmptyInFile(currentPosition))
-                    {
+                    if (isEmptyInFile(currentPosition)) {
                         mMediaPlayer.seekTo(currentPosition + 1000);
                         mMediaPlayer.start();
-                        return ;
+                        return;
                     }
 
-                    switch (mCurrentMode)
-                    {
+                    switch (mCurrentMode) {
                         case MODE_ONE_LOOP:
                             mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((MusicList.iCurrentMusic + 1) % MusicList.musicInfoList.size(),0);
+                            play((MusicList.iCurrentMusic + 1) % MusicList.musicInfoList.size(), 0);
                             break;
                         case MODE_RANDOM:
-                            play(getRandomPosition(),0);
+                            play(getRandomPosition(), 0);
                             break;
                         case MODE_SEQUENCE:
-                            if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
-                            {
-                                play(0,0);
-                            }
-                            else
-                            {
+                            if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                                play(0, 0);
+                            } else {
                                 next();
                             }
                             break;
@@ -388,11 +355,9 @@ public class MyService extends Service
             }
         });
 
-        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener()
-        {
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i2)
-            {
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
 
                 System.out.println("MediaPlayer has met a problem!" + i);
 
@@ -402,29 +367,25 @@ public class MyService extends Service
 
     }
 
-    private boolean isEmptyInFile(int currentPosition)
-    {
+    private boolean isEmptyInFile(int currentPosition) {
         return currentPosition < mMediaPlayer.getDuration();
 
     }
 
-    private void setCurrentMusic(int pCurrentMusic)
-    {
+    private void setCurrentMusic(int pCurrentMusic) {
         MusicList.iCurrentMusic = pCurrentMusic;
         mMessageHandler.sendEmptyMessage(UPDATE_CURRENT_MUSIC);
     }
 
-    private int getRandomPosition()
-    {
-        return (int)(Math.random() * (MusicList.musicInfoList.size() - 1));
+    private int getRandomPosition() {
+        return (int) (Math.random() * (MusicList.musicInfoList.size() - 1));
     }
 
-    private void play(int CurrentMusic, int CurrentPosition)
-    {
+    private void play(int CurrentMusic, int CurrentPosition) {
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
-        if(status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+        if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             return;
         }
 
@@ -433,10 +394,8 @@ public class MyService extends Service
 
         mMediaPlayer.reset();
 
-        try
-        {
-            if(!MusicList.musicInfoList.isEmpty())
-            {
+        try {
+            if (!MusicList.musicInfoList.isEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
                 mMediaPlayer.prepareAsync();
                 mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
@@ -448,8 +407,7 @@ public class MyService extends Service
         }
     }
 
-    private void stop()
-    {
+    private void stop() {
 
         MusicList.iCurrentPosition = mMediaPlayer.getCurrentPosition();
 
@@ -457,148 +415,125 @@ public class MyService extends Service
         mIsPlaying = false;
     }
 
-    private void next()
-    {
-        switch(mCurrentMode)
-        {
+    private void next() {
+        switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
-                {
-                    play(0,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic + 1,0);
+                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                    play(0, 0);
+                } else {
+                    play(MusicList.iCurrentMusic + 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
-                {
-                    play(0,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic + 1,0);
+                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                    play(0, 0);
+                } else {
+                    play(MusicList.iCurrentMusic + 1, 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1)
-                {
+                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
                     CommonUtils.showShortToast(R.string.last_song_tip);
-                    play(0,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic + 1,0);
+                    play(0, 0);
+                } else {
+                    play(MusicList.iCurrentMusic + 1, 0);
                 }
                 break;
             case MODE_RANDOM:
-                play(getRandomPosition(),0);
+                play(getRandomPosition(), 0);
                 break;
         }
     }
 
-    private void previous()
-    {
-        switch(mCurrentMode)
-        {
+    private void previous() {
+        switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if(MusicList.iCurrentMusic == 0)
-                {
-                    play(MusicList.musicInfoList.size() - 1,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic - 1,0);
+                if (MusicList.iCurrentMusic == 0) {
+                    play(MusicList.musicInfoList.size() - 1, 0);
+                } else {
+                    play(MusicList.iCurrentMusic - 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if(MusicList.iCurrentMusic == 0)
-                {
-                    play(MusicList.musicInfoList.size() - 1,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic - 1,0);
+                if (MusicList.iCurrentMusic == 0) {
+                    play(MusicList.musicInfoList.size() - 1, 0);
+                } else {
+                    play(MusicList.iCurrentMusic - 1, 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if(MusicList.iCurrentMusic == 0)
-                {
+                if (MusicList.iCurrentMusic == 0) {
                     CommonUtils.showShortToast(R.string.first_song_tip);
-                    play(MusicList.musicInfoList.size() - 1,0);
-                }
-                else
-                {
-                    play(MusicList.iCurrentMusic - 1,0);
+                    play(MusicList.musicInfoList.size() - 1, 0);
+                } else {
+                    play(MusicList.iCurrentMusic - 1, 0);
                 }
                 break;
             case MODE_RANDOM:
-                play(getRandomPosition(),0);
+                play(getRandomPosition(), 0);
                 break;
         }
     }
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         MusicList.mMyBinder = mMyBinder;
         return mMyBinder;
     }
 
-    public void startPlayNormal(){
+    public void startPlayNormal() {
         play(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
     }
 
     /**
      * 设置通知栏播放状态按钮图标
-     * */
-    private void setRemoteViewPlayOrPause(){
-        if(mNotificationRemoteView != null){
+     */
+    private void setRemoteViewPlayOrPause() {
+        if (mNotificationRemoteView != null) {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if(mNotificationManager != null){
+        if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
     }
 
-    private void setRemoteViewPlayOrPausePassive(){
-        if(mNotificationRemoteView != null){
+    private void setRemoteViewPlayOrPausePassive() {
+        if (mNotificationRemoteView != null) {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if(mNotificationManager != null){
+        if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
     }
 
     /**
      * 处理通知栏主动控制的消息
-     * */
-    private synchronized void handleIntentCommand(Intent intent){
+     */
+    private synchronized void handleIntentCommand(Intent intent) {
 
-        if(intent == null){
+        if (intent == null) {
             return;
         }
 
         final String action = intent.getAction();
-        if(NEXT_ACTION.equals(action)){
+        if (NEXT_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if(!CallObserver.callPlay(2)){
+            if (!CallObserver.callPlay(2)) {
                 next();
             }
-        } else if(PAUSE_OR_PLAY_ACTION.equals(action)){
+        } else if (PAUSE_OR_PLAY_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if(!CallObserver.callPlay(1)){
-                if(mMyBinder.getIsPlaying()){
+            if (!CallObserver.callPlay(1)) {
+                if (mMyBinder.getIsPlaying()) {
                     stop();
                 } else {
                     startPlayNormal();
                 }
             }
 
-        } else if(STOP_ACTION.equals(action)){
+        } else if (STOP_ACTION.equals(action)) {
             //TODO 这里实现完全关闭or只停止播放并撤销Notification
 
         }
@@ -609,32 +544,30 @@ public class MyService extends Service
 
         @Override
         public void onAudioFocusChange(final int focusChange) {
-            if(mMessageHandler != null){
+            if (mMessageHandler != null) {
                 mMessageHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
             }
         }
     };
 
-    public class MyBinder extends Binder
-    {
-        public void startPlay(int CurrentMusic,int CurrentPosition)
-        {
-            play(CurrentMusic,CurrentPosition);
+    public class MyBinder extends Binder {
+        public void startPlay(int CurrentMusic, int CurrentPosition) {
+            play(CurrentMusic, CurrentPosition);
         }
 
-        public void stopPlay(){
+        public void stopPlay() {
             stop();
         }
 
-        public void updateNotification(){
+        public void updateNotification() {
             setRemoteViewPlayOrPausePassive();
         }
 
-        public void playNext(){
+        public void playNext() {
             next();
         }
 
-        public void playPrevious(){
+        public void playPrevious() {
             previous();
         }
 
@@ -644,54 +577,47 @@ public class MyService extends Service
          * MODE_RANDOM = 3;
          * MODE_SEQUENCE = 4;
          */
-        public void changeMode(){
+        public void changeMode() {
             mCurrentMode = (mCurrentMode + 1) % 4;
         }
 
-        public int getCurrentMode(){
+        public int getCurrentMode() {
             return mCurrentMode;
         }
 
-        public synchronized boolean getIsPlaying(){
+        public synchronized boolean getIsPlaying() {
             return mIsPlaying;
         }
 
         /**
          * Notify Activities to update the current music and duration when current activity changes.
          */
-        public void notifyActivity()
-        {
+        public void notifyActivity() {
             toUpdateCurrentMusic();
             toUpdateDuration();
         }
 
         /**
          * seekBar action
-         * */
-        public void changeProgress(int pProgress)
-        {
-            if(mMediaPlayer != null)
-            {
+         */
+        public void changeProgress(int pProgress) {
+            if (mMediaPlayer != null) {
                 MusicList.iCurrentPosition = pProgress * 1000;
-                if(mIsPlaying)
-                {
+                if (mIsPlaying) {
                     mMediaPlayer.seekTo(MusicList.iCurrentPosition);
-                }
-                else
-                {
+                } else {
                     startPlayNormal();
                 }
             }
         }
 
-        public void notifyProgress()
-        {
+        public void notifyProgress() {
             toUpdateDuration();
             toUpdateProgress();
         }
     }
 
-    private class IntentReceiver extends BroadcastReceiver{
+    private class IntentReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
