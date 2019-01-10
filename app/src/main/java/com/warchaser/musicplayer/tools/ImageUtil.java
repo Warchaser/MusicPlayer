@@ -69,8 +69,14 @@ public class ImageUtil
                     Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
 
                     int width = dp2Px(context, px);
-
-                    bitmap = zoomImage(bitmap, width, width);
+                    float ratio = 0;
+                    if(bitmap.getHeight() > bitmap.getWidth()){
+                        ratio = (float) width / (float) bitmap.getHeight();
+                    } else {
+                        ratio = (float) width / (float) bitmap.getWidth();
+                    }
+//
+                    bitmap = scaleBitmap(bitmap, ratio);
                     if(is != null)
                     {
                         is.close();
@@ -121,6 +127,24 @@ public class ImageUtil
                 (int) height, matrix, true);
     }
 
+    public static Bitmap scaleBitmap(Bitmap origin, float ratio){
+        if(origin == null){
+            return null;
+        }
+
+        int width = origin.getWidth();
+        int height = origin.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.preScale(ratio, ratio);
+        Bitmap bitmap = Bitmap.createBitmap(origin, 0,0, width, height, matrix, false);
+        if(bitmap.equals(origin)){
+            return bitmap;
+        }
+
+        origin.recycle();
+        return bitmap;
+    }
+
     public static void setBottomBarDisc(Context context, String uri, int imageHeightId, View imageView, int defaultImageId, boolean backgroundOrResource)
     {
         Drawable drawable;
@@ -141,6 +165,7 @@ public class ImageUtil
             setBackground(imageView, drawable);
         } else {
             if(imageView instanceof ImageView){
+                imageView.setBackgroundResource(0);
                 ((ImageView)imageView).setImageDrawable(drawable);
             }
         }

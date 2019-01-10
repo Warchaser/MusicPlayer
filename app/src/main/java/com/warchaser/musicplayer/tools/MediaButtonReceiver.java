@@ -7,10 +7,8 @@ import android.view.KeyEvent;
 
 /**
  * Created by Wu on 2014/12/15.
- *
  */
-public class MediaButtonReceiver extends BroadcastReceiver
-{
+public class MediaButtonReceiver extends BroadcastReceiver {
 
     private static int mClickCounter = 0;
     private static final int DOUBLE_CLICK_DURATION = 500;
@@ -20,21 +18,18 @@ public class MediaButtonReceiver extends BroadcastReceiver
     private final int DOUBLE_CLICK = 2;
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         String intentAction = intent.getAction();
-        if(Intent.ACTION_MEDIA_BUTTON.equalsIgnoreCase(intentAction))
-        {
+        if (Intent.ACTION_MEDIA_BUTTON.equalsIgnoreCase(intentAction)) {
             KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (event == null)
-            {
+            if (event == null) {
                 return;
             }
             int keycode = event.getKeyCode();
             int action = event.getAction();
             final long eventTime = event.getEventTime();
 
-            switch (keycode){
+            switch (keycode) {
 
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
@@ -52,34 +47,28 @@ public class MediaButtonReceiver extends BroadcastReceiver
                                 mClickCounter = 0;
                             }
 
-                            mClickCounter ++;
+                            mClickCounter++;
                             if (mClickCounter >= 3) {
                                 mClickCounter = 0;
                             }
                             mLastClickTime = eventTime;
 
-                            if(mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK))
-                            {
-                                if(MusicList.mMyBinder != null)
-                                {
+                            if (mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK)) {
+                                if (MusicList.mMyBinder != null) {
                                     MusicList.mMyBinder.playNext();
                                 }
-                            } else if(mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)){
-                                if(MusicList.mMyBinder != null)
-                                {
-                                    if(MusicList.mMyBinder.getIsPlaying())
-                                    {
+                            } else if (mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)) {
+                                if (MusicList.mMyBinder != null) {
+                                    if (MusicList.mMyBinder.getIsPlaying()) {
                                         MusicList.mMyBinder.stopPlay();
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         MusicList.mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
                                     }
 
                                 }
                             }
 
-                            if(MusicList.mMyBinder != null){
+                            if (MusicList.mMyBinder != null) {
                                 MusicList.mMyBinder.updateNotification();
                             }
                         }

@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:orientation="vertical"
-    tools:context=".mainActivity.OnAirActivity"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    tools:context=".mainActivity.OnAirActivity">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -20,8 +20,7 @@
                 android:id="@+id/listView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:cacheColorHint="#00000000">
-            </ListView>
+                android:cacheColorHint="#00000000"></ListView>
 
             <TextView
                 android:id="@+id/tvFloatLetter"
@@ -30,9 +29,9 @@
                 android:layout_gravity="center"
                 android:background="#BB000000"
                 android:gravity="center"
+                android:textColor="#33CCCC"
                 android:textSize="40sp"
-                android:visibility="gone"
-                android:textColor="#33CCCC"/>
+                android:visibility="gone" />
 
             <com.warchaser.musicplayer.mainActivity.SlideBar
                 android:id="@+id/slideBar"
@@ -43,20 +42,18 @@
         </FrameLayout>
 
 
-
     </LinearLayout>
-
 
 
     <LinearLayout
         android:id="@+id/bottomBar"
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_weight="0.25"
         android:background="#EDEDED"
         android:clickable="true"
         android:focusable="true"
+        android:orientation="horizontal"
         android:paddingLeft="5dip">
 
         <ImageView
@@ -64,9 +61,7 @@
             android:layout_width="@dimen/bottom_bar_disc_width_and_height"
             android:layout_height="@dimen/bottom_bar_disc_width_and_height"
             android:layout_gravity="start|center"
-            android:background="@mipmap/disc"
-            android:contentDescription="image"
-            android:transitionName="cover"/>
+            android:transitionName="cover" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -75,28 +70,29 @@
 
             <SeekBar
                 android:id="@+id/progress"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="15dip"
                 android:layout_marginTop="3dip"
-                style="?android:attr/progressBarStyleHorizontal"
+                android:indeterminate="false"
                 android:maxHeight="1dip"
                 android:minHeight="1dip"
                 android:progressDrawable="@drawable/progress_style"
-                android:thumbOffset="0dip"
                 android:thumb="@mipmap/seekbar_thumb"
-                android:indeterminate="false"
-                android:transitionName="seek_bar"/>
+                android:thumbOffset="0dip"
+                android:transitionName="seek_bar" />
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="horizontal">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingLeft="15dip"
+                android:paddingRight="15dip">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="17dip"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toLeftOf="@id/ly_operation"
                     android:orientation="vertical">
 
                     <TextView
@@ -104,36 +100,38 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:text="显示歌曲名"
+                        android:ellipsize="end"
                         android:maxLines="2"
-                        android:ellipsize="end"/>
+                        android:text="显示歌曲名" />
+
                     <TextView
                         android:id="@+id/bottomBarTvArtist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="显示艺术家名"
                         android:layout_gravity="bottom"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
                         android:maxLines="1"
-                        android:ellipsize="end"/>
+                        android:text="显示艺术家名" />
 
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/ly_operation"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
-                    android:layout_gravity="right|center"
-                    android:layout_weight="1"
+                    android:layout_alignParentRight="true"
                     android:orientation="horizontal">
 
                     <LinearLayout
+                        android:id="@+id/lyBtnState"
                         android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:clickable="true"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:clickable="true"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:id="@+id/lyBtnState">
+                        android:padding="10dp">
 
                         <Button
                             android:id="@+id/btnState"
@@ -141,33 +139,32 @@
                             android:layout_height="33dip"
                             android:background="@mipmap/run"
                             android:gravity="right"
-                            android:transitionName="btn_state"/>
+                            android:transitionName="btn_state" />
 
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/lyBtnNext"
                         android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:clickable="true"
                         android:gravity="center"
-                        android:layout_weight="1"
                         android:orientation="horizontal"
-                        android:id="@+id/lyBtnNext">
+                        android:padding="10dp">
 
                         <Button
                             android:id="@+id/btnNext"
                             android:layout_width="33dip"
                             android:layout_height="33dip"
-                            android:gravity="right"
                             android:background="@mipmap/next"
-                            android:transitionName="btn_next"/>
+                            android:gravity="right"
+                            android:transitionName="btn_next" />
 
                     </LinearLayout>
 
-
-
                 </LinearLayout>
-            </LinearLayout>
+            </RelativeLayout>
         </LinearLayout>
 
     </LinearLayout>

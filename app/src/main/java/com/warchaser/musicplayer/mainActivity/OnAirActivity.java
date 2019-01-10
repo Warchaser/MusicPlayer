@@ -584,7 +584,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
-            ImageUtil.setBottomBarDisc(this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);
+            ImageUtil.setBottomBarDisc(this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, false);
         }
 
         mListViewSongs.setAdapter(mAdapter);
@@ -697,7 +697,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 if(!MusicList.musicInfoList.isEmpty())
                 {
                     MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, true);
+                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, false);
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }

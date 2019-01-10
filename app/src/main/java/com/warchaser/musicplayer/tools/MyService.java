@@ -1,6 +1,7 @@
 package com.warchaser.musicplayer.tools;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,6 +17,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -286,6 +288,13 @@ public class MyService extends Service {
                     .setContent(mNotificationRemoteView)
                     .setSmallIcon(R.mipmap.notification1);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MyService", NotificationManager.IMPORTANCE_LOW);
+                channel.setSound(null, null);
+                mNotificationManager.createNotificationChannel(channel);
+            }
+
+            builder.setOnlyAlertOnce(true);
             mNotification = builder.build();
             mNotification.flags |= Notification.FLAG_NO_CLEAR;
         }
@@ -498,6 +507,9 @@ public class MyService extends Service {
         }
     }
 
+    /**
+     * 设置通知栏播放状态按钮图标(被动的)
+     * */
     private void setRemoteViewPlayOrPausePassive() {
         if (mNotificationRemoteView != null) {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
