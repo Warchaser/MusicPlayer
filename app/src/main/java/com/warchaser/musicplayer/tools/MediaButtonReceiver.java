@@ -39,10 +39,6 @@ public class MediaButtonReceiver extends BroadcastReceiver {
 
                         if (keycode == KeyEvent.KEYCODE_HEADSETHOOK) {
 
-                            System.out.println(eventTime - mLastClickTime);
-                            System.out.println("mLastClickTime: " + mLastClickTime);
-                            System.out.println("eventTime: " + eventTime);
-
                             if (eventTime - mLastClickTime >= DOUBLE_CLICK_DURATION) {
                                 mClickCounter = 0;
                             }

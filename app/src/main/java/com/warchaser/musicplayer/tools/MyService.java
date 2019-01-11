@@ -368,7 +368,7 @@ public class MyService extends Service {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
 
-                System.out.println("MediaPlayer has met a problem!" + i);
+                NLog.e("MyService", "MediaPlayer has met a problem!" + i);
 
                 return false;
             }
