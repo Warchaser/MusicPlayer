@@ -391,7 +391,7 @@ public class MyService extends Service {
         return (int) (Math.random() * (MusicList.musicInfoList.size() - 1));
     }
 
-    private void play(int CurrentMusic, int CurrentPosition) {
+    private void play(int currentMusic, int currentPosition) {
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
@@ -399,8 +399,8 @@ public class MyService extends Service {
             return;
         }
 
-        MusicList.iCurrentPosition = CurrentPosition;
-        setCurrentMusic(CurrentMusic);
+        MusicList.iCurrentPosition = currentPosition;
+        setCurrentMusic(currentMusic);
 
         mMediaPlayer.reset();
 
@@ -503,7 +503,7 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if (mNotificationManager != null) {
+        if (mNotificationManager != null && mNotification != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
     }
@@ -516,7 +516,7 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if (mNotificationManager != null) {
+        if (mNotificationManager != null && mNotification != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
     }
@@ -566,10 +566,12 @@ public class MyService extends Service {
     public class MyBinder extends Binder {
         public void startPlay(int CurrentMusic, int CurrentPosition) {
             play(CurrentMusic, CurrentPosition);
+            updateNotification();
         }
 
         public void stopPlay() {
             stop();
+            updateNotification();
         }
 
         public void updateNotification() {
