@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -316,8 +317,16 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         Intent intent = getIntent();
         if (intent != null)
         {
-            String uri = intent.getStringExtra("uri");
-            ImageUtil.setBottomBarDisc(this, uri, R.dimen.bottom_bar_disc_width_and_height, mIvCover, R.mipmap.disc, false);
+            final String uri = intent.getStringExtra("uri");
+
+            ViewTreeObserver observer = mIvCover.getViewTreeObserver();
+            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    ImageUtil.setBottomBarDisc(DisplayActivity.this, uri, mIvCover.getWidth(), mIvCover, R.mipmap.disc, false);
+                }
+            });
+
         }
 
     }
@@ -373,7 +382,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
                 MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mIvCover, R.mipmap.disc, false);
+                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mIvCover.getHeight(), mIvCover, R.mipmap.disc, false);
 
             }
             else if(MyService.ACTION_UPDATE_DURATION.equals(action))

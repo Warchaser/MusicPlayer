@@ -67,8 +67,8 @@
 
         <ImageView
             android:id="@+id/fileImage"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="@dimen/notification_cover_width"
+            android:layout_height="@dimen/notification_cover_width"
             android:layout_gravity="center"
             android:layout_marginLeft="15dip"
             android:src="@mipmap/disc" />

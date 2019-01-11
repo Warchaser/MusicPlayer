@@ -249,7 +249,8 @@ public class MyService extends Service {
             if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
-                Drawable drawable = ImageUtil.getCoverDrawableFromMusicFile(uriString, this, 70);
+                float width = getResources().getDimension(R.dimen.notification_cover_width);
+                Drawable drawable = ImageUtil.getCoverDrawableFromMusicFile(uriString, this, width);
                 if (drawable == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {

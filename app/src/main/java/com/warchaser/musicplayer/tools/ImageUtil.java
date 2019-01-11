@@ -136,7 +136,7 @@ public class ImageUtil
         int height = origin.getHeight();
         Matrix matrix = new Matrix();
         matrix.preScale(ratio, ratio);
-        Bitmap bitmap = Bitmap.createBitmap(origin, 0,0, width, height, matrix, false);
+        Bitmap bitmap = Bitmap.createBitmap(origin, 0,0, width, height, matrix, true);
         if(bitmap.equals(origin)){
             return bitmap;
         }
@@ -145,12 +145,12 @@ public class ImageUtil
         return bitmap;
     }
 
-    public static void setBottomBarDisc(Context context, String uri, int imageHeightId, View imageView, int defaultImageId, boolean backgroundOrResource)
+    public static void setBottomBarDisc(Context context, String uri, float width, View imageView, int defaultImageId, boolean backgroundOrResource)
     {
         Drawable drawable;
         if(!TextUtils.isEmpty(uri))
         {
-            drawable = getCoverDrawableFromMusicFile(uri, context, context.getResources().getDimension(imageHeightId));
+            drawable = getCoverDrawableFromMusicFile(uri, context, width);
             if(drawable == null)
             {
                 drawable = getDrawableFromRes(context, defaultImageId);

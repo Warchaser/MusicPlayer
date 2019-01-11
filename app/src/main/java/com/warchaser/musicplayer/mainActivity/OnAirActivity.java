@@ -17,6 +17,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.AdapterView;
@@ -581,10 +582,26 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
 
         if(!MusicList.musicInfoList.isEmpty())
         {
-            MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+            final MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
-            ImageUtil.setBottomBarDisc(this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, false);
+
+            ViewTreeObserver observer = mBottomBarDisc.getViewTreeObserver();
+            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    ImageUtil.setBottomBarDisc(
+                            OnAirActivity.this,
+                            bean.getUriWithCoverPic(),
+                            mBottomBarDisc.getWidth(),
+                            mBottomBarDisc,
+                            R.mipmap.disc,
+                            false
+                    );
+                }
+            });
+
+
         }
 
         mListViewSongs.setAdapter(mAdapter);
@@ -697,7 +714,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                 if(!MusicList.musicInfoList.isEmpty())
                 {
                     MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), R.dimen.bottom_bar_disc_width_and_height, mBottomBarDisc, R.mipmap.disc, false);
+                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), mBottomBarDisc.getWidth(), mBottomBarDisc, R.mipmap.disc, false);
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }
