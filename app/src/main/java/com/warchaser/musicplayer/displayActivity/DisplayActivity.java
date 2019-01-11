@@ -111,6 +111,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
 
     private Unbinder mUnbinder;
 
+    private float mCoverWidth = 0;
+
     private ServiceConnection mServiceConnection = new ServiceConnection()
     {
 
@@ -319,14 +321,14 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
         {
             final String uri = intent.getStringExtra("uri");
 
-            ViewTreeObserver observer = mIvCover.getViewTreeObserver();
-            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            mIvCover.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    ImageUtil.setBottomBarDisc(DisplayActivity.this, uri, mIvCover.getWidth(), mIvCover, R.mipmap.disc, false);
+                    mCoverWidth = mIvCover.getMeasuredWidth() - mIvCover.getPaddingLeft() - mIvCover.getPaddingRight();
+                    ImageUtil.setBottomBarDisc(DisplayActivity.this, uri, mCoverWidth, mIvCover, R.mipmap.disc, false);
+                    mIvCover.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
-
         }
 
     }
@@ -382,7 +384,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
                 MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
-                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mIvCover.getHeight(), mIvCover, R.mipmap.disc, false);
+                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mCoverWidth, mIvCover, R.mipmap.disc, false);
 
             }
             else if(MyService.ACTION_UPDATE_DURATION.equals(action))

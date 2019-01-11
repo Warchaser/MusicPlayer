@@ -586,8 +586,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
 
-            ViewTreeObserver observer = mBottomBarDisc.getViewTreeObserver();
-            observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            mBottomBarDisc.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     ImageUtil.setBottomBarDisc(
@@ -598,10 +597,9 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener
                             R.mipmap.disc,
                             false
                     );
+                    mBottomBarDisc.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
-
-
         }
 
         mListViewSongs.setAdapter(mAdapter);

@@ -10,8 +10,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.warchaser.musicplayer.globalInfo.AppData;
 
 import java.io.InputStream;
 
@@ -25,6 +29,20 @@ public class ImageUtil
     private ImageUtil()
     {
 
+    }
+
+    public static int screenWidth() {
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wmgr = (WindowManager) AppData.getApp().getSystemService(Context.WINDOW_SERVICE);
+        wmgr.getDefaultDisplay().getMetrics(dm);
+        return dm.widthPixels ;
+    }
+
+    public static int screenHeight() {
+        DisplayMetrics dm = new DisplayMetrics();
+        WindowManager wmgr = (WindowManager) AppData.getApp().getSystemService(Context.WINDOW_SERVICE);
+        wmgr.getDefaultDisplay().getMetrics(dm);
+        return dm.heightPixels ;
     }
 
     public static void setBackground(View view, Drawable drawable)
