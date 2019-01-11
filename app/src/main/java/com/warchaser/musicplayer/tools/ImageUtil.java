@@ -112,6 +112,61 @@ public class ImageUtil
             return null;
         }
     }
+    public static Bitmap getCoverBitmapFromMusicFile(String uriString, Context context, float px)
+    {
+        if(TextUtils.isEmpty(uriString))
+        {
+            return null;
+        }
+        else
+        {
+            ContentResolver res = context.getContentResolver();
+            Uri uri = Uri.parse(uriString);
+
+            if(uri != null)
+            {
+                InputStream is;
+                try
+                {
+                    is = res.openInputStream(uri);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 1;
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeStream(is, null, options);
+                    options.inJustDecodeBounds = false;
+                    options.inDither = false;
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    is = res.openInputStream(uri);
+
+                    Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+
+                    int width = dp2Px(context, px);
+                    float ratio = 0;
+                    if(bitmap.getHeight() > bitmap.getWidth()){
+                        ratio = (float) width / (float) bitmap.getHeight();
+                    } else {
+                        ratio = (float) width / (float) bitmap.getWidth();
+                    }
+//
+                    bitmap = scaleBitmap(bitmap, ratio);
+                    if(is != null)
+                    {
+                        is.close();
+                    }
+
+                    return bitmap;
+                }
+                catch (Exception | Error e)
+                {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            return null;
+        }
+    }
+
 
     public static Drawable getDrawableFromBitmap(Context context, Bitmap bitmap)
     {

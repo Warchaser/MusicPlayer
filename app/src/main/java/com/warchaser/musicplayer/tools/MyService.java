@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -250,11 +251,12 @@ public class MyService extends Service {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
                 float width = getResources().getDimension(R.dimen.notification_cover_width);
-                Drawable drawable = ImageUtil.getCoverDrawableFromMusicFile(uriString, this, width);
-                if (drawable == null) {
+                Bitmap bitmap = ImageUtil.getCoverBitmapFromMusicFile(uriString, this, width);
+                if (bitmap == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {
-                    mNotificationRemoteView.setImageViewUri(R.id.fileImage, Uri.parse(uriString));
+//                    mNotificationRemoteView.setImageViewUri(R.id.fileImage, Uri.parse(uriString));
+                    mNotificationRemoteView.setImageViewBitmap(R.id.fileImage, bitmap);
                 }
             }
         }
