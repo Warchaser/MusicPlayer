@@ -21,13 +21,10 @@ import java.io.InputStream;
 
 /**
  * Created by Wucn on 2017/2/3.
- *
  */
 
-public class ImageUtil
-{
-    private ImageUtil()
-    {
+public class ImageUtil {
+    private ImageUtil() {
 
     }
 
@@ -35,99 +32,43 @@ public class ImageUtil
         DisplayMetrics dm = new DisplayMetrics();
         WindowManager wmgr = (WindowManager) AppData.getApp().getSystemService(Context.WINDOW_SERVICE);
         wmgr.getDefaultDisplay().getMetrics(dm);
-        return dm.widthPixels ;
+        return dm.widthPixels;
     }
 
     public static int screenHeight() {
         DisplayMetrics dm = new DisplayMetrics();
         WindowManager wmgr = (WindowManager) AppData.getApp().getSystemService(Context.WINDOW_SERVICE);
         wmgr.getDefaultDisplay().getMetrics(dm);
-        return dm.heightPixels ;
+        return dm.heightPixels;
     }
 
-    public static void setBackground(View view, Drawable drawable)
-    {
+    public static void setBackground(View view, Drawable drawable) {
         int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
-        {
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackgroundDrawable(drawable);
-        }
-        else
-        {
+        } else {
             view.setBackground(drawable);
         }
     }
 
-    public static Drawable getCoverDrawableFromMusicFile(String uriString, Context context, float px)
-    {
-        if(TextUtils.isEmpty(uriString))
-        {
+    public static Drawable getCoverDrawableFromMusicFile(String uriString, Context context, float px) {
+        if (TextUtils.isEmpty(uriString) || context == null) {
             return null;
-        }
-        else
-        {
-            ContentResolver res = context.getContentResolver();
-            Uri uri = Uri.parse(uriString);
-
-            if(uri != null)
-            {
-                InputStream is;
-                try
-                {
-                    is = res.openInputStream(uri);
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inSampleSize = 1;
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeStream(is, null, options);
-                    options.inJustDecodeBounds = false;
-                    options.inDither = false;
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    is = res.openInputStream(uri);
-
-                    Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
-
-                    int width = dp2Px(context, px);
-                    float ratio = 0;
-                    if(bitmap.getHeight() > bitmap.getWidth()){
-                        ratio = (float) width / (float) bitmap.getHeight();
-                    } else {
-                        ratio = (float) width / (float) bitmap.getWidth();
-                    }
-//
-                    bitmap = scaleBitmap(bitmap, ratio);
-                    if(is != null)
-                    {
-                        is.close();
-                    }
-
-                    return getDrawableFromBitmap(context, bitmap);
-                }
-                catch (Exception | Error e)
-                {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            return null;
+        } else {
+            return getDrawableFromBitmap(context, getCoverBitmapFromMusicFile(uriString, context, px));
         }
     }
-    public static Bitmap getCoverBitmapFromMusicFile(String uriString, Context context, float px)
-    {
-        if(TextUtils.isEmpty(uriString))
-        {
+
+    public static Bitmap getCoverBitmapFromMusicFile(String uriString, Context context, float px) {
+        if (TextUtils.isEmpty(uriString)) {
             return null;
-        }
-        else
-        {
+        } else {
             ContentResolver res = context.getContentResolver();
             Uri uri = Uri.parse(uriString);
 
-            if(uri != null)
-            {
+            if (uri != null) {
                 InputStream is;
-                try
-                {
+                try {
                     is = res.openInputStream(uri);
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inSampleSize = 1;
@@ -140,24 +81,25 @@ public class ImageUtil
 
                     Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
 
+                    if(bitmap == null){
+                        return null;
+                    }
+
                     int width = dp2Px(context, px);
                     float ratio = 0;
-                    if(bitmap.getHeight() > bitmap.getWidth()){
+                    if (bitmap.getHeight() > bitmap.getWidth()) {
                         ratio = (float) width / (float) bitmap.getHeight();
                     } else {
                         ratio = (float) width / (float) bitmap.getWidth();
                     }
-//
+
                     bitmap = scaleBitmap(bitmap, ratio);
-                    if(is != null)
-                    {
+                    if (is != null) {
                         is.close();
                     }
 
                     return bitmap;
-                }
-                catch (Exception | Error e)
-                {
+                } catch (Exception | Error e) {
                     e.printStackTrace();
                     return null;
                 }
@@ -168,16 +110,19 @@ public class ImageUtil
     }
 
 
-    public static Drawable getDrawableFromBitmap(Context context, Bitmap bitmap)
-    {
+    public static Drawable getDrawableFromBitmap(Context context, Bitmap bitmap) {
+
+        if(bitmap == null){
+            return null;
+        }
+
         return new BitmapDrawable(context.getResources(), bitmap);
     }
 
-    public static Drawable getDrawableFromRes(Context context, int res)
-    {
+    public static Drawable getDrawableFromRes(Context context, int res) {
         return ContextCompat.getDrawable(context, res);
     }
-    
+
 
     public static int dp2Px(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -200,8 +145,8 @@ public class ImageUtil
                 (int) height, matrix, true);
     }
 
-    public static Bitmap scaleBitmap(Bitmap origin, float ratio){
-        if(origin == null){
+    public static Bitmap scaleBitmap(Bitmap origin, float ratio) {
+        if (origin == null) {
             return null;
         }
 
@@ -209,8 +154,8 @@ public class ImageUtil
         int height = origin.getHeight();
         Matrix matrix = new Matrix();
         matrix.preScale(ratio, ratio);
-        Bitmap bitmap = Bitmap.createBitmap(origin, 0,0, width, height, matrix, true);
-        if(bitmap.equals(origin)){
+        Bitmap bitmap = Bitmap.createBitmap(origin, 0, 0, width, height, matrix, true);
+        if (bitmap.equals(origin)) {
             return bitmap;
         }
 
@@ -218,28 +163,23 @@ public class ImageUtil
         return bitmap;
     }
 
-    public static void setBottomBarDisc(Context context, String uri, float width, View imageView, int defaultImageId, boolean backgroundOrResource)
-    {
+    public static void setBottomBarDisc(Context context, String uri, float width, View imageView, int defaultImageId, boolean backgroundOrResource) {
         Drawable drawable;
-        if(!TextUtils.isEmpty(uri))
-        {
+        if (!TextUtils.isEmpty(uri)) {
             drawable = getCoverDrawableFromMusicFile(uri, context, width);
-            if(drawable == null)
-            {
+            if (drawable == null) {
                 drawable = getDrawableFromRes(context, defaultImageId);
             }
-        }
-        else
-        {
+        } else {
             drawable = getDrawableFromRes(context, defaultImageId);
         }
 
-        if(backgroundOrResource){
+        if (backgroundOrResource) {
             setBackground(imageView, drawable);
         } else {
-            if(imageView instanceof ImageView){
+            if (imageView instanceof ImageView) {
                 imageView.setBackgroundResource(0);
-                ((ImageView)imageView).setImageDrawable(drawable);
+                ((ImageView) imageView).setImageDrawable(drawable);
             }
         }
     }

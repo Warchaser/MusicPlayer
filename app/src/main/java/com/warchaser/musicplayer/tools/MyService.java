@@ -289,7 +289,7 @@ public class MyService extends Service {
         if (mNotification == null) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContent(mNotificationRemoteView)
-                    .setSmallIcon(R.mipmap.notification1);
+                    .setSmallIcon(R.mipmap.notification);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MyService", NotificationManager.IMPORTANCE_LOW);
@@ -384,8 +384,7 @@ public class MyService extends Service {
 
     }
 
-    private void setCurrentMusic(int pCurrentMusic) {
-        MusicList.iCurrentMusic = pCurrentMusic;
+    private void setCurrentMusic() {
         mMessageHandler.sendEmptyMessage(UPDATE_CURRENT_MUSIC);
     }
 
@@ -402,7 +401,7 @@ public class MyService extends Service {
         }
 
         MusicList.iCurrentPosition = currentPosition;
-        setCurrentMusic(currentMusic);
+        MusicList.iCurrentMusic = currentMusic;
 
         mMediaPlayer.reset();
 
@@ -417,6 +416,8 @@ public class MyService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        setCurrentMusic();
     }
 
     private void stop() {
