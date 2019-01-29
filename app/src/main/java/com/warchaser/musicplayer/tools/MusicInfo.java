@@ -6,10 +6,8 @@ import android.os.Parcelable;
 
 /**
  * Created by Wu on 2014/10/20.
- *
  */
-public class MusicInfo implements Parcelable
-{
+public class MusicInfo implements Parcelable {
 
     private long lId;
     private String sTitle;
@@ -25,8 +23,7 @@ public class MusicInfo implements Parcelable
 
     //Getters & setters
 
-    public MusicInfo(Parcel in)
-    {
+    public MusicInfo(Parcel in) {
         lId = in.readLong();
         sTitle = in.readString();
         sAlbum = in.readString();
@@ -41,17 +38,14 @@ public class MusicInfo implements Parcelable
 
     }
 
-    public static final Creator<MusicInfo> CREATOR = new Creator<MusicInfo>()
-    {
+    public static final Creator<MusicInfo> CREATOR = new Creator<MusicInfo>() {
         @Override
-        public MusicInfo createFromParcel(Parcel in)
-        {
+        public MusicInfo createFromParcel(Parcel in) {
             return new MusicInfo(in);
         }
 
         @Override
-        public MusicInfo[] newArray(int size)
-        {
+        public MusicInfo[] newArray(int size) {
             return new MusicInfo[size];
         }
     };
@@ -80,13 +74,11 @@ public class MusicInfo implements Parcelable
         this.sAlbum = album;
     }
 
-    public long getAlbumId()
-    {
+    public long getAlbumId() {
         return mAlbumId;
     }
 
-    public void setAlbumId(long albumId)
-    {
+    public void setAlbumId(long albumId) {
         this.mAlbumId = albumId;
     }
 
@@ -138,27 +130,23 @@ public class MusicInfo implements Parcelable
         this.pinyinTitle = pinyinTitle;
     }
 
-    public String getUriWithCoverPic()
-    {
+    public String getUriWithCoverPic() {
         return mUriWithCoverPic;
     }
 
-    public void setUriWithCoverPic(String uri)
-    {
+    public void setUriWithCoverPic(String uri) {
         this.mUriWithCoverPic = uri;
     }
 
-    public void setUriWithCoverPic(Uri uri)
-    {
+    public void setUriWithCoverPic(Uri uri) {
         this.mUriWithCoverPic = uri.toString();
     }
 
-    public MusicInfo(){
+    public MusicInfo() {
 
     }
 
-    public MusicInfo(long pId, String pTitle)
-    {
+    public MusicInfo(long pId, String pTitle) {
         lId = pId;
         sTitle = pTitle;
     }
@@ -169,8 +157,7 @@ public class MusicInfo implements Parcelable
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i)
-    {
+    public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(lId);
         parcel.writeString(sTitle);
         parcel.writeString(sAlbum);
@@ -183,11 +170,9 @@ public class MusicInfo implements Parcelable
     }
 
     public static final Creator<MusicInfo>
-        creator = new Creator<MusicInfo>()
-    {
+            creator = new Creator<MusicInfo>() {
         @Override
-        public MusicInfo createFromParcel(Parcel parcel)
-        {
+        public MusicInfo createFromParcel(Parcel parcel) {
             MusicInfo musicInfo = new MusicInfo();
             musicInfo.setId(parcel.readLong());
             musicInfo.setTitle(parcel.readString());
@@ -202,8 +187,7 @@ public class MusicInfo implements Parcelable
         }
 
         @Override
-        public MusicInfo[] newArray(int i)
-        {
+        public MusicInfo[] newArray(int i) {
             return new MusicInfo[i];
         }
     };

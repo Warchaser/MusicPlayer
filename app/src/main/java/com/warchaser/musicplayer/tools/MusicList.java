@@ -11,10 +11,8 @@ import java.util.List;
 
 /**
  * Created by Wu on 2014/10/20.
- *
  */
-public class MusicList
-{
+public class MusicList {
 
     public static List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
     private static MusicList musicList;
@@ -24,17 +22,17 @@ public class MusicList
 
     /**
      * The music which is playing.
-     * */
+     */
     public static int iCurrentMusic;
 
     /**
-     *The position of the music is playing.
-     * */
+     * The position of the music is playing.
+     */
     public static int iCurrentPosition;
 
     /**
      * The length of each music;
-     * */
+     */
     public static int iCurrentMax;
 
     public static MyService.MyBinder mMyBinder;
@@ -51,30 +49,23 @@ public class MusicList
 
     private String sSortOrder = Media.DATA;
 
-    public static MusicList instance(ContentResolver pContentResolver)
-    {
-        if(null == musicList){
-           contentResolver = pContentResolver;
+    public static MusicList instance(ContentResolver pContentResolver) {
+        if (null == musicList) {
+            contentResolver = pContentResolver;
             musicList = new MusicList();
         }
         return musicList;
     }
 
-    private MusicList()
-    {
+    private MusicList() {
         Cursor cursor = null;
-        try{
-            cursor = contentResolver.query(contentUri,null,null,null, order);
-            if(null == cursor)
-            {
+        try {
+            cursor = contentResolver.query(contentUri, null, null, null, order);
+            if (null == cursor) {
                 return;
-            }
-            else if(!cursor.moveToFirst())
-            {
+            } else if (!cursor.moveToFirst()) {
                 return;
-            }
-            else
-            {
+            } else {
                 int displayNameCol = cursor.getColumnIndex(Media.TITLE);
                 int albumCol = cursor.getColumnIndex(Media.ALBUM);
                 int albumIdCol = cursor.getColumnIndex(Media.ALBUM_ID);
@@ -83,8 +74,7 @@ public class MusicList
                 int sizeCol = cursor.getColumnIndex(Media.SIZE);
                 int artistCol = cursor.getColumnIndex(Media.ARTIST);
                 int urlCol = cursor.getColumnIndex(Media.DATA);
-                do
-                {
+                do {
                     String title = cursor.getString(displayNameCol);
                     String album = cursor.getString(albumCol);
                     long albumId = cursor.getLong(albumIdCol);
@@ -101,40 +91,39 @@ public class MusicList
                     musicInfo.setArtist(artist);
                     musicInfo.setUrl(url);
 
-                    if(id > 0)
-                    {
+                    if (id > 0) {
                         musicInfo.setUriWithCoverPic("content://media/external/audio/media/" + id + "/albumart");
-                    }
-                    else if(albumId > 0)
-                    {
+                    } else if (albumId > 0) {
                         musicInfo.setUriWithCoverPic(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId));
-                    }
-                    else
-                    {
+                    } else {
                         musicInfo.setUriWithCoverPic("");
                     }
 
 //                    musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0,1).toUpperCase());
-                    musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0,1));
-                    if(musicInfo.getDuration() / 1000 > 60){
+                    musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0, 1));
+                    if (musicInfo.getDuration() / 1000 > 60) {
                         musicInfoList.add(musicInfo);
                     }
 
-                }while(cursor.moveToNext());
+                } while (cursor.moveToNext());
                 cursor.close();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public List<MusicInfo> getMusicList(){
+    public List<MusicInfo> getMusicList() {
         return musicInfoList;
     }
 
-    public Uri getMusicUriById(long id){
+    public Uri getMusicUriById(long id) {
         Uri uri = ContentUris.withAppendedId(contentUri, id);
         return uri;
+    }
+
+    public static boolean isListEmpty(){
+        return musicInfoList.isEmpty();
     }
 
 }

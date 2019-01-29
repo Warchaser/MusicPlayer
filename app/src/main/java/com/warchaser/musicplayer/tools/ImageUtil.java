@@ -81,7 +81,7 @@ public class ImageUtil {
 
                     Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
 
-                    if(bitmap == null){
+                    if (bitmap == null) {
                         return null;
                     }
 
@@ -112,7 +112,7 @@ public class ImageUtil {
 
     public static Drawable getDrawableFromBitmap(Context context, Bitmap bitmap) {
 
-        if(bitmap == null){
+        if (bitmap == null) {
             return null;
         }
 

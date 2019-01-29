@@ -18,15 +18,13 @@ import butterknife.ButterKnife;
 
 /**
  * Created by Wucn on 2017/12/20.
- *
  */
 
-public class SongsAdapter extends BaseAdapter
-{
+public class SongsAdapter extends BaseAdapter {
 
     private Context mContext;
 
-    SongsAdapter(Context context){
+    SongsAdapter(Context context) {
         mContext = context;
     }
 
@@ -46,33 +44,28 @@ public class SongsAdapter extends BaseAdapter
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup)
-    {
+    public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolderItem viewHolder;
-        if(null == view)
-        {
+        if (null == view) {
             view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
             viewHolder = new ViewHolderItem(view);
             viewHolder.gfGo.setGifImage(R.mipmap.ani);
             viewHolder.gfGo.setGifImageType(GifView.GifImageType.COVER);
 
             view.setTag(viewHolder);
-        }
-        else
-        {
+        } else {
             viewHolder = (ViewHolderItem) view.getTag();
         }
 
         viewHolder.tvItemTitle.setText(MusicList.musicInfoList.get(i).getTitle());
         viewHolder.tvItemDuration.setText(FormatHelper.formatDuration(MusicList.musicInfoList.get(i).getDuration()));
 
-        viewHolder.tvItemTitle.setTextColor(Color.argb(255,0,0,0));
-        viewHolder.tvItemDuration.setTextColor(Color.argb(255,0,0,0));
+        viewHolder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
+        viewHolder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
 
         viewHolder.gfGo.setVisibility(View.GONE);
 
-        if(i == MusicList.iCurrentMusic)
-        {
+        if (i == MusicList.iCurrentMusic) {
             viewHolder.tvItemTitle.setTextColor(Color.RED);
             viewHolder.tvItemDuration.setTextColor(Color.RED);
             viewHolder.gfGo.setVisibility(View.VISIBLE);
@@ -81,28 +74,27 @@ public class SongsAdapter extends BaseAdapter
         return view;
     }
 
-    class ViewHolderItem
-    {
+    class ViewHolderItem {
         /**
          * TextView, Music Title
-         * */
+         */
         @BindView(R.id.tvItemTitle)
         TextView tvItemTitle;
 
         /**
          * TextView, Music Duration
-         * */
+         */
         @BindView(R.id.tvItemDuration)
         TextView tvItemDuration;
 
         /**
          * GifView, Tag a Gif on Current Music which is Playing
-         * */
+         */
         @BindView(R.id.gfGo)
         GifView gfGo;
 
-        ViewHolderItem(View view){
-            ButterKnife.bind(this,view);
+        ViewHolderItem(View view) {
+            ButterKnife.bind(this, view);
         }
     }
 }

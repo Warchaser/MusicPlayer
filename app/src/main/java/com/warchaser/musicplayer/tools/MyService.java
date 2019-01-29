@@ -11,12 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -129,9 +127,11 @@ public class MyService extends Service {
             mAudioManager.unregisterMediaButtonEventReceiver(mComponentName);
         }
 
-        unregisterReceiver(mIntentReceiver);
+        if(mIntentReceiver != null){
+            unregisterReceiver(mIntentReceiver);
+            mIntentReceiver = null;
+        }
 
-        stopSelf();
     }
 
     private void initializeReceiver() {

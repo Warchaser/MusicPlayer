@@ -13,36 +13,30 @@ import android.support.v7.app.AppCompatActivity;
  * 基类，
  */
 
-public class BaseActivity extends AppCompatActivity
-{
+public class BaseActivity extends AppCompatActivity {
 
     protected final int CODE_FOR_WRITE_PERMISSION = 1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        checkUriPermission();
         AppManager.addActivity(this);
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         AppManager.removeActivity(this);
         clearMember();
     }
 
-    protected boolean checkUriPermission()
-    {
-        if(android.os.Build.VERSION.SDK_INT >= 23)
-        {
+    protected boolean checkUriPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
             int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED)
-            {
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
                 BaseActivity activity = this;
-                ActivityCompat.requestPermissions(activity,new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         CODE_FOR_WRITE_PERMISSION);
                 return false;
 
@@ -54,18 +48,15 @@ public class BaseActivity extends AppCompatActivity
         return true;
     }
 
-    protected void clearMember()
-    {
+    protected void clearMember() {
 
     }
 
-    protected String getRestStrings(int resId)
-    {
+    protected String getRestStrings(int resId) {
         return getResources().getString(resId);
     }
 
-    protected void startCertainActivity(Class<?> cls)
-    {
+    protected void startCertainActivity(Class<?> cls) {
         startActivity(new Intent(this, cls));
     }
 }
