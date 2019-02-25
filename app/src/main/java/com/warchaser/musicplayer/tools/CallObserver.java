@@ -20,12 +20,7 @@ public class CallObserver {
     }
 
     public synchronized static void callObserver(final Intent intent) {
-        process(new SubFunction<UIObserver>() {
-            @Override
-            public void processor(UIObserver observer) {
-                observer.notifySeekBar2Update(intent);
-            }
-        });
+        process((observer) -> observer.notifySeekBar2Update(intent));
     }
 
     /**
@@ -37,12 +32,9 @@ public class CallObserver {
     public synchronized static boolean callPlay(final int repeatTime) {
         final ValueBean bean = new ValueBean();
 
-        process(new SubFunction<UIObserver>() {
-            @Override
-            public void processor(UIObserver observer) {
-                observer.notify2Play(repeatTime);
-                bean.setFlag(true);
-            }
+        process(observer -> {
+            observer.notify2Play(repeatTime);
+            bean.setFlag(true);
         });
 
         return bean.isFlag();
@@ -65,12 +57,7 @@ public class CallObserver {
     }
 
     public static void resetUIonStop() {
-        process(new SubFunction<UIObserver>() {
-            @Override
-            public void processor(UIObserver observer) {
-                observer.resetUIonStop();
-            }
-        });
+        process(UIObserver::resetUIonStop);
     }
 
     private static void process(SubFunction<UIObserver> observerSubFunction) {
