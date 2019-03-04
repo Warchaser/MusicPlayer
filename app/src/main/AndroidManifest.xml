@@ -58,11 +58,11 @@
         <service android:name=".tools.MyService" >
         </service>
 
-        <receiver android:name=".tools.MediaButtonReceiver" >
-            <intent-filter android:priority="999" >
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".tools.MediaButtonReceiver" >-->
+            <!--<intent-filter android:priority="999" >-->
+                <!--<action android:name="android.intent.action.MEDIA_BUTTON" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
     </application>
 

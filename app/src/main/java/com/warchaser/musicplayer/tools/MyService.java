@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -81,7 +80,7 @@ public class MyService extends Service {
     private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
-    private ComponentName mComponentName;
+//    private ComponentName mComponentName;
 
     private RemoteViews mNotificationRemoteView;
     private Notification mNotification;
@@ -90,6 +89,13 @@ public class MyService extends Service {
     private IntentReceiver mIntentReceiver;
 
     private MediaSession mMediaSession;
+
+    private static int mClickCounter = 0;
+    private static final int DOUBLE_CLICK_DURATION = 500;
+    private static long mLastClickTime = 0;
+
+    private final int SINGLE_CLICK = 1;
+    private final int DOUBLE_CLICK = 2;
 
     @Override
     public void onCreate() {
@@ -103,8 +109,8 @@ public class MyService extends Service {
         super.onCreate();
         //将ACTION_MEDIA_BUTTON注册到AudioManager，目前只能这么干(2014.12.24)
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        mComponentName = new ComponentName(getPackageName(), MediaButtonReceiver.class.getName());
-        mAudioManager.registerMediaButtonEventReceiver(mComponentName);
+//        mComponentName = new ComponentName(getPackageName(), MediaButtonReceiver.class.getName());
+//        mAudioManager.registerMediaButtonEventReceiver(mComponentName);
 
         initializeReceiver();
 
@@ -132,7 +138,7 @@ public class MyService extends Service {
 
         if (mAudioManager != null) {
             mAudioManager.abandonAudioFocus(mAudioFocusListener);
-            mAudioManager.unregisterMediaButtonEventReceiver(mComponentName);
+//            mAudioManager.unregisterMediaButtonEventReceiver(mComponentName);
         }
 
         if(mIntentReceiver != null){
@@ -562,12 +568,12 @@ public class MyService extends Service {
         final String action = intent.getAction();
         if (NEXT_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(2)) {
+            if (!CallObserver.callPlay(DOUBLE_CLICK)) {
                 next();
             }
         } else if (PAUSE_OR_PLAY_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(1)) {
+            if (!CallObserver.callPlay(SINGLE_CLICK)) {
                 if (mMyBinder.getIsPlaying()) {
                     stop();
                 } else {
@@ -584,17 +590,40 @@ public class MyService extends Service {
 
     private void handleMediaButtonUp(int keyCode, KeyEvent event){
         NLog.e("MyService", "keyCode: " + keyCode);
+        final long eventTime = event.getEventTime();
         setRemoteViewPlayOrPause();
         switch (keyCode){
             case KeyEvent.KEYCODE_MEDIA_NEXT:
-                if (!CallObserver.callPlay(2)) {
+                if (!CallObserver.callPlay(DOUBLE_CLICK)) {
                     next();
                 }
                 break;
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 break;
+            case KeyEvent.KEYCODE_HEADSETHOOK:
+                if (eventTime - mLastClickTime >= DOUBLE_CLICK_DURATION) {
+                    mClickCounter = 0;
+                }
+
+                mClickCounter++;
+                if (mClickCounter >= 3) {
+                    mClickCounter = 0;
+                }
+                mLastClickTime = eventTime;
+
+                if (mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK)) {
+                    next();
+                } else if (mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)) {
+                    if (mMyBinder.getIsPlaying()) {
+                        stop();
+                    } else {
+                        startPlayNormal();
+                    }
+                }
+
+                break;
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                if (!CallObserver.callPlay(1)) {
+                if (!CallObserver.callPlay(SINGLE_CLICK)) {
                     if (mMyBinder.getIsPlaying()) {
                         stop();
                     } else {
@@ -603,12 +632,12 @@ public class MyService extends Service {
                 }
                 break;
             case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                if (!CallObserver.callPlay(1)){
+                if (!CallObserver.callPlay(SINGLE_CLICK)){
                     stop();
                 }
                 break;
-            case KeyEvent.KEYCODE_MEDIA_CLOSE:
-                if (!CallObserver.callPlay(1)){
+            case KeyEvent.KEYCODE_MEDIA_PLAY:
+                if (!CallObserver.callPlay(SINGLE_CLICK)){
                     startPlayNormal();
                 }
                 break;
