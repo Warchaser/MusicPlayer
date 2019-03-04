@@ -15,6 +15,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.session.MediaSession;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.widget.RemoteViews;
 
 import com.warchaser.musicplayer.R;
@@ -57,6 +59,8 @@ public class MyService extends Service {
     public static final String NEXT_ACTION = "com.warchaser.MusicPlayer.next";
     public static final String STOP_ACTION = "com.warchaser.MusicPlayer.close";
 
+    private final String MEDIA_SESSION_TAG = "com.warchaser.musicplayer.tools.MyService";
+
     private final int PAUSE_FLAG = 0x11;
     private final int NEXT_FLAG = 0x12;
     private final int STOP_FLAG = 0x13;
@@ -85,6 +89,8 @@ public class MyService extends Service {
 
     private IntentReceiver mIntentReceiver;
 
+    private MediaSession mMediaSession;
+
     @Override
     public void onCreate() {
         MusicList.instance(getContentResolver());
@@ -101,6 +107,8 @@ public class MyService extends Service {
         mAudioManager.registerMediaButtonEventReceiver(mComponentName);
 
         initializeReceiver();
+
+        initializeMediaSession();
 
     }
 
@@ -132,6 +140,8 @@ public class MyService extends Service {
             mIntentReceiver = null;
         }
 
+        releaseMediaSession();
+
     }
 
     private void initializeReceiver() {
@@ -142,6 +152,22 @@ public class MyService extends Service {
         intentFilter.addAction(STOP_ACTION);
 
         registerReceiver(mIntentReceiver, intentFilter);
+    }
+
+    private void initializeMediaSession(){
+        mMediaSession = new MediaSession(getApplicationContext(), MEDIA_SESSION_TAG);
+        mMediaSession.setCallback(mMediaSessionCallBack);
+        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
+        mMediaSession.setActive(true);
+    }
+
+    private void releaseMediaSession(){
+        if(mMediaSession != null){
+            mMediaSession.setCallback(null);
+            mMediaSession.setActive(false);
+            mMediaSession.release();
+            mMediaSession = null;
+        }
     }
 
     private static class MessageHandler extends Handler {
@@ -556,6 +582,41 @@ public class MyService extends Service {
 
     }
 
+    private void handleMediaButtonUp(int keyCode, KeyEvent event){
+        NLog.e("MyService", "keyCode: " + keyCode);
+        setRemoteViewPlayOrPause();
+        switch (keyCode){
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+                if (!CallObserver.callPlay(2)) {
+                    next();
+                }
+                break;
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                break;
+            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                if (!CallObserver.callPlay(1)) {
+                    if (mMyBinder.getIsPlaying()) {
+                        stop();
+                    } else {
+                        startPlayNormal();
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                if (!CallObserver.callPlay(1)){
+                    stop();
+                }
+                break;
+            case KeyEvent.KEYCODE_MEDIA_CLOSE:
+                if (!CallObserver.callPlay(1)){
+                    startPlayNormal();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
 
         @Override
@@ -563,6 +624,28 @@ public class MyService extends Service {
             if (mMessageHandler != null) {
                 mMessageHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
             }
+        }
+    };
+
+    private final MediaSession.Callback mMediaSessionCallBack = new MediaSession.Callback() {
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+            if(mediaButtonIntent == null){
+                return false;
+            }
+
+            if(Intent.ACTION_MEDIA_BUTTON.equals(mediaButtonIntent.getAction())){
+                KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                if(event == null){
+                    return false;
+                }
+                if(KeyEvent.ACTION_UP == event.getAction()){
+                    handleMediaButtonUp(event.getKeyCode(), event);
+                    return true;
+                }
+            }
+
+            return false;
         }
     };
 
