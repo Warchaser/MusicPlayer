@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Media;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +59,10 @@ public class MusicList {
     }
 
     private MusicList() {
+        loadMusicList();
+    }
+
+    public void loadMusicList(){
         Cursor cursor = null;
         try {
             cursor = contentResolver.query(contentUri, null, null, null, order);
@@ -120,6 +125,10 @@ public class MusicList {
     public Uri getMusicUriById(long id) {
         Uri uri = ContentUris.withAppendedId(contentUri, id);
         return uri;
+    }
+
+    public static boolean deleteSingleMusicFile(String uri){
+        return new File(uri).delete();
     }
 
     public static boolean isListEmpty(){

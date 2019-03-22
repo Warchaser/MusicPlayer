@@ -6,4 +6,10 @@
     <string name="database_sync_completed">同步完成</string>
     <string name="last_song_tip">最后一首歌曲了，亲，即将播放第一首歌曲～</string>
     <string name="first_song_tip">已经是第一首歌了，亲，即将播放最后一首歌曲～</string>
+
+    <string name="song_title_place_holder">显示歌曲名</string>
+    <string name="song_author_place_holder">显示艺术家名</string>
+
+    <string name="option_delete">删除</string>
+
 </resources>

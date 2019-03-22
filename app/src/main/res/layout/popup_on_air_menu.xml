@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:paddingLeft="@dimen/common_padding"
+    android:paddingRight="@dimen/common_padding">
+
+    <RelativeLayout
+        android:id="@+id/mLyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/on_air_list_height">
+
+        <TextView
+            android:id="@+id/mTvSongTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/common_font_size"
+            android:textColor="@color/black"
+            android:maxLines="1"/>
+
+        <Button
+            android:id="@+id/mBtnClose"
+            android:layout_width="@dimen/common_button_height"
+            android:layout_height="@dimen/common_button_height"
+            android:background="@mipmap/icon_close_menu"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/mLyOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mTvOptionDelete"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/on_air_list_height"
+            android:gravity="center_vertical"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_font_size"
+            android:text="@string/option_delete"/>
+
+    </LinearLayout>
+
+</LinearLayout>

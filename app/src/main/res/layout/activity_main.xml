@@ -20,7 +20,7 @@
                 android:id="@+id/listView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:cacheColorHint="#00000000"></ListView>
+                android:cacheColorHint="#00000000"/>
 
             <TextView
                 android:id="@+id/tvFloatLetter"
@@ -102,7 +102,7 @@
                         android:layout_weight="2"
                         android:ellipsize="end"
                         android:maxLines="2"
-                        android:text="显示歌曲名" />
+                        android:text="@string/song_title_place_holder" />
 
                     <TextView
                         android:id="@+id/bottomBarTvArtist"
@@ -112,7 +112,7 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="显示艺术家名" />
+                        android:text="@string/song_author_place_holder" />
 
                 </LinearLayout>
 

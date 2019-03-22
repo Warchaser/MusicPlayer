@@ -42,6 +42,7 @@ import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
+import com.warchaser.musicplayer.view.OnAirListMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,6 +173,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     private boolean mIsFromExternal = false;
 
     private Unbinder mUnbinder;
+
+    private OnAirListMenu mMenuPopupWindow;
 
     /**
      * 绑定服务
@@ -538,25 +541,39 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             });
         }
 
+        mAdapter.setOnItemClickDelegate(new SongsAdapter.OnItemClickDelegate() {
+            @Override
+            public void onItemClick(int position, MusicInfo bean) {
+                onSongsItemClick(position);
+            }
+
+            @Override
+            public void onMenuClick(int position, MusicInfo bean) {
+                showSongListMenu(bean, position);
+            }
+        });
+
         mListViewSongs.setAdapter(mAdapter);
         mListViewSongs.setFocusable(true);
 
-        mListViewSongs.setOnItemClickListener(new OnItemClickListener() {
+//        mListViewSongs.setOnItemClickListener(new OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                MusicList.iCurrentMusic = i;
+//                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+//                if (mMyBinder.getIsPlaying()) {
+//                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+//                } else {
+//                    mBtnState.setBackgroundResource(R.mipmap.run);
+//                }
+//
+//                mAdapter.notifyDataSetChanged();
+//
+//            }
+//        });
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MusicList.iCurrentMusic = i;
-                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
-                if (mMyBinder.getIsPlaying()) {
-                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-                } else {
-                    mBtnState.setBackgroundResource(R.mipmap.run);
-                }
-
-                mAdapter.notifyDataSetChanged();
-
-            }
-        });
+        mMenuPopupWindow = new OnAirListMenu(this);
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
         final AlphaAnimation alp = new AlphaAnimation(1.0f, 0.0f);
@@ -610,6 +627,24 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
      */
     private boolean getBinderStatute() {
         return mMyBinder != null;
+    }
+
+    private void onSongsItemClick(int position){
+        MusicList.iCurrentMusic = position;
+        mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+        if (mMyBinder.getIsPlaying()) {
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+        } else {
+            mBtnState.setBackgroundResource(R.mipmap.run);
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void showSongListMenu(MusicInfo bean, int position){
+        if(mMenuPopupWindow != null){
+            mMenuPopupWindow.show(bean.getTitle(), bean.getUrl(), position);
+        }
     }
 
     private class UIUpdateObserver implements UIObserver {
