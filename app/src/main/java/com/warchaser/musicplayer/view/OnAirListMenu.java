@@ -26,6 +26,8 @@ public class OnAirListMenu extends AlertDialog {
 
     private int mSelectedMusicPosition = -1;
 
+    private OnMenuOptionsSelectedListener mOnMenuOptionsSelectedListener;
+
     public OnAirListMenu(Context context){
         super(context);
         this.mContext = context;
@@ -71,7 +73,13 @@ public class OnAirListMenu extends AlertDialog {
             @Override
             public void onClick(View v) {
                 if(isParamsAvailable()){
-                    MusicList.deleteSingleMusicFile(mCurrentUri);
+
+                    final boolean isDeleted = MusicList.deleteSingleMusicFile(mCurrentUri);
+
+                    if(mOnMenuOptionsSelectedListener != null){
+                        mOnMenuOptionsSelectedListener.onDeleteSelected(mSelectedMusicPosition, isDeleted);
+                    }
+
                     resetParams();
                 }
 
@@ -94,6 +102,14 @@ public class OnAirListMenu extends AlertDialog {
         mCurrentUri = uri;
         mSelectedMusicPosition = selectedMusicPosition;
         show();
+    }
+
+    public void setOnMenuOptionsSelectedListener(OnMenuOptionsSelectedListener listener){
+        mOnMenuOptionsSelectedListener = listener;
+    }
+
+    public interface OnMenuOptionsSelectedListener{
+        void onDeleteSelected(int position, boolean isDeleted);
     }
 
     @Override

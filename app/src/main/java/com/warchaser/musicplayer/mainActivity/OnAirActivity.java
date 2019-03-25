@@ -20,8 +20,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,8 +56,6 @@ import butterknife.Unbinder;
  * This activity contains ActionBar(Title), ListView, SlideBar(Me-Class) and LinerLayout.
  * This java-document contains inner-static classes.
  */
-
-
 public class OnAirActivity extends BaseActivity implements View.OnClickListener {
 
     /**
@@ -574,6 +570,20 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 //        });
 
         mMenuPopupWindow = new OnAirListMenu(this);
+
+        mMenuPopupWindow.setOnMenuOptionsSelectedListener(new OnAirListMenu.OnMenuOptionsSelectedListener() {
+            @Override
+            public void onDeleteSelected(int position, boolean isDeleted) {
+
+                if(isDeleted){
+                    MusicList.musicInfoList.remove(position);
+                    mAdapter.notifyDataSetChanged();
+                }
+
+                CommonUtils.showShortToast(isDeleted ? R.string.delete_single_file_successfully : R.string.delete_single_file_failed);
+
+            }
+        });
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
         final AlphaAnimation alp = new AlphaAnimation(1.0f, 0.0f);

@@ -12,4 +12,7 @@
 
     <string name="option_delete">删除</string>
 
+    <string name="delete_single_file_successfully">删除歌曲成功</string>
+    <string name="delete_single_file_failed">删除歌曲失败</string>
+
 </resources>
