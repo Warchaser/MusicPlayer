@@ -31,7 +31,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
 
     private OnItemClickDelegate mOnItemClickDelegate;
 
-
     SongsAdapter(Context context) {
         mContext = context;
         mOnItemClickListener = new OnItemClickListener();

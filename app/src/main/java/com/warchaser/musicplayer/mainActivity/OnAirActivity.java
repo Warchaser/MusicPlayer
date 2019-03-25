@@ -625,8 +625,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         } else {
             mBtnState.setBackgroundResource(R.mipmap.run);
         }
-
-        mAdapter.notifyItemChanged(position);
     }
 
     private void showSongListMenu(MusicInfo bean, int position){
