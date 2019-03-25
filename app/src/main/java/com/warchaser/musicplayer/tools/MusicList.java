@@ -80,6 +80,12 @@ public class MusicList {
                 int artistCol = cursor.getColumnIndex(Media.ARTIST);
                 int urlCol = cursor.getColumnIndex(Media.DATA);
                 do {
+                    String url = cursor.getString(urlCol);
+
+                    if(!new File(url).exists()){
+                        continue;
+                    }
+
                     String title = cursor.getString(displayNameCol);
                     String album = cursor.getString(albumCol);
                     long albumId = cursor.getLong(albumIdCol);
@@ -87,7 +93,7 @@ public class MusicList {
                     int duration = cursor.getInt(durationCol);
                     long size = cursor.getLong(sizeCol);
                     String artist = cursor.getString(artistCol);
-                    String url = cursor.getString(urlCol);
+
                     MusicInfo musicInfo = new MusicInfo(id, title);
                     musicInfo.setAlbum(album);
                     musicInfo.setAlbumId(albumId);
