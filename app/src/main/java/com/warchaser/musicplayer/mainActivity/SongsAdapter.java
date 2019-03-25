@@ -2,15 +2,16 @@ package com.warchaser.musicplayer.mainActivity;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.ant.liao.GifView;
+import com.bumptech.glide.Glide;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
@@ -23,68 +24,67 @@ import butterknife.ButterKnife;
  * Created by Wucn on 2017/12/20.
  */
 
-public class SongsAdapter extends BaseAdapter {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderItem> {
 
     private Context mContext;
     private OnItemClickListener mOnItemClickListener;
 
     private OnItemClickDelegate mOnItemClickDelegate;
 
+
     SongsAdapter(Context context) {
         mContext = context;
         mOnItemClickListener = new OnItemClickListener();
     }
 
+    @NonNull
     @Override
-    public int getCount() {
+    public ViewHolderItem onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new ViewHolderItem(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item, viewGroup, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolderItem viewHolderItem, int position) {
+
+        MusicInfo bean = MusicList.musicInfoList.get(position);
+
+        Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(viewHolderItem.gfGo);
+//        viewHolderItem.gfGo.setGifImage(R.mipmap.ani);
+//        viewHolderItem.gfGo.setGifImageType(GifView.GifImageType.COVER);
+
+
+        viewHolderItem.tvItemTitle.setText(bean.getTitle());
+        viewHolderItem.tvItemDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
+
+        viewHolderItem.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
+        viewHolderItem.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
+
+        viewHolderItem.gfGo.setVisibility(View.GONE);
+
+        viewHolderItem.mLyRoot.setTag(position);
+        viewHolderItem.mLyRoot.setOnClickListener(mOnItemClickListener);
+
+        viewHolderItem.mBtnMenu.setTag(position);
+        viewHolderItem.mBtnMenu.setOnClickListener(mOnItemClickListener);
+
+        if (position == MusicList.iCurrentMusic) {
+            viewHolderItem.tvItemTitle.setTextColor(Color.RED);
+            viewHolderItem.tvItemDuration.setTextColor(Color.RED);
+            viewHolderItem.gfGo.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return MusicList.musicInfoList.size();
     }
 
+    /**
+     * 配合setHasStableIds(true)使用
+     * */
     @Override
-    public Object getItem(int i) {
-        return MusicList.musicInfoList.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return MusicList.musicInfoList.get(i).getId();
-    }
-
-    @Override
-    public View getView(int position, View view, ViewGroup viewGroup) {
-        ViewHolderItem viewHolder;
-        if (null == view) {
-            view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
-            viewHolder = new ViewHolderItem(view);
-            viewHolder.gfGo.setGifImage(R.mipmap.ani);
-            viewHolder.gfGo.setGifImageType(GifView.GifImageType.COVER);
-
-            view.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolderItem) view.getTag();
-        }
-
-        viewHolder.tvItemTitle.setText(MusicList.musicInfoList.get(position).getTitle());
-        viewHolder.tvItemDuration.setText(FormatHelper.formatDuration(MusicList.musicInfoList.get(position).getDuration()));
-
-        viewHolder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
-        viewHolder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
-
-        viewHolder.gfGo.setVisibility(View.GONE);
-
-        viewHolder.mLyRoot.setTag(position);
-        viewHolder.mLyRoot.setOnClickListener(mOnItemClickListener);
-
-        viewHolder.mBtnMenu.setTag(position);
-        viewHolder.mBtnMenu.setOnClickListener(mOnItemClickListener);
-
-        if (position == MusicList.iCurrentMusic) {
-            viewHolder.tvItemTitle.setTextColor(Color.RED);
-            viewHolder.tvItemDuration.setTextColor(Color.RED);
-            viewHolder.gfGo.setVisibility(View.VISIBLE);
-        }
-
-        return view;
+    public long getItemId(int position) {
+        return position;
     }
 
     public void setOnItemClickDelegate(OnItemClickDelegate delegate){
@@ -122,7 +122,7 @@ public class SongsAdapter extends BaseAdapter {
         void onMenuClick(int position, MusicInfo bean);
     }
 
-    class ViewHolderItem {
+    class ViewHolderItem extends RecyclerView.ViewHolder{
         /**
          * TextView, Music Title
          */
@@ -139,7 +139,7 @@ public class SongsAdapter extends BaseAdapter {
          * GifView, Tag a Gif on Current Music which is Playing
          */
         @BindView(R.id.gfGo)
-        GifView gfGo;
+        ImageView gfGo;
 
         /**
          * 右侧菜单按钮
@@ -151,6 +151,7 @@ public class SongsAdapter extends BaseAdapter {
         RelativeLayout mLyRoot;
 
         ViewHolderItem(View view) {
+            super(view);
             ButterKnife.bind(this, view);
         }
     }

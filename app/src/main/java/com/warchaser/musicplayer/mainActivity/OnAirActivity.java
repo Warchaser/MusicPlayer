@@ -13,6 +13,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +26,6 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -68,23 +70,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
      */
     public MyBinder mMyBinder;
 
-    //Save the position of list on pause
-    /**
-     * View to convert.
-     */
-    private View mView4SeekListView;
-
-    /**
-     * Index of current position of ListView.
-     */
-    private int mIndex4SeekListView;
-
-    /**
-     * Top of the position of ListView.
-     */
-    private int mTop4SeekListView;
-    //Save the position of list on pause
-
     /**
      * Layout BottomBar
      */
@@ -127,7 +112,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
      * ListView, Songs List
      */
     @BindView(R.id.listView)
-    ListView mListViewSongs;
+    RecyclerView mListViewSongs;
 
     /**
      * SeekBar, Playing Progress
@@ -168,9 +153,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
     private boolean mIsFromExternal = false;
 
-    private Unbinder mUnbinder;
+    private Unbinder mUnBinder;
 
     private OnAirListMenu mMenuPopupWindow;
+
+    private LinearLayoutManager mLayoutManager;
 
     /**
      * 绑定服务
@@ -213,7 +200,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mUnbinder = ButterKnife.bind(this);
+        mUnBinder = ButterKnife.bind(this);
 
         getList();
         playExternal();
@@ -313,7 +300,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 });
     }
 
-
     //获取数据库中没有的文件的各种信息，并显示在列表的尾部
     private void getMetaData(String filePath) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -338,11 +324,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mMyBinder = null;
         }
 
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
+        if (mUnBinder != null) {
+            mUnBinder.unbind();
+            mUnBinder = null;
         }
-
-        mUnbinder = null;
 
         CallObserver.removeSingleObserver(mObserver);
         clearOnDestroy();
@@ -351,8 +336,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void onPause() {
         super.onPause();
-        mIndex4SeekListView = mListViewSongs.getFirstVisiblePosition();
-        mTop4SeekListView = (mView4SeekListView == null) ? 0 : mView4SeekListView.getTop();
         if (mObserver != null) {
             mObserver.setObserverEnabled(false);
         }
@@ -370,7 +353,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         }
 
-        mListViewSongs.setSelectionFromTop(mIndex4SeekListView, mTop4SeekListView);
         if (mObserver != null) {
             mObserver.setObserverEnabled(true);
         }
@@ -455,8 +437,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mMusicListTmps = null;
         }
 
-        mView4SeekListView = null;
-
         mLyBottomBar = null;
 
         mLyBtnState = null;
@@ -476,6 +456,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         mSlideBar = null;
         mTvFloatLetter = null;
         mObserver = null;
+
+        if(mMenuPopupWindow != null){
+            mMenuPopupWindow.dismiss();
+            mMenuPopupWindow = null;
+        }
+
+        mLayoutManager = null;
+
     }
 
     private void play() {
@@ -549,25 +537,16 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        mListViewSongs.setAdapter(mAdapter);
-        mListViewSongs.setFocusable(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mListViewSongs.setLayoutManager(mLayoutManager);
 
-//        mListViewSongs.setOnItemClickListener(new OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                MusicList.iCurrentMusic = i;
-//                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
-//                if (mMyBinder.getIsPlaying()) {
-//                    mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-//                } else {
-//                    mBtnState.setBackgroundResource(R.mipmap.run);
-//                }
-//
-//                mAdapter.notifyDataSetChanged();
-//
-//            }
-//        });
+        mListViewSongs.setItemAnimator(null);
+
+        mListViewSongs.addItemDecoration(new DividerItemDecoration(
+                this, DividerItemDecoration.VERTICAL));
+
+        mAdapter.setHasStableIds(true);
+        mListViewSongs.setAdapter(mAdapter);
 
         mMenuPopupWindow = new OnAirListMenu(this);
 
@@ -620,11 +599,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 }
 
                 int index = mMusicListTmps.indexOf(bean.getPinyinInitial());
-                mListViewSongs.setSelection(index);
+
+                scrollRecyclerView2Position(index);
             }
         });
-
-        mView4SeekListView = mListViewSongs.getChildAt(0);
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
@@ -648,12 +626,18 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mBtnState.setBackgroundResource(R.mipmap.run);
         }
 
-        mAdapter.notifyDataSetChanged();
+        mAdapter.notifyItemChanged(position);
     }
 
     private void showSongListMenu(MusicInfo bean, int position){
         if(mMenuPopupWindow != null){
             mMenuPopupWindow.show(bean.getTitle(), bean.getUrl(), position);
+        }
+    }
+
+    private void scrollRecyclerView2Position(int position){
+        if(mLayoutManager != null){
+            mLayoutManager.scrollToPositionWithOffset(position, 0);
         }
     }
 
@@ -677,7 +661,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }
-                mListViewSongs.setSelection(MusicList.iCurrentMusic);
+
                 mAdapter.notifyDataSetChanged();
 
             } else if (MyService.ACTION_UPDATE_DURATION.equals(sAction)) {
