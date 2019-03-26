@@ -9,6 +9,7 @@
     <dimen name="on_air_list_height">60dip</dimen>
     <dimen name="common_padding">15dip</dimen>
     <dimen name="common_button_height">25dip</dimen>
+    <dimen name="common_dialog_button_height">50dip</dimen>
 
     <dimen name="common_font_size">16sp</dimen>
 </resources>

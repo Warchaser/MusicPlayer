@@ -13,6 +13,12 @@
     <string name="option_delete">删除</string>
 
     <string name="delete_single_file_successfully">删除歌曲成功</string>
-    <string name="delete_single_file_failed">删除歌曲失败</string>
+
+    <string name="dialog_common_title_hint">提示</string>
+    <string name="dialog_confirm_text">确认</string>
+    <string name="dialog_cancel_text">取消</string>
+    <string name="format_dialog_message">确认删除%1$s?</string>
+
+    <string name="hint_file_can_not_be_deleted">歌曲不可删除或者已经不存在!</string>
 
 </resources>

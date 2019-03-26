@@ -48,9 +48,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         MusicInfo bean = MusicList.musicInfoList.get(position);
 
         Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(viewHolderItem.gfGo);
-//        viewHolderItem.gfGo.setGifImage(R.mipmap.ani);
-//        viewHolderItem.gfGo.setGifImageType(GifView.GifImageType.COVER);
-
 
         viewHolderItem.tvItemTitle.setText(bean.getTitle());
         viewHolderItem.tvItemDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
@@ -58,7 +55,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         viewHolderItem.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
         viewHolderItem.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
 
-        viewHolderItem.gfGo.setVisibility(View.GONE);
+        viewHolderItem.gfGo.setVisibility(View.INVISIBLE);
 
         viewHolderItem.mLyRoot.setTag(position);
         viewHolderItem.mLyRoot.setOnClickListener(mOnItemClickListener);

@@ -14,7 +14,8 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.tools.MusicList;
+
+import java.io.File;
 
 public class OnAirListMenu extends AlertDialog {
 
@@ -74,10 +75,17 @@ public class OnAirListMenu extends AlertDialog {
             public void onClick(View v) {
                 if(isParamsAvailable()){
 
-                    final boolean isDeleted = MusicList.deleteSingleMusicFile(mCurrentUri);
+//                    final boolean isDeleted = MusicList.deleteSingleMusicFile(mCurrentUri);
 
                     if(mOnMenuOptionsSelectedListener != null){
-                        mOnMenuOptionsSelectedListener.onDeleteSelected(mSelectedMusicPosition, isDeleted);
+
+                        mOnMenuOptionsSelectedListener.onDeleteSelected(
+                                mTvSongTitle.getText().toString(),
+                                mSelectedMusicPosition,
+                                mCurrentUri,
+                                new File(mCurrentUri).exists()
+                        );
+
                     }
 
                     resetParams();
@@ -109,7 +117,7 @@ public class OnAirListMenu extends AlertDialog {
     }
 
     public interface OnMenuOptionsSelectedListener{
-        void onDeleteSelected(int position, boolean isDeleted);
+        void onDeleteSelected(String songTitle, int position, String currentUri, boolean isDeleted);
     }
 
     @Override

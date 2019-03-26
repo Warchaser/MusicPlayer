@@ -15,14 +15,16 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_gravity="left"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_toLeftOf="@id/gfGo"
+        android:layout_alignParentLeft="true">
 
         <TextView
             android:id="@+id/tvItemTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:singleLine="true"
+            android:maxLines="1"
             android:text="@string/song_title_place_holder" />
 
         <TextView
@@ -38,7 +40,7 @@
         android:layout_height="@dimen/common_button_height"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/mBtnMenu"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/mBtnMenu"

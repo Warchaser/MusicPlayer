@@ -20,7 +20,10 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/common_font_size"
             android:textColor="@color/black"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:layout_toLeftOf="@id/mBtnClose"
+            android:layout_alignParentLeft="true"
+            android:ellipsize="end"/>
 
         <Button
             android:id="@+id/mBtnClose"
@@ -45,7 +48,8 @@
             android:gravity="center_vertical"
             android:textColor="@color/black"
             android:textSize="@dimen/common_font_size"
-            android:text="@string/option_delete"/>
+            android:text="@string/option_delete"
+            android:background="@drawable/water_bg"/>
 
     </LinearLayout>
 

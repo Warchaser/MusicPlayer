@@ -42,6 +42,7 @@ import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
+import com.warchaser.musicplayer.view.ConfirmDeleteDialog;
 import com.warchaser.musicplayer.view.OnAirListMenu;
 
 import java.util.ArrayList;
@@ -156,6 +157,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     private Unbinder mUnBinder;
 
     private OnAirListMenu mMenuPopupWindow;
+    private ConfirmDeleteDialog mConfirmDeleteDialog;
 
     private LinearLayoutManager mLayoutManager;
 
@@ -424,6 +426,40 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    private void showConfirmDeleteDialog(String songTitle, int selectedPosition, String currentUri){
+        if(mConfirmDeleteDialog == null){
+            mConfirmDeleteDialog = new ConfirmDeleteDialog(this);
+            mConfirmDeleteDialog.setOnConfirmClickListener(new ConfirmDeleteDialog.OnConfirmListener() {
+                @Override
+                public void onConfirmClick(int selectedPosition, boolean isDeleted) {
+                    if(isDeleted){
+                        MusicList.musicInfoList.remove(selectedPosition);
+
+                        if(selectedPosition == MusicList.iCurrentMusic){
+                            mMyBinder.playNextOnDelete();
+                        }
+
+                        mAdapter.notifyDataSetChanged();
+                    }
+
+                    CommonUtils.showShortToast(isDeleted ? R.string.delete_single_file_successfully : R.string.hint_file_can_not_be_deleted);
+                }
+            });
+        }
+
+        if(!mConfirmDeleteDialog.isShowing()){
+            mConfirmDeleteDialog.show(songTitle, currentUri, selectedPosition);
+        }
+    }
+
+    private void dismissConfirmDeleteDialog(){
+        if(mConfirmDeleteDialog != null && mConfirmDeleteDialog.isShowing()){
+            mConfirmDeleteDialog.dismiss();
+        }
+
+        mConfirmDeleteDialog = null;
+    }
+
     private void playNext() {
         mMyBinder.playNext();
         if (mMyBinder.getIsPlaying()) {
@@ -461,6 +497,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mMenuPopupWindow.dismiss();
             mMenuPopupWindow = null;
         }
+
+        dismissConfirmDeleteDialog();
 
         mLayoutManager = null;
 
@@ -552,15 +590,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
         mMenuPopupWindow.setOnMenuOptionsSelectedListener(new OnAirListMenu.OnMenuOptionsSelectedListener() {
             @Override
-            public void onDeleteSelected(int position, boolean isDeleted) {
-
-                if(isDeleted){
-                    MusicList.musicInfoList.remove(position);
-                    mAdapter.notifyDataSetChanged();
+            public void onDeleteSelected(String songTitle, int position, String currentUri, boolean isDeleted) {
+                if(isDeleted) {
+                    showConfirmDeleteDialog(songTitle, position, currentUri);
+                } else {
+                    CommonUtils.showShortToast(R.string.hint_file_can_not_be_deleted);
                 }
-
-                CommonUtils.showShortToast(isDeleted ? R.string.delete_single_file_successfully : R.string.delete_single_file_failed);
-
             }
         });
 

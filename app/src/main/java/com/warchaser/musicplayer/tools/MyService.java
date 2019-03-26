@@ -460,6 +460,10 @@ public class MyService extends Service {
         mIsPlaying = false;
     }
 
+    private void nextOnDelete(){
+        play(MusicList.iCurrentMusic, 0);
+    }
+
     private void next() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
@@ -695,6 +699,10 @@ public class MyService extends Service {
 
         public void playNext() {
             next();
+        }
+
+        public void playNextOnDelete(){
+            nextOnDelete();
         }
 
         public void playPrevious() {
