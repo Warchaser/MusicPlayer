@@ -26,6 +26,7 @@ import android.view.KeyEvent;
 import android.widget.RemoteViews;
 
 import com.warchaser.musicplayer.R;
+import com.warchaser.musicplayer.globalInfo.AppData;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 
 import java.io.IOException;
@@ -586,10 +587,14 @@ public class MyService extends Service {
             }
 
         } else if (STOP_ACTION.equals(action)) {
-            //TODO 这里实现完全关闭or只停止播放并撤销Notification
+            if(CallObserver.isNeedCallObserver()){
+                CallObserver.stopUI();
+            } else {
+                stopSelf();
+            }
 
+            StatusBarUtil.collapseStatusBar(AppData.getApp().getApplicationContext());
         }
-
     }
 
     private void handleMediaButtonUp(int keyCode, KeyEvent event){

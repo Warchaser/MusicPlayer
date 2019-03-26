@@ -56,8 +56,8 @@ public class CallObserver {
         return mObservers != null && !mObservers.isEmpty();
     }
 
-    public static void resetUIonStop() {
-        process(UIObserver::resetUIonStop);
+    public static void stopUI() {
+        processAll(UIObserver::stopServiceAndExit);
     }
 
     private static void process(SubFunction<UIObserver> observerSubFunction) {
@@ -67,6 +67,19 @@ public class CallObserver {
             for (int i = 0; i < size; i++) {
                 UIObserver observer = mObservers.get(i);
                 if (observer != null && observer.getObserverEnabled()) {
+                    observerSubFunction.processor(observer);
+                }
+            }
+        }
+    }
+
+    private static void processAll(SubFunction<UIObserver> observerSubFunction) {
+        int size;
+        if (mObservers != null && (size = mObservers.size()) > 0) {
+
+            for (int i = 0; i < size; i++) {
+                UIObserver observer = mObservers.get(i);
+                if (observer != null) {
                     observerSubFunction.processor(observer);
                 }
             }

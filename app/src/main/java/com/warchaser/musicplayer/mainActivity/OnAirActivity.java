@@ -321,10 +321,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (getBinderStatute() && mIsBind) {
-            this.getApplicationContext().unbindService(mServiceConnection);
-            mMyBinder = null;
-        }
+
+        destroyServiceBinder();
 
         if (mUnBinder != null) {
             mUnBinder.unbind();
@@ -378,14 +376,22 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_exit) {
-            finish();
-            if (getBinderStatute() && mIsBind) {
-                this.getApplicationContext().unbindService(mServiceConnection);
-                mMyBinder = null;
-            }
-            stopService(new Intent(this, MyService.class));
+            destroyWholeApp();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void destroyWholeApp(){
+        finish();
+        destroyServiceBinder();
+        stopService(new Intent(this, MyService.class));
+    }
+
+    public void destroyServiceBinder(){
+        if (getBinderStatute() && mIsBind) {
+            this.getApplicationContext().unbindService(mServiceConnection);
+            mMyBinder = null;
+        }
     }
 
     @OnClick({R.id.bottomBar, R.id.lyBtnState, R.id.btnState, R.id.lyBtnNext, R.id.btnNext})
@@ -730,8 +736,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         }
 
         @Override
-        public void resetUIonStop() {
-
+        public void stopServiceAndExit() {
+            destroyWholeApp();
         }
     }
 }

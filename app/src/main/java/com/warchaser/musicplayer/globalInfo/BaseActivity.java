@@ -52,10 +52,6 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    protected String getRestStrings(int resId) {
-        return getResources().getString(resId);
-    }
-
     protected void startCertainActivity(Class<?> cls) {
         startActivity(new Intent(this, cls));
     }

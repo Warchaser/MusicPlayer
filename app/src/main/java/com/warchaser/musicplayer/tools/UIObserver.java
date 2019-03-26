@@ -31,5 +31,5 @@ public interface UIObserver {
     /**
      * 在Service停止时，设置UI重置为初始状态
      */
-    void resetUIonStop();
+    void stopServiceAndExit();
 }

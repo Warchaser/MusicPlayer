@@ -381,8 +381,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         }
 
         @Override
-        public void resetUIonStop() {
-
+        public void stopServiceAndExit() {
+            finish();
         }
     }
 }

@@ -20,7 +20,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"/>
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_font_size"/>
 
         <TextView
             android:id="@+id/fileName"
@@ -30,7 +32,7 @@
             android:singleLine="true"
             android:ellipsize="marquee"
             android:text="未知文件"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:textSize="15sp" />
         　　
     </LinearLayout>
@@ -46,22 +48,22 @@
 
         <ImageView
             android:id="@+id/ivPauseOrPlay"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/common_button_height"
+            android:layout_height="@dimen/common_button_height"
             android:src="@mipmap/pausedetail"
             android:layout_marginLeft="15dp"/>
 
         <ImageView
             android:id="@+id/ivNext"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/common_button_height"
+            android:layout_height="@dimen/common_button_height"
             android:src="@mipmap/next"
             android:layout_marginLeft="15dp"/>
 
         <ImageView
             android:id="@+id/ivClose"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="@dimen/common_button_height"
+            android:layout_height="@dimen/common_button_height"
             android:src="@mipmap/icon_close"
             android:layout_marginLeft="15dp"/>
 
