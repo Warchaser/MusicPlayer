@@ -141,4 +141,12 @@ public class MusicList {
         return musicInfoList.isEmpty();
     }
 
+    public static MusicInfo getCurrentMusic(){
+        return musicInfoList.get(iCurrentMusic);
+    }
+
+    public static MusicInfo getMusicWithPosition(int position){
+        return musicInfoList.get(position);
+    }
+
 }

@@ -258,7 +258,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
 
     private void initComponent() {
         if (!MusicList.musicInfoList.isEmpty()) {
-            mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
+            mTvTitle.setText(FormatHelper.formatTitle(MusicList.getCurrentMusic().getTitle(), 25));
         }
 
         mTvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
@@ -341,8 +341,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0) {
                 //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
-                mTvTitle.setText(FormatHelper.formatTitle(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getTitle(), 25));
-                MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+                MusicInfo bean = MusicList.getCurrentMusic();
+                mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
                 ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mCoverWidth, mIvCover, R.mipmap.disc, false);
 
             } else if (MyService.ACTION_UPDATE_DURATION.equals(action)) {

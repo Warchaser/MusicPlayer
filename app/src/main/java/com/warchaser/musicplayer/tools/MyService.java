@@ -98,6 +98,11 @@ public class MyService extends Service {
     private final int SINGLE_CLICK = 1;
     private final int DOUBLE_CLICK = 2;
 
+    private Intent mPauseIntent;
+    private Intent mNextIntent;
+    private Intent mCloseIntent;
+    private Intent mActivityIntent;
+
     @Override
     public void onCreate() {
         MusicList.instance(getContentResolver());
@@ -277,7 +282,7 @@ public class MyService extends Service {
             notificationTitle = "Mr.Song is not here for now……";
             mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
         } else {
-            bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+            bean = MusicList.getCurrentMusic();
             notificationTitle = bean.getTitle();
             String uriString = bean.getUriWithCoverPic();
             if (TextUtils.isEmpty(uriString)) {
@@ -288,7 +293,6 @@ public class MyService extends Service {
                 if (bitmap == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {
-//                    mNotificationRemoteView.setImageViewUri(R.id.fileImage, Uri.parse(uriString));
                     mNotificationRemoteView.setImageViewBitmap(R.id.fileImage, bitmap);
                 }
             }
@@ -296,28 +300,37 @@ public class MyService extends Service {
 
         mNotificationRemoteView.setTextViewText(R.id.fileName, notificationTitle);
 
-        Intent pauseIntent = new Intent(PAUSE_OR_PLAY_ACTION);
-        pauseIntent.putExtra("FLAG", PAUSE_FLAG);
-        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
+        if(mPauseIntent == null){
+            mPauseIntent = new Intent(PAUSE_OR_PLAY_ACTION);
+            mPauseIntent.putExtra("FLAG", PAUSE_FLAG);
+            PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, mPauseIntent, 0);
+            mNotificationRemoteView.setOnClickPendingIntent(R.id.ivPauseOrPlay, pausePendingIntent);
+        }
+
         mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
-        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivPauseOrPlay, pausePendingIntent);
 
-        Intent nextIntent = new Intent(NEXT_ACTION);
-        nextIntent.putExtra("FLAG", NEXT_FLAG);
-        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
-        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivNext, nextPendingIntent);
+        if(mNextIntent == null){
+            mNextIntent = new Intent(NEXT_ACTION);
+            mNextIntent.putExtra("FLAG", NEXT_FLAG);
+            PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, mNextIntent, 0);
+            mNotificationRemoteView.setOnClickPendingIntent(R.id.ivNext, nextPendingIntent);
+        }
 
-        Intent closeIntent = new Intent(STOP_ACTION);
-        closeIntent.putExtra("FLAG", STOP_FLAG);
-        PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
-        mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
+        if(mCloseIntent == null){
+            mCloseIntent = new Intent(STOP_ACTION);
+            mCloseIntent.putExtra("FLAG", STOP_FLAG);
+            PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, mCloseIntent, 0);
+            mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
+        }
 
-        Intent activityIntent = new Intent(MyService.this, OnAirActivity.class);
-        //clear the top of the stack, this flag can forbid the possibility of the two activities
-        //existing at the same time
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(MyService.this, 0, activityIntent, 0);
-        mNotificationRemoteView.setOnClickPendingIntent(R.id.lyRoot, activityPendingIntent);
+        if(mActivityIntent == null){
+            mActivityIntent = new Intent(MyService.this, OnAirActivity.class);
+            //clear the top of the stack, this flag can forbid the possibility of the two activities
+            //existing at the same time
+            mActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent activityPendingIntent = PendingIntent.getActivity(MyService.this, 0, mActivityIntent, 0);
+            mNotificationRemoteView.setOnClickPendingIntent(R.id.lyRoot, activityPendingIntent);
+        }
 
         if (mNotification == null) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -440,7 +453,7 @@ public class MyService extends Service {
 
         try {
             if (!MusicList.musicInfoList.isEmpty()) {
-                mMediaPlayer.setDataSource(MusicList.musicInfoList.get(MusicList.iCurrentMusic).getUrl());
+                mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
                 mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
                 mIsPlaying = true;

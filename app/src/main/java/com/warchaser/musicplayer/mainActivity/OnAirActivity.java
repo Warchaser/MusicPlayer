@@ -215,7 +215,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         int musicInfoListSize = MusicList.musicInfoList.size();
         for (int i = 0; i < musicInfoListSize; i++) {
 //            musicListTmps.add(musicInfoList.get(i).getPinyinInitial().toUpperCase());//用于除英文以外的版本
-            mMusicListTmps.add(MusicList.musicInfoList.get(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
+            mMusicListTmps.add(MusicList.getMusicWithPosition(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
         }
     }
 
@@ -251,7 +251,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         //从外部传歌曲名
         if (mPath != null) {
             for (int i = 0; i < musicInfoListSize; i++) {
-                if (MusicList.musicInfoList.get(i).getUrl().equals(mPath)) {
+                if (MusicList.getMusicWithPosition(i).getUrl().equals(mPath)) {
                     MusicList.iCurrentMusic = i;
                     isFileFound = true;
                 }
@@ -415,7 +415,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 }
 
                 Intent intent = new Intent(this, DisplayActivity.class);
-                MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+                MusicInfo bean = MusicList.getCurrentMusic();
                 intent.putExtra("uri", bean.getUriWithCoverPic());
                 int sdk = android.os.Build.VERSION.SDK_INT;
                 if (sdk >= Build.VERSION_CODES.LOLLIPOP) {
@@ -549,7 +549,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         });
 
         if (!MusicList.musicInfoList.isEmpty()) {
-            final MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+            final MusicInfo bean = MusicList.getCurrentMusic();
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
 
@@ -693,16 +693,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mSeekBarProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
-                MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 if (!MusicList.musicInfoList.isEmpty()) {
-                    MusicInfo bean = MusicList.musicInfoList.get(MusicList.iCurrentMusic);
+                    MusicInfo bean = MusicList.getCurrentMusic();
                     ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), mBottomBarDisc.getWidth(), mBottomBarDisc, R.mipmap.disc, false);
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }
-
-                mAdapter.notifyDataSetChanged();
-
             } else if (MyService.ACTION_UPDATE_DURATION.equals(sAction)) {
                 MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
                 mSeekBarProgress.setMax(MusicList.iCurrentMax / 1000);

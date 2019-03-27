@@ -31,6 +31,8 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
 
     private OnItemClickDelegate mOnItemClickDelegate;
 
+    private int mCurrentPosition = MusicList.iCurrentMusic;
+
     SongsAdapter(Context context) {
         mContext = context;
         mOnItemClickListener = new OnItemClickListener();
@@ -45,7 +47,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
     @Override
     public void onBindViewHolder(@NonNull ViewHolderItem viewHolderItem, int position) {
 
-        MusicInfo bean = MusicList.musicInfoList.get(position);
+        MusicInfo bean = MusicList.getMusicWithPosition(position);
 
         Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(viewHolderItem.gfGo);
 
@@ -97,9 +99,12 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
             }
 
             final int position = (int)v.getTag();
-            final MusicInfo bean = MusicList.musicInfoList.get(position);
+            final MusicInfo bean = MusicList.getMusicWithPosition(position);
             switch (v.getId()){
                 case R.id.mLyRoot:
+                    notifyItemChanged(mCurrentPosition);
+                    notifyItemChanged(position);
+                    mCurrentPosition = position;
                     mOnItemClickDelegate.onItemClick(position, bean);
                     break;
                 case R.id.mBtnMenu:
