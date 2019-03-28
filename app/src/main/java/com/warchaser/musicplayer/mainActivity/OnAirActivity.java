@@ -11,9 +11,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,7 +45,6 @@ import com.warchaser.musicplayer.tools.UIObserver;
 import com.warchaser.musicplayer.view.ConfirmDeleteDialog;
 import com.warchaser.musicplayer.view.OnAirListMenu;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,10 +146,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     @BindView(R.id.tvFloatLetter)
     TextView mTvFloatLetter;
 
-    private static final int REFRESH_PLAYING_STATE = 1;
-
-    private static final int REFRESH_BOTTOM_DISC = 2;
-
     private boolean mIsBind = false;
 
     private UIUpdateObserver mObserver;
@@ -167,8 +160,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     private ConfirmDeleteDialog mConfirmDeleteDialog;
 
     private LinearLayoutManager mLayoutManager;
-
-    private MessageHandler mMessageHandler;
 
     /**
      * 绑定服务
@@ -332,11 +323,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         super.onDestroy();
 
         destroyServiceBinder();
-
-        if(mMessageHandler != null){
-            mMessageHandler.removeCallbacksAndMessages(null);
-            mMessageHandler = null;
-        }
 
         if (mUnBinder != null) {
             mUnBinder.unbind();
@@ -530,13 +516,16 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             return;
         }
 
-        sendMessage(REFRESH_PLAYING_STATE, null);
+        if (mMyBinder.getIsPlaying()) {
+            mMyBinder.stopPlay();
+            mBtnState.setBackgroundResource(R.mipmap.run);
+        } else {
+            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+        }
     }
 
     private void initComponent() {
-
-        mMessageHandler = new MessageHandler(this);
-
         mAdapter = new SongsAdapter(this);
 
         mSeekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -559,7 +548,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        if (!MusicList.isListEmpty()) {
+        if (!MusicList.musicInfoList.isEmpty()) {
             final MusicInfo bean = MusicList.getCurrentMusic();
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
@@ -691,63 +680,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    private void refreshPlayingState(){
-        if (mMyBinder.getIsPlaying()) {
-            mMyBinder.stopPlay();
-            mBtnState.setBackgroundResource(R.mipmap.run);
-        } else {
-            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
-            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-        }
-    }
-
-    private void refreshBottomDisc(Bundle bundle){
-        mAdapter.notifyDataSetChanged();
-
-        MusicInfo bean = MusicList.getCurrentMusic();
-
-        mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
-        mTvBottomArtist.setText(bean.getArtist());
-        if(bundle != null){
-            ImageUtil.setBottomBarPic(OnAirActivity.this, mBottomBarDisc, bundle.getParcelable(MyService.KEY_ALBUM), R.mipmap.disc);
-        }
-    }
-
-    private void sendMessage(int what, Object object){
-        if(mMessageHandler == null){
-            return;
-        }
-
-        mMessageHandler.obtainMessage(what, object).sendToTarget();
-    }
-
-    private static class MessageHandler extends Handler{
-
-        private WeakReference<OnAirActivity> mActivity;
-
-        MessageHandler(OnAirActivity activity){
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            final OnAirActivity activity = mActivity.get();
-            switch (msg.what){
-                case REFRESH_PLAYING_STATE:
-                    activity.refreshPlayingState();
-                    break;
-                case REFRESH_BOTTOM_DISC:
-                    Bundle bundle = (Bundle) msg.obj;
-                    activity.refreshBottomDisc(bundle);
-                    break;
-                default:
-                    break;
-
-            }
-        }
-    }
-
     private class UIUpdateObserver implements UIObserver {
         private boolean mIsEnabled;
 
@@ -761,11 +693,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mSeekBarProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
-                MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
-                if (!MusicList.isListEmpty()) {
-                    Bundle bundle = intent.getExtras();
-
-                    sendMessage(REFRESH_BOTTOM_DISC, bundle);
+                if (!MusicList.musicInfoList.isEmpty()) {
+                    MusicInfo bean = MusicList.getCurrentMusic();
+                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), mBottomBarDisc.getWidth(), mBottomBarDisc, R.mipmap.disc, false);
+                    mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
+                    mTvBottomArtist.setText(bean.getArtist());
                 }
             } else if (MyService.ACTION_UPDATE_DURATION.equals(sAction)) {
                 MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);

@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
@@ -27,8 +25,6 @@ import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
 import com.warchaser.musicplayer.tools.MyService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
-
-import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,24 +75,41 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     @BindView(R.id.iv_cover)
     ImageView mIvCover;
 
+//    /**
+//     * Button, Play Previous
+//     * */
+//    @BindView(R.id.btnDisplayPrevious)
+//    Button mBtnPrevious;
+//
+//    /**
+//     * Button, Play Next
+//     * */
+//    @BindView(R.id.btnDisplayNext)
+//    Button mBtnNext;
+
     /**
      * Button, Current Music Playing State
      */
     @BindView(R.id.btnDisplayState)
     Button mBtnState;
 
+//    @BindView(R.id.lyIvMode)
+//    LinearLayout mLyBtnMode;
+//
+//    @BindView(R.id.lyBtnDisplayPrevious)
+//    LinearLayout mLyBtnDisplayPrevious;
+//
+//    @BindView(R.id.lyBtnDisplayState)
+//    LinearLayout mLyBtnDisplayState;
+//
+//    @BindView(R.id.lyBtnDisplayNext)
+//    LinearLayout mLyBtnDisplayNext;
+
     private UIUpdateObserver mObserver;
 
-    private Unbinder mUnBinder;
+    private Unbinder mUnbinder;
 
     private float mCoverWidth = 0;
-
-    private static final int REFRESH_PLAYING_STATE = 1;
-    private static final int REFRESH_DISC = 2;
-    private static final int REFRESH_PROGRESS = 3;
-    private static final int REFRESH_DURATION = 4;
-
-    private MessageHandler mMessageHandler;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -136,7 +149,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display);
-        mUnBinder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         connectToMyService();
         initComponent();
     }
@@ -148,16 +161,11 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             unbindService(mServiceConnection);
         }
 
-        if (mUnBinder != null) {
-            mUnBinder.unbind();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
         }
 
-        if(mMessageHandler != null){
-            mMessageHandler.removeCallbacksAndMessages(null);
-            mMessageHandler = null;
-        }
-
-        mUnBinder = null;
+        mUnbinder = null;
 
         CallObserver.removeSingleObserver(mObserver);
     }
@@ -249,10 +257,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     private void initComponent() {
-
-        mMessageHandler = new MessageHandler(this);
-
-        if (!MusicList.isListEmpty()) {
+        if (!MusicList.musicInfoList.isEmpty()) {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.getCurrentMusic().getTitle(), 25));
         }
 
@@ -301,7 +306,13 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     private void play() {
-        sendMessage(REFRESH_PLAYING_STATE, null);
+        if (mMyBinder.getIsPlaying()) {
+            mMyBinder.stopPlay();
+            mBtnState.setBackgroundResource(R.mipmap.run);
+        } else {
+            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
+        }
     }
 
     private void updatePlayButton() {
@@ -314,78 +325,6 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void refreshPlayingStatePassively(){
-        if (mMyBinder.getIsPlaying()) {
-            mMyBinder.stopPlay();
-            mBtnState.setBackgroundResource(R.mipmap.run);
-        } else {
-            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
-            mBtnState.setBackgroundResource(R.mipmap.pausedetail);
-        }
-    }
-
-    private void refreshDisc(Bundle bundle){
-        MusicInfo bean = MusicList.getCurrentMusic();
-        mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
-        ImageUtil.setBottomBarPic(DisplayActivity.this, mIvCover, bundle.getParcelable(MyService.KEY_ALBUM), R.mipmap.disc);
-    }
-
-    private void refreshProgress(int progress){
-        if (progress > 0) {
-            MusicList.iCurrentPosition = progress; // Remember the current position
-            mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
-            mSeekProgress.setProgress(progress / 1000);
-        }
-    }
-
-    private void refreshDuration(int duration){
-        mTvDuration.setText(FormatHelper.formatDuration(duration));
-        mSeekProgress.setMax(duration / 1000);
-    }
-
-    private void sendMessage(int what, Object object){
-        if(mMessageHandler == null){
-            return;
-        }
-
-        mMessageHandler.obtainMessage(what, object).sendToTarget();
-    }
-
-    private static class MessageHandler extends Handler {
-
-        private WeakReference<DisplayActivity> mActivity;
-
-        MessageHandler(DisplayActivity activity){
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            final DisplayActivity activity = mActivity.get();
-            switch (msg.what){
-                case REFRESH_PLAYING_STATE:
-                    activity.refreshPlayingStatePassively();
-                    break;
-                case REFRESH_DISC:
-                    Bundle bundle = (Bundle) msg.obj;
-                    activity.refreshDisc(bundle);
-                    break;
-                case REFRESH_PROGRESS:
-                    int progress = (int)msg.obj;
-                    activity.refreshProgress(progress);
-                    break;
-                case REFRESH_DURATION:
-                    int duration = (int)msg.obj;
-                    activity.refreshDuration(duration);
-                    break;
-                default:
-                    break;
-
-            }
-        }
-    }
-
     private class UIUpdateObserver implements UIObserver {
         private boolean mIsEnabled;
 
@@ -394,16 +333,24 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             String action = intent.getAction();
             if (MyService.ACTION_UPDATE_PROGRESS.equals(action)) {
                 int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.iCurrentPosition);
-                sendMessage(REFRESH_PROGRESS, progress);
-            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && !MusicList.isListEmpty()) {
+                if (progress > 0) {
+                    MusicList.iCurrentPosition = progress; // Remember the current position
+                    mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
+                    mSeekProgress.setProgress(progress / 1000);
+                }
+            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0) {
+                //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
-                Bundle bundle = intent.getExtras();
-                sendMessage(REFRESH_DISC, bundle);
+                MusicInfo bean = MusicList.getCurrentMusic();
+                mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
+                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mCoverWidth, mIvCover, R.mipmap.disc, false);
+
             } else if (MyService.ACTION_UPDATE_DURATION.equals(action)) {
                 //Receive the duration and show under the progress bar
                 //Why do this ? because from the ContentResolver, the duration is zero.
                 int duration = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
-                sendMessage(REFRESH_DURATION, duration);
+                mTvDuration.setText(FormatHelper.formatDuration(duration));
+                mSeekProgress.setMax(duration / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
                 play();
             }
