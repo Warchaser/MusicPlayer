@@ -184,4 +184,19 @@ public class ImageUtil {
         }
     }
 
+    /**
+     * 使用Bitmap直接向ImageView设置ImageDrawable
+     * */
+    public static void setBottomBarPic(Context context, View imageView, Bitmap bitmap, int defaultImageId){
+        Drawable drawable;
+        drawable = getDrawableFromBitmap(context, bitmap);
+        if (drawable == null) {
+            drawable = getDrawableFromRes(context, defaultImageId);
+        }
+        if (imageView instanceof ImageView) {
+            imageView.setBackgroundResource(0);
+            ((ImageView) imageView).setImageDrawable(drawable);
+        }
+    }
+
 }
