@@ -17,8 +17,11 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.session.MediaSession;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -29,7 +32,6 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.AppData;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 /**
@@ -49,6 +51,7 @@ public class MyService extends Service {
     private static final int UPDATE_CURRENT_MUSIC = 2;
     private static final int UPDATE_DURATION = 3;
     private static final int FOCUS_CHANGE = 4;
+    private static final int GET_ALBUM_AND_REFRESH = 5;
     //用于Handler
 
     public static final String ACTION_UPDATE_PROGRESS = "com.warchaser.MusicPlayer.UPDATE_PROGRESS";
@@ -60,6 +63,8 @@ public class MyService extends Service {
     public static final String STOP_ACTION = "com.warchaser.MusicPlayer.close";
 
     private final String MEDIA_SESSION_TAG = "com.warchaser.musicplayer.tools.MyService";
+
+    public static final String KEY_ALBUM = "KEY_ALBUM";
 
     private final int PAUSE_FLAG = 0x11;
     private final int NEXT_FLAG = 0x12;
@@ -79,6 +84,7 @@ public class MyService extends Service {
 
     private MyBinder mMyBinder = new MyBinder();
     private MessageHandler mMessageHandler;
+    private HandlerThread mMessageHandlerThread;
 
     private AudioManager mAudioManager;
 //    private ComponentName mComponentName;
@@ -103,11 +109,19 @@ public class MyService extends Service {
     private Intent mCloseIntent;
     private Intent mActivityIntent;
 
+    private float NOTIFICATION_PIC_WIDTH;
+
     @Override
     public void onCreate() {
         MusicList.instance(getContentResolver());
 
-        mMessageHandler = new MessageHandler(this);
+        NOTIFICATION_PIC_WIDTH = getResources().getDimension(R.dimen.notification_cover_width);
+
+        mMessageHandlerThread = new HandlerThread("MyMessageHandlerThread");
+
+        mMessageHandlerThread.start();
+
+        mMessageHandler = new MessageHandler(this, mMessageHandlerThread.getLooper());
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         initMediaPlayer();
@@ -121,7 +135,6 @@ public class MyService extends Service {
         initializeReceiver();
 
         initializeMediaSession();
-
     }
 
     @Override
@@ -132,6 +145,12 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if(mMessageHandlerThread != null){
+            mMessageHandlerThread.quit();
+            mMessageHandlerThread = null;
+        }
+
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
@@ -182,11 +201,23 @@ public class MyService extends Service {
         }
     }
 
+    /**
+     * MessageHandler发送消息
+     * */
+    private void sendMessage(int type, Object object){
+        if(mMessageHandler == null){
+            return;
+        }
+
+        mMessageHandler.obtainMessage(type, object).sendToTarget();
+    }
+
     private static class MessageHandler extends Handler {
 
         private WeakReference<MyService> mServiceWeakReference;
 
-        MessageHandler(MyService service) {
+        MessageHandler(MyService service, Looper looper) {
+            super(looper);
             mServiceWeakReference = new WeakReference<>(service);
         }
 
@@ -205,6 +236,10 @@ public class MyService extends Service {
                     break;
                 case FOCUS_CHANGE:
                     service.handleAudioFocusChanged(msg.arg1);
+                    break;
+                case GET_ALBUM_AND_REFRESH:
+                    String uriString = (String)msg.obj;
+                    service.refreshNotificationPic(uriString);
                     break;
                 default:
                     break;
@@ -261,13 +296,7 @@ public class MyService extends Service {
     }
 
     private void toUpdateCurrentMusic() {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
-        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
-
         startForeground(NOTIFICATION_ID, getNotification());
-
-        CallObserver.callObserver(intent);
     }
 
     private Notification getNotification() {
@@ -288,13 +317,7 @@ public class MyService extends Service {
             if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
-                float width = getResources().getDimension(R.dimen.notification_cover_width);
-                Bitmap bitmap = ImageUtil.getCoverBitmapFromMusicFile(uriString, this, width);
-                if (bitmap == null) {
-                    mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
-                } else {
-                    mNotificationRemoteView.setImageViewBitmap(R.id.fileImage, bitmap);
-                }
+                sendMessage(GET_ALBUM_AND_REFRESH, uriString);
             }
         }
 
@@ -452,15 +475,15 @@ public class MyService extends Service {
         mMediaPlayer.reset();
 
         try {
-            if (!MusicList.musicInfoList.isEmpty()) {
+            if (!MusicList.isListEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
-                mMediaPlayer.prepareAsync();
+                mMediaPlayer.prepare();
                 mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
                 mIsPlaying = true;
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception | Error e) {
+            NLog.printStackTrace("MyService.play()", e);
         }
 
         setCurrentMusic();
@@ -479,6 +502,7 @@ public class MyService extends Service {
     }
 
     private void next() {
+        NLog.e("MyService", "next()");
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
                 if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
@@ -556,9 +580,7 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if (mNotificationManager != null && mNotification != null) {
-            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
-        }
+        notifyNotification();
     }
 
     /**
@@ -569,9 +591,34 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
+        notifyNotification();
+
+    }
+
+    private void notifyNotification(){
         if (mNotificationManager != null && mNotification != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
+    }
+
+    private void refreshNotificationPic(String uriString){
+        Bitmap bitmap = ImageUtil.getCoverBitmapFromMusicFile(uriString, this, NOTIFICATION_PIC_WIDTH);
+        if (bitmap == null) {
+            mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
+        } else {
+            mNotificationRemoteView.setImageViewBitmap(R.id.fileImage, bitmap);
+        }
+        notifyNotification();
+
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
+        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
+        bundle.putParcelable(KEY_ALBUM, bitmap);
+        intent.putExtras(bundle);
+
+        CallObserver.callObserver(intent);
+
     }
 
     /**
