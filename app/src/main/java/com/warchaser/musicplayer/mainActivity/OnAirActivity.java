@@ -35,8 +35,8 @@ import com.warchaser.musicplayer.displayActivity.DisplayActivity;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CommonUtils;
+import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
-import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
@@ -416,7 +416,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
                 Intent intent = new Intent(this, DisplayActivity.class);
                 MusicInfo bean = MusicList.getCurrentMusic();
-                intent.putExtra("uri", bean.getUriWithCoverPic());
+                intent.putExtra("albumId", bean.getAlbumId());
                 int sdk = android.os.Build.VERSION.SDK_INT;
                 if (sdk >= Build.VERSION_CODES.LOLLIPOP) {
                     Pair p1 = Pair.create(mBottomBarDisc, "cover");
@@ -556,14 +556,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mBottomBarDisc.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    ImageUtil.setBottomBarDisc(
-                            OnAirActivity.this,
-                            bean.getUriWithCoverPic(),
-                            mBottomBarDisc.getWidth(),
-                            mBottomBarDisc,
-                            R.mipmap.disc,
-                            false
-                    );
+                    refreshBottomThumb(bean.getAlbumId());
                     mBottomBarDisc.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
@@ -680,6 +673,12 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    private void refreshBottomThumb(long albumId){
+        if(mBottomBarDisc != null){
+            mBottomBarDisc.setImageBitmap(CoverLoader.get().loadBottomThumb(albumId));
+        }
+    }
+
     private class UIUpdateObserver implements UIObserver {
         private boolean mIsEnabled;
 
@@ -693,9 +692,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mSeekBarProgress.setProgress(MusicList.iCurrentPosition / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
+                mAdapter.notifyDataSetChanged();
                 if (!MusicList.musicInfoList.isEmpty()) {
                     MusicInfo bean = MusicList.getCurrentMusic();
-                    ImageUtil.setBottomBarDisc(OnAirActivity.this, bean.getUriWithCoverPic(), mBottomBarDisc.getWidth(), mBottomBarDisc, R.mipmap.disc, false);
+                    refreshBottomThumb(bean.getAlbumId());
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }

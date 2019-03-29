@@ -145,6 +145,22 @@ public class ImageUtil {
                 (int) height, matrix, true);
     }
 
+    public static Bitmap scaleBitmap(Bitmap origin, int width){
+
+        if(origin == null){
+            return null;
+        }
+
+        float ratio = 0;
+        if (origin.getHeight() > origin.getWidth()) {
+            ratio = (float) width / (float) origin.getHeight();
+        } else {
+            ratio = (float) width / (float) origin.getWidth();
+        }
+
+        return scaleBitmap(origin, ratio);
+    }
+
     public static Bitmap scaleBitmap(Bitmap origin, float ratio) {
         if (origin == null) {
             return null;
@@ -182,6 +198,21 @@ public class ImageUtil {
                 ((ImageView) imageView).setImageDrawable(drawable);
             }
         }
+    }
+
+    /**
+     * 将图片放大或缩小到指定尺寸
+     */
+    public static Bitmap resizeImage(Bitmap source, int dstWidth, int dstHeight) {
+        if (source == null) {
+            return null;
+        }
+
+        if (source.getWidth() == dstWidth && source.getHeight() == dstHeight) {
+            return source;
+        }
+
+        return Bitmap.createScaledBitmap(source, dstWidth, dstHeight, true);
     }
 
 }

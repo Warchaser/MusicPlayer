@@ -2,6 +2,7 @@ package com.warchaser.musicplayer.globalInfo;
 
 import android.app.Application;
 
+import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.NLog;
 
 /**
@@ -17,6 +18,7 @@ public class AppData extends Application {
 
         mThis = this;
 
+        CoverLoader.get().init(mThis);
         NLog.initLogFile(this);
     }
 

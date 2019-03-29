@@ -12,4 +12,6 @@
     <dimen name="common_dialog_button_height">50dip</dimen>
 
     <dimen name="common_font_size">16sp</dimen>
+
+    <dimen name="display_cover_width">50dp</dimen>
 </resources>

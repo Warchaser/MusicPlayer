@@ -29,7 +29,6 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.AppData;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 /**
@@ -288,8 +287,9 @@ public class MyService extends Service {
             if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
-                float width = getResources().getDimension(R.dimen.notification_cover_width);
-                Bitmap bitmap = ImageUtil.getCoverBitmapFromMusicFile(uriString, this, width);
+//                float width = getResources().getDimension(R.dimen.notification_cover_width);
+//                Bitmap bitmap = ImageUtil.getCoverBitmapFromMusicFile(uriString, this, width);
+                Bitmap bitmap = CoverLoader.get().loadThumb(bean.getAlbumId());
                 if (bitmap == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {
@@ -370,6 +370,7 @@ public class MyService extends Service {
             @Override
             public void onPrepared(MediaPlayer pMediaPlayer) {
                 mMediaPlayer.seekTo(MusicList.iCurrentPosition);
+                NLog.e("MyService", "play.start " + System.currentTimeMillis());
                 mMediaPlayer.start();
                 mMessageHandler.sendEmptyMessage(UPDATE_DURATION);
             }
@@ -449,17 +450,19 @@ public class MyService extends Service {
         MusicList.iCurrentPosition = currentPosition;
         MusicList.iCurrentMusic = currentMusic;
 
+        mMediaPlayer.stop();
         mMediaPlayer.reset();
 
         try {
             if (!MusicList.musicInfoList.isEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
+                NLog.e("MyService", "play.prepareAsync " + System.currentTimeMillis());
                 mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
                 mIsPlaying = true;
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

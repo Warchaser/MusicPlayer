@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.warchaser.musicplayer.tools.CoverLoader.MAX_CACHE;
+
 /**
  * Created by Wu on 2014/10/20.
  */
@@ -65,6 +67,9 @@ public class MusicList {
     public void loadMusicList(){
         Cursor cursor = null;
         try {
+
+            int i = 0;
+
             cursor = contentResolver.query(contentUri, null, null, null, order);
             if (null == cursor) {
                 return;
@@ -105,7 +110,7 @@ public class MusicList {
                     if (id > 0) {
                         musicInfo.setUriWithCoverPic("content://media/external/audio/media/" + id + "/albumart");
                     } else if (albumId > 0) {
-                        musicInfo.setUriWithCoverPic(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId));
+                        musicInfo.setUriWithCoverPic(getMediaStoreAlbumCoverUri(albumId));
                     } else {
                         musicInfo.setUriWithCoverPic("");
                     }
@@ -115,6 +120,13 @@ public class MusicList {
                     if (musicInfo.getDuration() / 1000 > 60) {
                         musicInfoList.add(musicInfo);
                     }
+
+                    if(i <= MAX_CACHE){
+                        CoverLoader.get().loadThumb(albumId);
+                        CoverLoader.get().loadBottomThumb(albumId);
+                    }
+
+                    i++;
 
                 } while (cursor.moveToNext());
                 cursor.close();
@@ -147,6 +159,11 @@ public class MusicList {
 
     public static MusicInfo getMusicWithPosition(int position){
         return musicInfoList.get(position);
+    }
+
+    public static Uri getMediaStoreAlbumCoverUri(long albumId) {
+        Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
+        return ContentUris.withAppendedId(artworkUri, albumId);
     }
 
 }

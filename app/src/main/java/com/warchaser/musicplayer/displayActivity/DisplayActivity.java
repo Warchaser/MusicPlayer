@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
+import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
@@ -75,39 +76,15 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     @BindView(R.id.iv_cover)
     ImageView mIvCover;
 
-//    /**
-//     * Button, Play Previous
-//     * */
-//    @BindView(R.id.btnDisplayPrevious)
-//    Button mBtnPrevious;
-//
-//    /**
-//     * Button, Play Next
-//     * */
-//    @BindView(R.id.btnDisplayNext)
-//    Button mBtnNext;
-
     /**
      * Button, Current Music Playing State
      */
     @BindView(R.id.btnDisplayState)
     Button mBtnState;
 
-//    @BindView(R.id.lyIvMode)
-//    LinearLayout mLyBtnMode;
-//
-//    @BindView(R.id.lyBtnDisplayPrevious)
-//    LinearLayout mLyBtnDisplayPrevious;
-//
-//    @BindView(R.id.lyBtnDisplayState)
-//    LinearLayout mLyBtnDisplayState;
-//
-//    @BindView(R.id.lyBtnDisplayNext)
-//    LinearLayout mLyBtnDisplayNext;
-
     private UIUpdateObserver mObserver;
 
-    private Unbinder mUnbinder;
+    private Unbinder mUnBinder;
 
     private float mCoverWidth = 0;
 
@@ -149,7 +126,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display);
-        mUnbinder = ButterKnife.bind(this);
+        mUnBinder = ButterKnife.bind(this);
         connectToMyService();
         initComponent();
     }
@@ -161,11 +138,11 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             unbindService(mServiceConnection);
         }
 
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
+        if (mUnBinder != null) {
+            mUnBinder.unbind();
         }
 
-        mUnbinder = null;
+        mUnBinder = null;
 
         CallObserver.removeSingleObserver(mObserver);
     }
@@ -291,13 +268,12 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
 
         Intent intent = getIntent();
         if (intent != null) {
-            final String uri = intent.getStringExtra("uri");
+            final long albumId = intent.getLongExtra("albumId", -1);
 
             mIvCover.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    mCoverWidth = mIvCover.getMeasuredWidth() - mIvCover.getPaddingLeft() - mIvCover.getPaddingRight();
-                    ImageUtil.setBottomBarDisc(DisplayActivity.this, uri, mCoverWidth, mIvCover, R.mipmap.disc, false);
+                    refreshCover(albumId);
                     mIvCover.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             });
@@ -325,6 +301,12 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    private void refreshCover(long albumId){
+        if(mIvCover != null){
+            mIvCover.setImageBitmap(CoverLoader.get().loadDisplayCover(albumId));
+        }
+    }
+
     private class UIUpdateObserver implements UIObserver {
         private boolean mIsEnabled;
 
@@ -343,8 +325,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 MusicInfo bean = MusicList.getCurrentMusic();
                 mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
-                ImageUtil.setBottomBarDisc(DisplayActivity.this, bean.getUriWithCoverPic(), mCoverWidth, mIvCover, R.mipmap.disc, false);
-
+                refreshCover(bean.getAlbumId());
             } else if (MyService.ACTION_UPDATE_DURATION.equals(action)) {
                 //Receive the duration and show under the progress bar
                 //Why do this ? because from the ContentResolver, the duration is zero.
