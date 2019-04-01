@@ -20,7 +20,6 @@ import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
-import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
@@ -31,7 +30,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-
 
 /**
  * Created by Wu on 2014/10/22.
@@ -85,8 +83,6 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     private UIUpdateObserver mObserver;
 
     private Unbinder mUnBinder;
-
-    private float mCoverWidth = 0;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -234,7 +230,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     private void initComponent() {
-        if (!MusicList.musicInfoList.isEmpty()) {
+        if (!MusicList.isListEmpty()) {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.getCurrentMusic().getTitle(), 25));
         }
 
@@ -320,7 +316,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
                     mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
                     mSeekProgress.setProgress(progress / 1000);
                 }
-            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.musicInfoList.size() != 0) {
+            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.size() != 0) {
                 //Retrieve the current music and get the title to show on top of the screen.
                 MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 MusicInfo bean = MusicList.getCurrentMusic();

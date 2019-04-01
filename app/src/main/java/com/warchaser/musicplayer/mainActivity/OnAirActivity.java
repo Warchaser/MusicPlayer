@@ -212,7 +212,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     //初始化各个List
     private void getList() {
         mMusicListTmps = new ArrayList<>();
-        int musicInfoListSize = MusicList.musicInfoList.size();
+        int musicInfoListSize = MusicList.size();
         for (int i = 0; i < musicInfoListSize; i++) {
 //            musicListTmps.add(musicInfoList.get(i).getPinyinInitial().toUpperCase());//用于除英文以外的版本
             mMusicListTmps.add(MusicList.getMusicWithPosition(i).getPinyinInitial());//用于英文版本（英文名开头歌曲多的）
@@ -222,7 +222,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     //处理外存传过来的路径，以播放
     private void playExternal() {
         boolean isFileFound = false;
-        int musicInfoListSize = MusicList.musicInfoList.size();
+        int musicInfoListSize = MusicList.size();
         //从splash得到传过来的绝对路径
         Uri uri = getIntent().getData();
         mIsFromExternal = getIntent().getBooleanExtra("isFromExternal", false);
@@ -260,7 +260,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             if (!isFileFound) {
                 getMetaData(mPath);
                 updateDataBase(mPath);
-                MusicList.iCurrentMusic = MusicList.musicInfoList.size() - 1;
+                MusicList.iCurrentMusic = MusicList.size() - 1;
             }
         }
 
@@ -314,7 +314,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         musicInfo.setDuration(Integer.parseInt(
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
         musicInfo.setUrl(filePath);
-        MusicList.musicInfoList.add(musicInfo);
+        MusicList.add(musicInfo);
 
     }
 
@@ -439,7 +439,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 @Override
                 public void onConfirmClick(int selectedPosition, boolean isDeleted) {
                     if(isDeleted){
-                        MusicList.musicInfoList.remove(selectedPosition);
+                        MusicList.remove(selectedPosition);
 
                         if(selectedPosition == MusicList.iCurrentMusic){
                             mMyBinder.playNextOnDelete();
@@ -548,7 +548,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        if (!MusicList.musicInfoList.isEmpty()) {
+        if (!MusicList.isListEmpty()) {
             final MusicInfo bean = MusicList.getCurrentMusic();
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
@@ -693,7 +693,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
                 mAdapter.notifyDataSetChanged();
-                if (!MusicList.musicInfoList.isEmpty()) {
+                if (!MusicList.isListEmpty()) {
                     MusicInfo bean = MusicList.getCurrentMusic();
                     refreshBottomThumb(bean.getAlbumId());
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));

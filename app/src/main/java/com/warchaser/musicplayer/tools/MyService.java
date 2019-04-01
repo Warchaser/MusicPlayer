@@ -270,7 +270,7 @@ public class MyService extends Service {
 
         MusicInfo bean;
 
-        if (MusicList.musicInfoList.isEmpty()) {
+        if (MusicList.isListEmpty()) {
             notificationTitle = "Mr.Song is not here for now……";
             mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
         } else {
@@ -376,13 +376,13 @@ public class MyService extends Service {
                             mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((MusicList.iCurrentMusic + 1) % MusicList.musicInfoList.size(), 0);
+                            play((MusicList.iCurrentMusic + 1) % MusicList.size(), 0);
                             break;
                         case MODE_RANDOM:
                             play(getRandomPosition(), 0);
                             break;
                         case MODE_SEQUENCE:
-                            if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                            if (MusicList.iCurrentMusic == MusicList.size() - 1) {
                                 play(0, 0);
                             } else {
                                 next();
@@ -417,7 +417,7 @@ public class MyService extends Service {
     }
 
     private int getRandomPosition() {
-        return (int) (Math.random() * (MusicList.musicInfoList.size() - 1));
+        return (int) (Math.random() * (MusicList.size() - 1));
     }
 
     private void play(int currentMusic, int currentPosition) {
@@ -435,7 +435,7 @@ public class MyService extends Service {
         mMediaPlayer.reset();
 
         try {
-            if (!MusicList.musicInfoList.isEmpty()) {
+            if (!MusicList.isListEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
                 NLog.e("MyService", "play.prepareAsync " + System.currentTimeMillis());
@@ -465,21 +465,21 @@ public class MyService extends Service {
     private void next() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
                     play(0, 0);
                 } else {
                     play(MusicList.iCurrentMusic + 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
                     play(0, 0);
                 } else {
                     play(MusicList.iCurrentMusic + 1, 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if (MusicList.iCurrentMusic == MusicList.musicInfoList.size() - 1) {
+                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
                     CommonUtils.showShortToast(R.string.last_song_tip);
                     play(0, 0);
                 } else {
@@ -496,14 +496,14 @@ public class MyService extends Service {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
                 if (MusicList.iCurrentMusic == 0) {
-                    play(MusicList.musicInfoList.size() - 1, 0);
+                    play(MusicList.size() - 1, 0);
                 } else {
                     play(MusicList.iCurrentMusic - 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
                 if (MusicList.iCurrentMusic == 0) {
-                    play(MusicList.musicInfoList.size() - 1, 0);
+                    play(MusicList.size() - 1, 0);
                 } else {
                     play(MusicList.iCurrentMusic - 1, 0);
                 }
@@ -511,7 +511,7 @@ public class MyService extends Service {
             case MODE_SEQUENCE:
                 if (MusicList.iCurrentMusic == 0) {
                     CommonUtils.showShortToast(R.string.first_song_tip);
-                    play(MusicList.musicInfoList.size() - 1, 0);
+                    play(MusicList.size() - 1, 0);
                 } else {
                     play(MusicList.iCurrentMusic - 1, 0);
                 }

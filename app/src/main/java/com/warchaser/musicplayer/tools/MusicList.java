@@ -17,11 +17,11 @@ import static com.warchaser.musicplayer.tools.CoverLoader.MAX_CACHE;
  */
 public class MusicList {
 
-    public static List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
-    private static MusicList musicList;
+    private static final List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
+    private static MusicList mInstance;
     private static ContentResolver contentResolver;
-    private Uri contentUri = Media.EXTERNAL_CONTENT_URI;
-    private String order = "title COLLATE LOCALIZED";
+    private final Uri CONTENT_URI = Media.EXTERNAL_CONTENT_URI;
+    private final String ORDER = "title COLLATE LOCALIZED";
 
     /**
      * The music which is playing.
@@ -53,11 +53,11 @@ public class MusicList {
     private String sSortOrder = Media.DATA;
 
     public static MusicList instance(ContentResolver pContentResolver) {
-        if (null == musicList) {
+        if (null == mInstance) {
             contentResolver = pContentResolver;
-            musicList = new MusicList();
+            mInstance = new MusicList();
         }
-        return musicList;
+        return mInstance;
     }
 
     private MusicList() {
@@ -70,7 +70,7 @@ public class MusicList {
 
             int i = 0;
 
-            cursor = contentResolver.query(contentUri, null, null, null, order);
+            cursor = contentResolver.query(CONTENT_URI, null, null, null, ORDER);
             if (null == cursor) {
                 return;
             } else if (!cursor.moveToFirst()) {
@@ -141,7 +141,7 @@ public class MusicList {
     }
 
     public Uri getMusicUriById(long id) {
-        Uri uri = ContentUris.withAppendedId(contentUri, id);
+        Uri uri = ContentUris.withAppendedId(CONTENT_URI, id);
         return uri;
     }
 
@@ -164,6 +164,33 @@ public class MusicList {
     public static Uri getMediaStoreAlbumCoverUri(long albumId) {
         Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
         return ContentUris.withAppendedId(artworkUri, albumId);
+    }
+
+    public static int size(){
+
+        if(musicInfoList == null){
+            return 0;
+        }
+
+        return musicInfoList.size();
+    }
+
+    public static void add(MusicInfo bean){
+
+        if(musicInfoList == null){
+            return;
+        }
+
+        musicInfoList.add(bean);
+    }
+
+    public static void remove(int position){
+
+        if(musicInfoList == null || musicInfoList.isEmpty()){
+            return;
+        }
+
+        musicInfoList.remove(position);
     }
 
 }

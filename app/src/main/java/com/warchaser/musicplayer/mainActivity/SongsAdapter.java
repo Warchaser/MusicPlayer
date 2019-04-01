@@ -74,7 +74,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
 
     @Override
     public int getItemCount() {
-        return MusicList.musicInfoList.size();
+        return MusicList.size();
     }
 
     /**
