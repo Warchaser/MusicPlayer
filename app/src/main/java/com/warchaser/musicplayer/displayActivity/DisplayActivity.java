@@ -265,14 +265,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         Intent intent = getIntent();
         if (intent != null) {
             final long albumId = intent.getLongExtra("albumId", -1);
-
-            mIvCover.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    refreshCover(albumId);
-                    mIvCover.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            });
+            refreshCover(albumId);
         }
 
     }
@@ -336,10 +329,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         @Override
         public void notify2Play(int repeatTime) {
             switch (repeatTime) {
-                case 1:
+                case MyService.SINGLE_CLICK:
                     play();
                     break;
-                case 2:
+                case MyService.DOUBLE_CLICK:
                     playNext();
                     break;
                 default:

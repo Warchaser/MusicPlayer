@@ -553,13 +553,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
 
-            mBottomBarDisc.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    refreshBottomThumb(bean.getAlbumId());
-                    mBottomBarDisc.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            });
+            refreshBottomThumb(bean.getAlbumId());
         }
 
         mAdapter.setOnItemClickDelegate(new SongsAdapter.OnItemClickDelegate() {
@@ -710,10 +704,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         @Override
         public void notify2Play(int repeatTime) {
             switch (repeatTime) {
-                case 1:
+                case MyService.SINGLE_CLICK:
                     play();
                     break;
-                case 2:
+                case MyService.DOUBLE_CLICK:
                     playNext();
                     break;
                 default:

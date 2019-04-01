@@ -94,8 +94,8 @@ public class MyService extends Service {
     private static final int DOUBLE_CLICK_DURATION = 500;
     private static long mLastClickTime = 0;
 
-    private final int SINGLE_CLICK = 1;
-    private final int DOUBLE_CLICK = 2;
+    public static final int SINGLE_CLICK = 1;
+    public static final int DOUBLE_CLICK = 2;
 
     @Override
     public void onCreate() {
