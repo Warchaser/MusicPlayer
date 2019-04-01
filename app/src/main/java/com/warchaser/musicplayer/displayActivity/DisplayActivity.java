@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -96,26 +95,30 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             mMyBinder = (MyBinder) service;
             updatePlayButton();
 
-            switch (mMyBinder.getCurrentMode()) {
-                case 0:
-                    mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
-                    break;
-                case 1:
-                    mIvMode.setBackgroundResource(R.mipmap.mode_loop);
-                    break;
-                case 2:
-                    mIvMode.setBackgroundResource(R.mipmap.mode_random);
-                    break;
-                case 3:
-                    mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
-                    break;
-            }
+            refreshModeButton();
         }
     };
 
     private void connectToMyService() {
         Intent intent = new Intent(DisplayActivity.this, MyService.class);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void refreshModeButton(){
+        switch (mMyBinder.getCurrentMode()) {
+            case MyService.MODE_ONE_LOOP:
+                mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
+                break;
+            case MyService.MODE_ALL_LOOP:
+                mIvMode.setBackgroundResource(R.mipmap.mode_loop);
+                break;
+            case MyService.MODE_RANDOM:
+                mIvMode.setBackgroundResource(R.mipmap.mode_random);
+                break;
+            case MyService.MODE_SEQUENCE:
+                mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
+                break;
+        }
     }
 
     @Override
@@ -195,20 +198,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             case R.id.lyIvMode:
             case R.id.ivMode:
                 mMyBinder.changeMode();
-                switch (mMyBinder.getCurrentMode()) {
-                    case 0:
-                        mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
-                        break;
-                    case 1:
-                        mIvMode.setBackgroundResource(R.mipmap.mode_loop);
-                        break;
-                    case 2:
-                        mIvMode.setBackgroundResource(R.mipmap.mode_random);
-                        break;
-                    case 3:
-                        mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
-                        break;
-                }
+                refreshModeButton();
                 break;
             default:
                 break;
