@@ -26,17 +26,17 @@ public class MusicList {
     /**
      * The music which is playing.
      */
-    public static int iCurrentMusic;
+    private static int mCurrentMusic;
 
     /**
      * The position of the music is playing.
      */
-    public static int iCurrentPosition;
+    private static int mCurrentPosition;
 
     /**
      * The length of each music;
      */
-    public static int iCurrentMax;
+    private static int mCurrentMax;
 
     public static MyService.MyBinder mMyBinder;
 
@@ -154,7 +154,7 @@ public class MusicList {
     }
 
     public static MusicInfo getCurrentMusic(){
-        return musicInfoList.get(iCurrentMusic);
+        return musicInfoList.get(mCurrentMusic);
     }
 
     public static MusicInfo getMusicWithPosition(int position){
@@ -191,6 +191,39 @@ public class MusicList {
         }
 
         musicInfoList.remove(position);
+    }
+
+    public synchronized static void setCurrentPosition(int currentPosition){
+        mCurrentPosition = currentPosition;
+    }
+
+    /**
+     * 获取当前Music的播放进度
+     * */
+    public synchronized static int getCurrentPosition(){
+        return mCurrentPosition;
+    }
+
+    public synchronized static void setCurrentMusic(int currentMusic){
+        mCurrentMusic = currentMusic;
+    }
+
+    /**
+     * 获取当前Music的Index
+     * */
+    public synchronized static int getCurrentMusicInt(){
+        return mCurrentMusic;
+    }
+
+    public synchronized static void setCurrentMusicMax(int max){
+        mCurrentMax = max;
+    }
+
+    /**
+     * 获取当前Music最大进度
+     * */
+    public synchronized static int getCurrentMusicMax(){
+        return mCurrentMax;
     }
 
 }

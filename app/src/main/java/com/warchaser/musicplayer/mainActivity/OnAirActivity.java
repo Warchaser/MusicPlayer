@@ -171,7 +171,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             //判断外部（外存）传来的路径是否为空，不为空就在绑定成功之后立即播放
             if (null != mPath) {
                 if (mIsFromExternal) {
-                    mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+                    mMyBinder.startPlay(MusicList.getCurrentMusicInt(), 0);
                     mBtnState.setBackgroundResource(R.mipmap.pausedetail);
                 } else {
                     play();
@@ -252,7 +252,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         if (mPath != null) {
             for (int i = 0; i < musicInfoListSize; i++) {
                 if (MusicList.getMusicWithPosition(i).getUrl().equals(mPath)) {
-                    MusicList.iCurrentMusic = i;
+                    MusicList.setCurrentMusic(i);
                     isFileFound = true;
                 }
             }
@@ -260,7 +260,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             if (!isFileFound) {
                 getMetaData(mPath);
                 updateDataBase(mPath);
-                MusicList.iCurrentMusic = MusicList.size() - 1;
+                MusicList.setCurrentMusic(MusicList.size() - 1);
             }
         }
 
@@ -270,7 +270,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         } else {
             if (mPath != null) {
                 //这里在点击notification时，会有从新播放的bug
-                mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+                mMyBinder.startPlay(MusicList.getCurrentMusicInt(), 0);
             }
 
             if (mMyBinder.getIsPlaying()) {
@@ -441,7 +441,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     if(isDeleted){
                         MusicList.remove(selectedPosition);
 
-                        if(selectedPosition == MusicList.iCurrentMusic){
+                        if(selectedPosition == MusicList.getCurrentMusicInt()){
                             mMyBinder.playNextOnDelete();
                         }
 
@@ -520,7 +520,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             mMyBinder.stopPlay();
             mBtnState.setBackgroundResource(R.mipmap.run);
         } else {
-            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+            mMyBinder.startPlay(MusicList.getCurrentMusicInt(), MusicList.getCurrentPosition());
             mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
@@ -652,8 +652,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void onSongsItemClick(int position){
-        MusicList.iCurrentMusic = position;
-        mMyBinder.startPlay(MusicList.iCurrentMusic, 0);
+        MusicList.setCurrentMusic(position);
+        mMyBinder.startPlay(MusicList.getCurrentMusicInt(), 0);
         if (mMyBinder.getIsPlaying()) {
             mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         } else {
@@ -688,8 +688,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             if (MyService.ACTION_UPDATE_PROGRESS.equals(sAction)) {
                 int iProgress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, 0);
                 if (iProgress > 0) {
-                    MusicList.iCurrentPosition = iProgress;
-                    mSeekBarProgress.setProgress(MusicList.iCurrentPosition / 1000);
+                    MusicList.setCurrentPosition(iProgress);
+                    mSeekBarProgress.setProgress(MusicList.getCurrentPosition() / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
                 mAdapter.notifyDataSetChanged();
@@ -700,8 +700,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mTvBottomArtist.setText(bean.getArtist());
                 }
             } else if (MyService.ACTION_UPDATE_DURATION.equals(sAction)) {
-                MusicList.iCurrentMax = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
-                mSeekBarProgress.setMax(MusicList.iCurrentMax / 1000);
+                MusicList.setCurrentMusicMax(intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0));
+                mSeekBarProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction)) {
                 play();
             }

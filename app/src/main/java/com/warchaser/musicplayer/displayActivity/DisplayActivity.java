@@ -234,7 +234,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.getCurrentMusic().getTitle(), 25));
         }
 
-        mTvDuration.setText(FormatHelper.formatDuration(MusicList.iCurrentMax));
+        mTvDuration.setText(FormatHelper.formatDuration(MusicList.getCurrentMusicMax()));
         mSeekProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
             @Override
@@ -254,10 +254,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
 
             }
         });
-        mSeekProgress.setMax(MusicList.iCurrentMax / 1000);
-        mSeekProgress.setProgress(MusicList.iCurrentPosition / 1000);
+        mSeekProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
+        mSeekProgress.setProgress(MusicList.getCurrentPosition() / 1000);
 
-        mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.iCurrentPosition));
+        mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.getCurrentPosition()));
 
         mObserver = new UIUpdateObserver();
         CallObserver.setObserver(mObserver);
@@ -282,7 +282,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             mMyBinder.stopPlay();
             mBtnState.setBackgroundResource(R.mipmap.run);
         } else {
-            mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+            mMyBinder.startPlay(MusicList.getCurrentMusicInt(), MusicList.getCurrentPosition());
             mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         }
     }
@@ -310,15 +310,15 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         public void notifySeekBar2Update(Intent intent) {
             String action = intent.getAction();
             if (MyService.ACTION_UPDATE_PROGRESS.equals(action)) {
-                int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.iCurrentPosition);
+                int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.getCurrentPosition());
                 if (progress > 0) {
-                    MusicList.iCurrentPosition = progress; // Remember the current position
+                    MusicList.setCurrentPosition(progress);// Remember the current position
                     mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
                     mSeekProgress.setProgress(progress / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.size() != 0) {
                 //Retrieve the current music and get the title to show on top of the screen.
-                MusicList.iCurrentMusic = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+                MusicList.setCurrentMusic(intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0));
                 MusicInfo bean = MusicList.getCurrentMusic();
                 mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
                 refreshCover(bean.getAlbumId());

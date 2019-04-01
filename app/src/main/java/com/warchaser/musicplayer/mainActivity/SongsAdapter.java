@@ -31,7 +31,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
 
     private OnItemClickDelegate mOnItemClickDelegate;
 
-    private int mCurrentPosition = MusicList.iCurrentMusic;
+    private int mCurrentPosition = MusicList.getCurrentMusicInt();
 
     SongsAdapter(Context context) {
         mContext = context;
@@ -65,7 +65,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         viewHolderItem.mBtnMenu.setTag(position);
         viewHolderItem.mBtnMenu.setOnClickListener(mOnItemClickListener);
 
-        if (position == MusicList.iCurrentMusic) {
+        if (position == MusicList.getCurrentMusicInt()) {
             viewHolderItem.tvItemTitle.setTextColor(Color.RED);
             viewHolderItem.tvItemDuration.setTextColor(Color.RED);
             viewHolderItem.gfGo.setVisibility(View.VISIBLE);

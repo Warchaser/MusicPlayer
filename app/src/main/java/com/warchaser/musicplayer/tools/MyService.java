@@ -257,7 +257,7 @@ public class MyService extends Service {
     private void toUpdateCurrentMusic() {
         Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
-        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.iCurrentMusic);
+        intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.getCurrentMusicInt());
 
         startForeground(NOTIFICATION_ID, getNotification());
 
@@ -350,7 +350,7 @@ public class MyService extends Service {
 
             @Override
             public void onPrepared(MediaPlayer pMediaPlayer) {
-                mMediaPlayer.seekTo(MusicList.iCurrentPosition);
+                mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 NLog.e("MyService", "play.start " + System.currentTimeMillis());
                 mMediaPlayer.start();
                 mMessageHandler.sendEmptyMessage(UPDATE_DURATION);
@@ -376,13 +376,13 @@ public class MyService extends Service {
                             mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((MusicList.iCurrentMusic + 1) % MusicList.size(), 0);
+                            play((MusicList.getCurrentMusicInt() + 1) % MusicList.size(), 0);
                             break;
                         case MODE_RANDOM:
                             play(getRandomPosition(), 0);
                             break;
                         case MODE_SEQUENCE:
-                            if (MusicList.iCurrentMusic == MusicList.size() - 1) {
+                            if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
                                 play(0, 0);
                             } else {
                                 next();
@@ -409,7 +409,6 @@ public class MyService extends Service {
 
     private boolean isEmptyInFile(int currentPosition) {
         return currentPosition < mMediaPlayer.getDuration();
-
     }
 
     private void setCurrentMusic() {
@@ -428,8 +427,8 @@ public class MyService extends Service {
             return;
         }
 
-        MusicList.iCurrentPosition = currentPosition;
-        MusicList.iCurrentMusic = currentMusic;
+        MusicList.setCurrentPosition(currentPosition);
+        MusicList.setCurrentMusic(currentMusic);
 
         mMediaPlayer.stop();
         mMediaPlayer.reset();
@@ -452,38 +451,38 @@ public class MyService extends Service {
 
     private void stop() {
 
-        MusicList.iCurrentPosition = mMediaPlayer.getCurrentPosition();
+        MusicList.setCurrentPosition(mMediaPlayer.getCurrentPosition());
 
         mMediaPlayer.stop();
         mIsPlaying = false;
     }
 
     private void nextOnDelete(){
-        play(MusicList.iCurrentMusic, 0);
+        play(MusicList.getCurrentMusicInt(), 0);
     }
 
     private void next() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
+                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
                     play(0, 0);
                 } else {
-                    play(MusicList.iCurrentMusic + 1, 0);
+                    play(MusicList.getCurrentMusicInt() + 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
+                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
                     play(0, 0);
                 } else {
-                    play(MusicList.iCurrentMusic + 1, 0);
+                    play(MusicList.getCurrentMusicInt() + 1, 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if (MusicList.iCurrentMusic == MusicList.size() - 1) {
+                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
                     CommonUtils.showShortToast(R.string.last_song_tip);
                     play(0, 0);
                 } else {
-                    play(MusicList.iCurrentMusic + 1, 0);
+                    play(MusicList.getCurrentMusicInt() + 1, 0);
                 }
                 break;
             case MODE_RANDOM:
@@ -495,25 +494,25 @@ public class MyService extends Service {
     private void previous() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if (MusicList.iCurrentMusic == 0) {
+                if (MusicList.getCurrentMusicInt() == 0) {
                     play(MusicList.size() - 1, 0);
                 } else {
-                    play(MusicList.iCurrentMusic - 1, 0);
+                    play(MusicList.getCurrentMusicInt() - 1, 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if (MusicList.iCurrentMusic == 0) {
+                if (MusicList.getCurrentMusicInt() == 0) {
                     play(MusicList.size() - 1, 0);
                 } else {
-                    play(MusicList.iCurrentMusic - 1, 0);
+                    play(MusicList.getCurrentMusicInt() - 1, 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if (MusicList.iCurrentMusic == 0) {
+                if (MusicList.getCurrentMusicInt() == 0) {
                     CommonUtils.showShortToast(R.string.first_song_tip);
                     play(MusicList.size() - 1, 0);
                 } else {
-                    play(MusicList.iCurrentMusic - 1, 0);
+                    play(MusicList.getCurrentMusicInt() - 1, 0);
                 }
                 break;
             case MODE_RANDOM:
@@ -529,7 +528,7 @@ public class MyService extends Service {
     }
 
     public void startPlayNormal() {
-        play(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+        play(MusicList.getCurrentMusicInt(), MusicList.getCurrentPosition());
     }
 
     /**
@@ -742,9 +741,9 @@ public class MyService extends Service {
          */
         public void changeProgress(int pProgress) {
             if (mMediaPlayer != null) {
-                MusicList.iCurrentPosition = pProgress * 1000;
+                MusicList.setCurrentPosition(pProgress * 1000);
                 if (mIsPlaying) {
-                    mMediaPlayer.seekTo(MusicList.iCurrentPosition);
+                    mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 } else {
                     startPlayNormal();
                 }

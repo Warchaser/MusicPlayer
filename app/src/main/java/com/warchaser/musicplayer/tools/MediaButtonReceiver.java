@@ -58,7 +58,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                                     if (MusicList.mMyBinder.getIsPlaying()) {
                                         MusicList.mMyBinder.stopPlay();
                                     } else {
-                                        MusicList.mMyBinder.startPlay(MusicList.iCurrentMusic, MusicList.iCurrentPosition);
+                                        MusicList.mMyBinder.startPlay(MusicList.getCurrentMusicInt(), MusicList.getCurrentPosition());
                                     }
 
                                 }
