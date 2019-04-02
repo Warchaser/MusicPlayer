@@ -3,6 +3,7 @@ package com.warchaser.musicplayer.displayActivity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,9 +17,11 @@ import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.globalInfo.BaseActivity;
+import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
+import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
@@ -246,6 +249,11 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         });
         mSeekProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
         mSeekProgress.setProgress(MusicList.getCurrentPosition() / 1000);
+
+        final int height = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_height));
+        final int width = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_width));
+        Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
+        mSeekProgress.setThumb(thumbDrawable);
 
         mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.getCurrentPosition()));
 

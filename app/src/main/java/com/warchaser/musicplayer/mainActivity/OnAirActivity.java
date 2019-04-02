@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
@@ -36,6 +37,7 @@ import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
+import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 import com.warchaser.musicplayer.tools.MyService;
@@ -546,6 +548,11 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
             }
         });
+
+        final int height = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_height));
+        final int width = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_width));
+        Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
+        mSeekBarProgress.setThumb(thumbDrawable);
 
         if (!MusicList.isListEmpty()) {
             final MusicInfo bean = MusicList.getCurrentMusic();

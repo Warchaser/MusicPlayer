@@ -1,10 +1,14 @@
 package com.warchaser.musicplayer.tools;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -110,7 +114,7 @@ public class ImageUtil {
     }
 
 
-    public static Drawable getDrawableFromBitmap(Context context, Bitmap bitmap) {
+    public static BitmapDrawable getDrawableFromBitmap(Context context, Bitmap bitmap) {
 
         if (bitmap == null) {
             return null;
@@ -215,4 +219,16 @@ public class ImageUtil {
         return Bitmap.createScaledBitmap(source, dstWidth, dstHeight, true);
     }
 
+    public static BitmapDrawable getNewDrawable(Context context, int restId, int dstWidth){
+        Bitmap bitmapOrigin = BitmapFactory.decodeResource(
+                context.getResources(), restId);
+        Bitmap bmp = scaleBitmap(bitmapOrigin, dstWidth);
+        BitmapDrawable d = new BitmapDrawable(bmp);
+        Bitmap bitmap = d.getBitmap();
+        if (bitmap.getDensity() == Bitmap.DENSITY_NONE) {
+            d.setTargetDensity(context.getResources().getDisplayMetrics());
+        }
+        bitmapOrigin.recycle();
+        return d;
+    }
 }

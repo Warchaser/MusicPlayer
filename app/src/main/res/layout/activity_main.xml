@@ -75,12 +75,13 @@
                 android:layout_height="15dip"
                 android:layout_marginTop="3dip"
                 android:indeterminate="false"
-                android:maxHeight="1dip"
-                android:minHeight="1dip"
+                android:maxHeight="6dip"
+                android:minHeight="6dip"
                 android:progressDrawable="@drawable/progress_style"
-                android:thumb="@mipmap/seekbar_thumb"
+                android:thumb="@mipmap/thumb"
                 android:thumbOffset="0dip"
-                android:transitionName="seek_bar" />
+                android:transitionName="seek_bar"
+                android:splitTrack="false"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -135,8 +136,8 @@
 
                         <Button
                             android:id="@+id/btnState"
-                            android:layout_width="33dip"
-                            android:layout_height="33dip"
+                            android:layout_width="37dip"
+                            android:layout_height="44dip"
                             android:background="@mipmap/run"
                             android:gravity="right"
                             android:transitionName="btn_state" />
@@ -155,8 +156,8 @@
 
                         <Button
                             android:id="@+id/btnNext"
-                            android:layout_width="33dip"
-                            android:layout_height="33dip"
+                            android:layout_width="@dimen/action_button_width"
+                            android:layout_height="@dimen/action_button_height"
                             android:background="@mipmap/next"
                             android:gravity="right"
                             android:transitionName="btn_next" />

@@ -17,7 +17,7 @@
             android:gravity="center"
             android:text="Title"
             android:textSize="25sp"
-            android:background="#FF85FC74"/>
+            android:textColor="@color/black"/>
 
     </LinearLayout>
 
@@ -42,7 +42,8 @@
             android:layout_gravity="center_horizontal|center_vertical"
             android:gravity="right"
             android:layout_weight="1"
-            android:text="00:00" />
+            android:text="00:00"
+            android:textColor="@color/black"/>
 
         <SeekBar
             android:id="@+id/progress"
@@ -51,13 +52,14 @@
             android:layout_weight="6"
             android:layout_gravity="center_horizontal|center_vertical"
             style="?android:attr/progressBarStyleHorizontal"
-            android:maxHeight="1dip"
-            android:minHeight="1dip"
+            android:maxHeight="6dip"
+            android:minHeight="6dip"
             android:progressDrawable="@drawable/progress_style"
             android:thumbOffset="0dip"
-            android:thumb="@mipmap/seekbar_thumb"
+            android:thumb="@mipmap/thumb"
             android:indeterminate="false"
-            android:transitionName="seek_bar"/>
+            android:transitionName="seek_bar"
+            android:splitTrack="false"/>
 
         <TextView
             android:id="@+id/tvDisplayDuration"
@@ -65,7 +67,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
             android:layout_weight="1"
-            android:text="00:00" />
+            android:text="00:00"
+            android:textColor="@color/black"/>
         
     </LinearLayout>
 
@@ -105,8 +108,8 @@
 
             <Button
                 android:id="@+id/btnDisplayPrevious"
-                android:layout_width="33dip"
-                android:layout_height="33dip"
+                android:layout_width="@dimen/action_button_width"
+                android:layout_height="@dimen/action_button_height"
                 android:layout_gravity="center"
                 android:background="@mipmap/previous"/>
 
@@ -123,8 +126,8 @@
 
             <Button
                 android:id="@+id/btnDisplayState"
-                android:layout_width="33dip"
-                android:layout_height="33dip"
+                android:layout_width="37dip"
+                android:layout_height="44dip"
                 android:layout_gravity="center"
                 android:background="@mipmap/run"
                 android:transitionName="btn_state"/>
@@ -142,8 +145,8 @@
 
             <Button
                 android:id="@+id/btnDisplayNext"
-                android:layout_width="33dip"
-                android:layout_height="33dip"
+                android:layout_width="@dimen/action_button_width"
+                android:layout_height="@dimen/action_button_height"
                 android:layout_gravity="center"
                 android:background="@mipmap/next"
                 android:transitionName="btn_next"/>

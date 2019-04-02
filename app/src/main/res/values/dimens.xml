@@ -14,4 +14,11 @@
     <dimen name="common_font_size">16sp</dimen>
 
     <dimen name="display_cover_width">50dp</dimen>
+
+    <dimen name="seek_bar_thumb_height">17dp</dimen>
+    <dimen name="seek_bar_thumb_width">15dp</dimen>
+
+    <dimen name="action_button_width">55dip</dimen>
+    <dimen name="action_button_height">34dip</dimen>
+
 </resources>
