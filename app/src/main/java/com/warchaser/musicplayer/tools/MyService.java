@@ -156,6 +156,7 @@ public class MyService extends Service {
         intentFilter.addAction(PAUSE_OR_PLAY_ACTION);
         intentFilter.addAction(NEXT_ACTION);
         intentFilter.addAction(STOP_ACTION);
+        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);//拔出耳机
 
         registerReceiver(mIntentReceiver, intentFilter);
     }
@@ -590,6 +591,15 @@ public class MyService extends Service {
             }
 
             StatusBarUtil.collapseStatusBar(AppData.getApp().getApplicationContext());
+        } else if(AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)){
+            if(mMyBinder.getIsPlaying()){
+                setRemoteViewPlayOrPause();
+                if(CallObserver.isNeedCallObserver()){
+                    CallObserver.callObserver(new Intent().setAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+                } else {
+                    stop();
+                }
+            }
         }
     }
 

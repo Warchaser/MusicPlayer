@@ -250,7 +250,6 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         mSeekProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
         mSeekProgress.setProgress(MusicList.getCurrentPosition() / 1000);
 
-        final int height = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_height));
         final int width = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_width));
         Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
         mSeekProgress.setThumb(thumbDrawable);
@@ -320,7 +319,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
                 mTvDuration.setText(FormatHelper.formatDuration(duration));
                 mSeekProgress.setMax(duration / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                play();
+                if(mMyBinder.getIsPlaying()){
+                    mMyBinder.stopPlay();
+                    mBtnState.setBackgroundResource(R.mipmap.run);
+                }
             }
         }
 

@@ -703,7 +703,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 MusicList.setCurrentMusicMax(intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0));
                 mSeekBarProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction)) {
-                play();
+                if(mMyBinder.getIsPlaying()){
+                    mMyBinder.stopPlay();
+                    mBtnState.setBackgroundResource(R.mipmap.run);
+                }
             }
         }
 
