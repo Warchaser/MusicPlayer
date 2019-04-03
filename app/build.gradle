@@ -26,12 +26,18 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+    implementation "androidx.appcompat:appcompat:$androidx_app_compat_version"
+    implementation "androidx.legacy:legacy-support-v4:$androidx_version"
+    implementation "androidx.recyclerview:recyclerview:$androidx_version"
+//
+//    implementation 'com.android.support:appcompat-v7:28.0.0'
+//    implementation 'com.android.support:design:28.0.0'
+//    implementation 'com.android.support:recyclerview-v7:28.0.0'
 
     implementation files('libs/pinyin4j-2.5.0.jar')
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'com.jakewharton:butterknife:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.9.0'

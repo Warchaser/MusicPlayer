@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -14,6 +13,8 @@ import com.warchaser.musicplayer.globalInfo.BaseActivity;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.MyService;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by Administrator on 2014/11/6.

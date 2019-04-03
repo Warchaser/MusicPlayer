@@ -1,18 +1,13 @@
 package com.warchaser.musicplayer.tools;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -22,6 +17,8 @@ import android.widget.ImageView;
 import com.warchaser.musicplayer.globalInfo.AppData;
 
 import java.io.InputStream;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by Wucn on 2017/2/3.

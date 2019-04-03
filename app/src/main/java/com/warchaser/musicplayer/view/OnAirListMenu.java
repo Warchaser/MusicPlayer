@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +15,8 @@ import android.widget.TextView;
 import com.warchaser.musicplayer.R;
 
 import java.io.File;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class OnAirListMenu extends AlertDialog {
 

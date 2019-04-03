@@ -15,12 +15,14 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.session.MediaSession;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.widget.RemoteViews;
@@ -30,6 +32,8 @@ import com.warchaser.musicplayer.globalInfo.AppData;
 import com.warchaser.musicplayer.mainActivity.OnAirActivity;
 
 import java.lang.ref.WeakReference;
+
+import androidx.core.app.NotificationCompat;
 
 /**
  * Created by Wu on 2014/10/20.
@@ -58,7 +62,7 @@ public class MyService extends Service {
     public static final String NEXT_ACTION = "com.warchaser.MusicPlayer.next";
     public static final String STOP_ACTION = "com.warchaser.MusicPlayer.close";
 
-    private final String MEDIA_SESSION_TAG = "com.warchaser.musicplayer.tools.MyService";
+    private final String MEDIA_SESSION_TAG = "com.warchaser.MusicPlayer.tools.MyService";
 
     private final int PAUSE_FLAG = 0x11;
     private final int NEXT_FLAG = 0x12;
@@ -66,7 +70,7 @@ public class MyService extends Service {
 
     private final int NOTIFICATION_ID = 1001;
 
-    private int mCurrentMode = 3; //default sequence playing
+    private int mCurrentMode = MODE_SEQUENCE; //default sequence playing
 
     /**
      * 播放模式
@@ -75,6 +79,14 @@ public class MyService extends Service {
     public static final int MODE_ALL_LOOP = 1;
     public static final int MODE_RANDOM = 2;
     public static final int MODE_SEQUENCE = 3;
+
+    private static final long MEDIA_SESSION_ACTIONS = PlaybackStateCompat.ACTION_PLAY
+            | PlaybackStateCompat.ACTION_PAUSE
+            | PlaybackStateCompat.ACTION_PLAY_PAUSE
+            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+            | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+            | PlaybackStateCompat.ACTION_STOP
+            | PlaybackStateCompat.ACTION_SEEK_TO;
 
     private MyBinder mMyBinder = new MyBinder();
     private MessageHandler mMessageHandler;
@@ -88,14 +100,17 @@ public class MyService extends Service {
 
     private IntentReceiver mIntentReceiver;
 
-    private MediaSession mMediaSession;
+//    private MediaSession mMediaSession;
+    private MediaSessionCompat mMediaSessionCompat;
 
-    private static int mClickCounter = 0;
-    private static final int DOUBLE_CLICK_DURATION = 500;
-    private static long mLastClickTime = 0;
+//    private static int mClickCounter = 0;
+//    private static final int DOUBLE_CLICK_DURATION = 500;
+//    private static long mLastClickTime = 0;
 
     public static final int SINGLE_CLICK = 1;
     public static final int DOUBLE_CLICK = 2;
+
+    private boolean mIsPreparing = false;
 
     @Override
     public void onCreate() {
@@ -114,8 +129,9 @@ public class MyService extends Service {
 
         initializeReceiver();
 
-        initializeMediaSession();
+//        initializeMediaSession();
 
+        initializeMediaSessionCompat();
     }
 
     @Override
@@ -146,8 +162,9 @@ public class MyService extends Service {
             mIntentReceiver = null;
         }
 
-        releaseMediaSession();
+//        releaseMediaSession();
 
+        releaseMediaSessionCompat();
     }
 
     private void initializeReceiver() {
@@ -161,19 +178,35 @@ public class MyService extends Service {
         registerReceiver(mIntentReceiver, intentFilter);
     }
 
-    private void initializeMediaSession(){
-        mMediaSession = new MediaSession(getApplicationContext(), MEDIA_SESSION_TAG);
-        mMediaSession.setCallback(mMediaSessionCallBack);
-        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
-        mMediaSession.setActive(true);
+//    private void initializeMediaSession(){
+//        mMediaSession = new MediaSession(getApplicationContext(), MEDIA_SESSION_TAG);
+//        mMediaSession.setCallback(mMediaSessionCallBack);
+//        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
+//        mMediaSession.setActive(true);
+//    }
+//
+//    private void releaseMediaSession(){
+//        if(mMediaSession != null){
+//            mMediaSession.setCallback(null);
+//            mMediaSession.setActive(false);
+//            mMediaSession.release();
+//            mMediaSession = null;
+//        }
+//    }
+
+    private void initializeMediaSessionCompat(){
+        mMediaSessionCompat = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
+        mMediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+        mMediaSessionCompat.setCallback(mMediaSessionCompatCallback);
+        mMediaSessionCompat.setActive(true);
     }
 
-    private void releaseMediaSession(){
-        if(mMediaSession != null){
-            mMediaSession.setCallback(null);
-            mMediaSession.setActive(false);
-            mMediaSession.release();
-            mMediaSession = null;
+    private void releaseMediaSessionCompat(){
+        if(mMediaSessionCompat != null){
+            mMediaSessionCompat.setCallback(null);
+            mMediaSessionCompat.setActive(false);
+            mMediaSessionCompat.release();
+            mMediaSessionCompat = null;
         }
     }
 
@@ -351,6 +384,7 @@ public class MyService extends Service {
 
             @Override
             public void onPrepared(MediaPlayer pMediaPlayer) {
+                mIsPreparing = false;
                 mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 NLog.e("MyService", "play.start " + System.currentTimeMillis());
                 mMediaPlayer.start();
@@ -438,9 +472,12 @@ public class MyService extends Service {
             if (!MusicList.isListEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
+                mIsPreparing = true;
                 NLog.e("MyService", "play.prepareAsync " + System.currentTimeMillis());
                 mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
                 mIsPlaying = true;
+                updatePlaybackState();
+                updateMetaData(MusicList.getCurrentMusic());
             }
 
         } catch (Exception e) {
@@ -603,63 +640,63 @@ public class MyService extends Service {
         }
     }
 
-    private void handleMediaButtonUp(int keyCode, KeyEvent event){
-        NLog.e("MyService", "keyCode: " + keyCode);
-        final long eventTime = event.getEventTime();
-        setRemoteViewPlayOrPause();
-        switch (keyCode){
-            case KeyEvent.KEYCODE_MEDIA_NEXT:
-                if (!CallObserver.callPlay(DOUBLE_CLICK)) {
-                    next();
-                }
-                break;
-            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                break;
-            case KeyEvent.KEYCODE_HEADSETHOOK:
-                if (eventTime - mLastClickTime >= DOUBLE_CLICK_DURATION) {
-                    mClickCounter = 0;
-                }
-
-                mClickCounter++;
-                if (mClickCounter >= 3) {
-                    mClickCounter = 0;
-                }
-                mLastClickTime = eventTime;
-
-                if (mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK)) {
-                    next();
-                } else if (mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)) {
-                    if (mMyBinder.getIsPlaying()) {
-                        stop();
-                    } else {
-                        startPlayNormal();
-                    }
-                }
-
-                break;
-            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                if (!CallObserver.callPlay(SINGLE_CLICK)) {
-                    if (mMyBinder.getIsPlaying()) {
-                        stop();
-                    } else {
-                        startPlayNormal();
-                    }
-                }
-                break;
-            case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                if (!CallObserver.callPlay(SINGLE_CLICK)){
-                    stop();
-                }
-                break;
-            case KeyEvent.KEYCODE_MEDIA_PLAY:
-                if (!CallObserver.callPlay(SINGLE_CLICK)){
-                    startPlayNormal();
-                }
-                break;
-            default:
-                break;
-        }
-    }
+//    private void handleMediaButtonUp(int keyCode, KeyEvent event){
+//        NLog.e("MyService", "keyCode: " + keyCode);
+//        final long eventTime = event.getEventTime();
+//        setRemoteViewPlayOrPause();
+//        switch (keyCode){
+//            case KeyEvent.KEYCODE_MEDIA_NEXT:
+//                if (!CallObserver.callPlay(DOUBLE_CLICK)) {
+//                    next();
+//                }
+//                break;
+//            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+//                break;
+//            case KeyEvent.KEYCODE_HEADSETHOOK:
+//                if (eventTime - mLastClickTime >= DOUBLE_CLICK_DURATION) {
+//                    mClickCounter = 0;
+//                }
+//
+//                mClickCounter++;
+//                if (mClickCounter >= 3) {
+//                    mClickCounter = 0;
+//                }
+//                mLastClickTime = eventTime;
+//
+//                if (mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK)) {
+//                    next();
+//                } else if (mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)) {
+//                    if (mMyBinder.getIsPlaying()) {
+//                        stop();
+//                    } else {
+//                        startPlayNormal();
+//                    }
+//                }
+//
+//                break;
+//            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+//                if (!CallObserver.callPlay(SINGLE_CLICK)) {
+//                    if (mMyBinder.getIsPlaying()) {
+//                        stop();
+//                    } else {
+//                        startPlayNormal();
+//                    }
+//                }
+//                break;
+//            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+//                if (!CallObserver.callPlay(SINGLE_CLICK)){
+//                    stop();
+//                }
+//                break;
+//            case KeyEvent.KEYCODE_MEDIA_PLAY:
+//                if (!CallObserver.callPlay(SINGLE_CLICK)){
+//                    startPlayNormal();
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 
     private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
 
@@ -671,25 +708,114 @@ public class MyService extends Service {
         }
     };
 
-    private final MediaSession.Callback mMediaSessionCallBack = new MediaSession.Callback() {
+//    private final MediaSession.Callback mMediaSessionCallBack = new MediaSession.Callback() {
+//        @Override
+//        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+//            if(mediaButtonIntent == null){
+//                NLog.e("MyService", "mMediaSessionCallBack.onMediaButtonEvent mediaButtonIntent == null");
+//                return false;
+//            }
+//
+//            if(Intent.ACTION_MEDIA_BUTTON.equals(mediaButtonIntent.getAction())){
+//                KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+//                if(event == null){
+//                    NLog.e("MyService", "mMediaSessionCallBack.onMediaButtonEvent event == null");
+//                    return false;
+//                }
+//                if(KeyEvent.ACTION_UP == event.getAction()){
+//                    handleMediaButtonUp(event.getKeyCode(), event);
+//                    return true;
+//                }
+//            }
+//
+//            return false;
+//        }
+//    };
+
+    public void updatePlaybackState(){
+        int state = (mMyBinder.getIsPlaying() || mIsPreparing) ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
+
+        if(mMediaSessionCompat != null){
+            mMediaSessionCompat.setPlaybackState(
+                    new PlaybackStateCompat.Builder()
+                            .setActions(MEDIA_SESSION_ACTIONS)
+                            .setState(state, MusicList.getCurrentPosition(), 1)
+                            .build());
+        }
+    }
+
+    public void updateMetaData(MusicInfo music) {
+        if (music == null) {
+            if(mMediaSessionCompat != null){
+                mMediaSessionCompat.setMetadata(null);
+            }
+            return;
+        }
+
+        MediaMetadataCompat.Builder metaData = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, music.getTitle())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, music.getArtist())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, music.getAlbum())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, music.getArtist())
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, music.getDuration())
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, CoverLoader.get().loadThumb(music.getAlbumId()));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            metaData.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, MusicList.size());
+        }
+
+        if(mMediaSessionCompat != null){
+            mMediaSessionCompat.setMetadata(metaData.build());
+        }
+    }
+
+    private final MediaSessionCompat.Callback mMediaSessionCompatCallback = new MediaSessionCompat.Callback() {
+
         @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-            if(mediaButtonIntent == null){
-                return false;
-            }
-
-            if(Intent.ACTION_MEDIA_BUTTON.equals(mediaButtonIntent.getAction())){
-                KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if(event == null){
-                    return false;
-                }
-                if(KeyEvent.ACTION_UP == event.getAction()){
-                    handleMediaButtonUp(event.getKeyCode(), event);
-                    return true;
+        public void onPlay() {
+            super.onPlay();
+            setRemoteViewPlayOrPause();
+            if (!CallObserver.callPlay(SINGLE_CLICK)) {
+                if (mMyBinder.getIsPlaying()) {
+                    stop();
+                } else {
+                    startPlayNormal();
                 }
             }
+        }
 
-            return false;
+        @Override
+        public void onPause() {
+            super.onPause();
+            setRemoteViewPlayOrPause();
+            if (!CallObserver.callPlay(SINGLE_CLICK)) {
+                if (mMyBinder.getIsPlaying()) {
+                    stop();
+                } else {
+                    startPlayNormal();
+                }
+            }
+        }
+
+        @Override
+        public void onSkipToNext() {
+            super.onSkipToNext();
+            setRemoteViewPlayOrPause();
+            if (!CallObserver.callPlay(DOUBLE_CLICK)) {
+                next();
+            }
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            super.onSkipToPrevious();
+            setRemoteViewPlayOrPause();
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            setRemoteViewPlayOrPause();
         }
     };
 
@@ -749,9 +875,9 @@ public class MyService extends Service {
         /**
          * seekBar action
          */
-        public void changeProgress(int pProgress) {
+        public void changeProgress(int progress) {
             if (mMediaPlayer != null) {
-                MusicList.setCurrentPosition(pProgress * 1000);
+                MusicList.setCurrentPosition(progress * 1000);
                 if (mIsPlaying) {
                     mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 } else {
