@@ -122,10 +122,8 @@ public class MyService extends Service {
         initMediaPlayer();
 
         super.onCreate();
-        //将ACTION_MEDIA_BUTTON注册到AudioManager，目前只能这么干(2014.12.24)
+
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        mComponentName = new ComponentName(getPackageName(), MediaButtonReceiver.class.getName());
-//        mAudioManager.registerMediaButtonEventReceiver(mComponentName);
 
         initializeReceiver();
 
@@ -154,7 +152,6 @@ public class MyService extends Service {
 
         if (mAudioManager != null) {
             mAudioManager.abandonAudioFocus(mAudioFocusListener);
-//            mAudioManager.unregisterMediaButtonEventReceiver(mComponentName);
         }
 
         if(mIntentReceiver != null){
