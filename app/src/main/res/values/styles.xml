@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
 
@@ -16,7 +16,7 @@
         <item name="android:backgroundDimEnabled">true</item> <!--背景是否模糊显示-->
     </style>
 
-    <style name="splash_activity" parent="AppTheme">
+    <style name="splash_activity" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:background">@drawable/bg_splash</item>
     </style>
 
