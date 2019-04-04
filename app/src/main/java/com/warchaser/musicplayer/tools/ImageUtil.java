@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.warchaser.musicplayer.globalInfo.AppData;
+import com.warchaser.musicplayer.global.AppData;
 
 import java.io.InputStream;
 

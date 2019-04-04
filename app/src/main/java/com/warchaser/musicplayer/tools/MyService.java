@@ -14,7 +14,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.media.session.MediaSession;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.os.Binder;
@@ -24,12 +23,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.widget.RemoteViews;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.globalInfo.AppData;
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.global.AppData;
+import com.warchaser.musicplayer.main.OnAirActivity;
 
 import java.lang.ref.WeakReference;
 

@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.mainActivity;
+package com.warchaser.musicplayer.main;
 
 import android.app.ActivityOptions;
 import android.content.ComponentName;
@@ -28,8 +28,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.displayActivity.DisplayActivity;
-import com.warchaser.musicplayer.globalInfo.BaseActivity;
+import com.warchaser.musicplayer.display.DisplayActivity;
+import com.warchaser.musicplayer.global.BaseActivity;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.CoverLoader;

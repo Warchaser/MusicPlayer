@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.mainActivity;
+package com.warchaser.musicplayer.main;
 
 import android.content.Context;
 import android.graphics.Color;

@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.globalInfo;
+package com.warchaser.musicplayer.global;
 
 import android.Manifest;
 import android.content.Intent;

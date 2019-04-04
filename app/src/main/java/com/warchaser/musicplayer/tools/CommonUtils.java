@@ -2,7 +2,7 @@ package com.warchaser.musicplayer.tools;
 
 import android.widget.Toast;
 
-import com.warchaser.musicplayer.globalInfo.AppData;
+import com.warchaser.musicplayer.global.AppData;
 
 public class CommonUtils {
     private CommonUtils() {

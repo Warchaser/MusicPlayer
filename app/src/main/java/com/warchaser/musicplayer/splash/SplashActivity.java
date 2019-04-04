@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.splashActivity;
+package com.warchaser.musicplayer.splash;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,8 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.warchaser.musicplayer.R;
-import com.warchaser.musicplayer.globalInfo.BaseActivity;
-import com.warchaser.musicplayer.mainActivity.OnAirActivity;
+import com.warchaser.musicplayer.global.BaseActivity;
+import com.warchaser.musicplayer.main.OnAirActivity;
 import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.MyService;
 
