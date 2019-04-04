@@ -155,6 +155,7 @@ public class MyService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
         }

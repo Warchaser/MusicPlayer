@@ -549,7 +549,6 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
-        final int height = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_height));
         final int width = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_width));
         Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
         mSeekBarProgress.setThumb(thumbDrawable);
@@ -692,7 +691,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mSeekBarProgress.setProgress(MusicList.getCurrentPosition() / 1000);
                 }
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
-                mAdapter.notifyDataSetChanged();
+                int position = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+                mAdapter.notifyItemsChanged(position);
                 if (!MusicList.isListEmpty()) {
                     MusicInfo bean = MusicList.getCurrentMusic();
                     refreshBottomThumb(bean.getAlbumId());

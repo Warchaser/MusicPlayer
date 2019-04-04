@@ -15,6 +15,9 @@ import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -45,31 +48,44 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolderItem viewHolderItem, int position) {
+    public void onBindViewHolder(@NonNull ViewHolderItem holder, int position, @NonNull List<Object> payloads) {
+        boolean isFullRefresh = payloads.isEmpty();
 
-        MusicInfo bean = MusicList.getMusicWithPosition(position);
+        if(isFullRefresh){
+            MusicInfo bean = MusicList.getMusicWithPosition(position);
 
-        Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(viewHolderItem.gfGo);
+            Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(holder.gfGo);
 
-        viewHolderItem.tvItemTitle.setText(bean.getTitle());
-        viewHolderItem.tvItemDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
+            holder.tvItemTitle.setText(bean.getTitle());
+            holder.tvItemDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
 
-        viewHolderItem.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
-        viewHolderItem.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
 
-        viewHolderItem.gfGo.setVisibility(View.INVISIBLE);
+            holder.gfGo.setVisibility(View.INVISIBLE);
 
-        viewHolderItem.mLyRoot.setTag(position);
-        viewHolderItem.mLyRoot.setOnClickListener(mOnItemClickListener);
+            holder.mLyRoot.setTag(position);
+            holder.mLyRoot.setOnClickListener(mOnItemClickListener);
 
-        viewHolderItem.mBtnMenu.setTag(position);
-        viewHolderItem.mBtnMenu.setOnClickListener(mOnItemClickListener);
+            holder.mBtnMenu.setTag(position);
+            holder.mBtnMenu.setOnClickListener(mOnItemClickListener);
+        }
 
         if (position == MusicList.getCurrentMusicInt()) {
-            viewHolderItem.tvItemTitle.setTextColor(Color.RED);
-            viewHolderItem.tvItemDuration.setTextColor(Color.RED);
-            viewHolderItem.gfGo.setVisibility(View.VISIBLE);
+            holder.tvItemTitle.setTextColor(Color.RED);
+            holder.tvItemDuration.setTextColor(Color.RED);
+            holder.gfGo.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
+
+            holder.gfGo.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolderItem viewHolderItem, int position) {
+        onBindViewHolder(viewHolderItem, position, new ArrayList<>());
     }
 
     @Override
@@ -102,9 +118,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
             final MusicInfo bean = MusicList.getMusicWithPosition(position);
             switch (v.getId()){
                 case R.id.mLyRoot:
-                    notifyItemChanged(mCurrentPosition);
-                    notifyItemChanged(position);
-                    mCurrentPosition = position;
+                    notifyItemsChanged(position);
                     mOnItemClickDelegate.onItemClick(position, bean);
                     break;
                 case R.id.mBtnMenu:
@@ -114,6 +128,12 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
                     break;
             }
         }
+    }
+
+    public void notifyItemsChanged(int position){
+        notifyItemChanged(mCurrentPosition, "local_refresh");
+        notifyItemChanged(position, "local_refresh");
+        mCurrentPosition = position;
     }
 
     public interface OnItemClickDelegate{
