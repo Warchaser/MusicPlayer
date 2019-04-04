@@ -42,19 +42,16 @@
 
         <activity
             android:name=".mainActivity.OnAirActivity"
-            android:clearTaskOnLaunch="true"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:excludeFromRecents="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".displayActivity.DisplayActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
 
         <activity android:name=".globalInfo.BaseActivity" />
 
