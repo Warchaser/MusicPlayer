@@ -22,8 +22,8 @@ import butterknife.ButterKnife;
 
 /**
  * Created by Wucn on 2017/12/20.
+ * Songs Adapter
  */
-
 public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderItem> {
 
     private Context mContext;

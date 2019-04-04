@@ -17,7 +17,8 @@ import com.warchaser.musicplayer.tools.MyService;
 import androidx.annotation.NonNull;
 
 /**
- * Created by Administrator on 2014/11/6.
+ * Created by Wucn on 2014/11/6.
+ * SplashActivity
  */
 public class SplashActivity extends BaseActivity {
 

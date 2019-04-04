@@ -35,6 +35,7 @@ import androidx.core.app.NotificationCompat;
 
 /**
  * Created by Wu on 2014/10/20.
+ * Playing-Service
  */
 public class MyService extends Service {
 
@@ -78,6 +79,9 @@ public class MyService extends Service {
     public static final int MODE_RANDOM = 2;
     public static final int MODE_SEQUENCE = 3;
 
+    /**
+     * MediaSessionCompat Flags
+     * */
     private static final long MEDIA_SESSION_ACTIONS = PlaybackStateCompat.ACTION_PLAY
             | PlaybackStateCompat.ACTION_PAUSE
             | PlaybackStateCompat.ACTION_PLAY_PAUSE
@@ -90,20 +94,34 @@ public class MyService extends Service {
     private MessageHandler mMessageHandler;
 
     private AudioManager mAudioManager;
-//    private ComponentName mComponentName;
 
+    /**
+     * Custom Notification's RemoteViews
+     * */
     private RemoteViews mNotificationRemoteView;
+
+    /**
+     * Notification
+     * */
     private Notification mNotification;
+
+    /**
+     * Notification's Manager
+     * */
     private NotificationManager mNotificationManager;
 
+    /**
+     * IntentReceiver
+     * For receiving Notification's clicking actions and AUDIO-BECOMING_NOISY action.
+     * */
     private IntentReceiver mIntentReceiver;
 
-//    private MediaSession mMediaSession;
+    /**
+     * MediaSessionCompat
+     * For receiving media button actions.
+     * Earphones and HeadSets.
+     * */
     private MediaSessionCompat mMediaSessionCompat;
-
-//    private static int mClickCounter = 0;
-//    private static final int DOUBLE_CLICK_DURATION = 500;
-//    private static long mLastClickTime = 0;
 
     public static final int SINGLE_CLICK = 1;
     public static final int DOUBLE_CLICK = 2;
@@ -124,8 +142,6 @@ public class MyService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         initializeReceiver();
-
-//        initializeMediaSession();
 
         initializeMediaSessionCompat();
     }
@@ -157,8 +173,6 @@ public class MyService extends Service {
             mIntentReceiver = null;
         }
 
-//        releaseMediaSession();
-
         releaseMediaSessionCompat();
     }
 
@@ -172,22 +186,6 @@ public class MyService extends Service {
 
         registerReceiver(mIntentReceiver, intentFilter);
     }
-
-//    private void initializeMediaSession(){
-//        mMediaSession = new MediaSession(getApplicationContext(), MEDIA_SESSION_TAG);
-//        mMediaSession.setCallback(mMediaSessionCallBack);
-//        mMediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
-//        mMediaSession.setActive(true);
-//    }
-//
-//    private void releaseMediaSession(){
-//        if(mMediaSession != null){
-//            mMediaSession.setCallback(null);
-//            mMediaSession.setActive(false);
-//            mMediaSession.release();
-//            mMediaSession = null;
-//        }
-//    }
 
     private void initializeMediaSessionCompat(){
         mMediaSessionCompat = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
@@ -635,64 +633,6 @@ public class MyService extends Service {
         }
     }
 
-//    private void handleMediaButtonUp(int keyCode, KeyEvent event){
-//        NLog.e("MyService", "keyCode: " + keyCode);
-//        final long eventTime = event.getEventTime();
-//        setRemoteViewPlayOrPause();
-//        switch (keyCode){
-//            case KeyEvent.KEYCODE_MEDIA_NEXT:
-//                if (!CallObserver.callPlay(DOUBLE_CLICK)) {
-//                    next();
-//                }
-//                break;
-//            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-//                break;
-//            case KeyEvent.KEYCODE_HEADSETHOOK:
-//                if (eventTime - mLastClickTime >= DOUBLE_CLICK_DURATION) {
-//                    mClickCounter = 0;
-//                }
-//
-//                mClickCounter++;
-//                if (mClickCounter >= 3) {
-//                    mClickCounter = 0;
-//                }
-//                mLastClickTime = eventTime;
-//
-//                if (mClickCounter == DOUBLE_CLICK && !CallObserver.callPlay(DOUBLE_CLICK)) {
-//                    next();
-//                } else if (mClickCounter == SINGLE_CLICK && !CallObserver.callPlay(SINGLE_CLICK)) {
-//                    if (mMyBinder.getIsPlaying()) {
-//                        stop();
-//                    } else {
-//                        startPlayNormal();
-//                    }
-//                }
-//
-//                break;
-//            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-//                if (!CallObserver.callPlay(SINGLE_CLICK)) {
-//                    if (mMyBinder.getIsPlaying()) {
-//                        stop();
-//                    } else {
-//                        startPlayNormal();
-//                    }
-//                }
-//                break;
-//            case KeyEvent.KEYCODE_MEDIA_PAUSE:
-//                if (!CallObserver.callPlay(SINGLE_CLICK)){
-//                    stop();
-//                }
-//                break;
-//            case KeyEvent.KEYCODE_MEDIA_PLAY:
-//                if (!CallObserver.callPlay(SINGLE_CLICK)){
-//                    startPlayNormal();
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//    }
-
     private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
 
         @Override
@@ -702,30 +642,6 @@ public class MyService extends Service {
             }
         }
     };
-
-//    private final MediaSession.Callback mMediaSessionCallBack = new MediaSession.Callback() {
-//        @Override
-//        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-//            if(mediaButtonIntent == null){
-//                NLog.e("MyService", "mMediaSessionCallBack.onMediaButtonEvent mediaButtonIntent == null");
-//                return false;
-//            }
-//
-//            if(Intent.ACTION_MEDIA_BUTTON.equals(mediaButtonIntent.getAction())){
-//                KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-//                if(event == null){
-//                    NLog.e("MyService", "mMediaSessionCallBack.onMediaButtonEvent event == null");
-//                    return false;
-//                }
-//                if(KeyEvent.ACTION_UP == event.getAction()){
-//                    handleMediaButtonUp(event.getKeyCode(), event);
-//                    return true;
-//                }
-//            }
-//
-//            return false;
-//        }
-//    };
 
     public void updatePlaybackState(){
         int state = (mMyBinder.getIsPlaying() || mIsPreparing) ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;

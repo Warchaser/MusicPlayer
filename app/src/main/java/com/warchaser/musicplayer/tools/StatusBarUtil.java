@@ -4,6 +4,9 @@ import android.content.Context;
 
 import java.lang.reflect.Method;
 
+/**
+ * Util for StatusBar
+ * */
 public final class StatusBarUtil {
 
     private StatusBarUtil(){
