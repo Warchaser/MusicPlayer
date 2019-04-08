@@ -28,14 +28,19 @@ public class SplashActivity extends BaseActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.splash_startup);
+        //可以达到覆盖启动页面的目的，
+        // 如先快速启动layer-list提供的启动页面,
+        // 然后经逻辑处理的一段时间之后(如网络请求CM页面数据)，
+        // 再由此code覆盖启动页面
+        //setContentView(R.layout.activity_splash_with_cm);
 
-        int SPLASH_DISPLAY_LENGTH = 3000;
+        final int SPLASH_DISPLAY_LENGTH = 2_000;
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (checkUriPermission()) {
+//                    setContentView(R.layout.activity_splash_with_cm);
                     startOnAirActivity();
                 } else {
 
