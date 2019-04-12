@@ -256,7 +256,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         mTvTimeElapsed.setText(FormatHelper.formatDuration(MusicList.getCurrentPosition()));
 
         mObserver = new UIUpdateObserver();
-        CallObserver.setObserver(mObserver);
+        CallObserver.registerObserver(mObserver);
 
         Intent intent = getIntent();
         if (intent != null) {

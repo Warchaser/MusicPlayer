@@ -6,8 +6,9 @@ import java.util.ArrayList;
 
 /**
  * Created by Wucn on 2017/1/26.
+ * 观察者类
+ * 双向通知
  */
-
 public class CallObserver {
     private static ArrayList<UIObserver> mObservers = new ArrayList<UIObserver>();
 
@@ -15,10 +16,17 @@ public class CallObserver {
 
     }
 
-    public static void setObserver(UIObserver observer) {
+    public static void registerObserver(UIObserver observer) {
+        if(mObservers == null){
+            return;
+        }
+
         mObservers.add(observer);
     }
 
+    /**
+     * 通知UI刷新
+     * */
     public synchronized static void callObserver(final Intent intent) {
         process((observer) -> observer.notifySeekBar2Update(intent));
     }
@@ -37,12 +45,13 @@ public class CallObserver {
             bean.setFlag(true);
         });
 
-        return bean.isFlag();
+        return !bean.isFlag();
     }
 
     public static void removeAllObservers() {
         if (mObservers != null) {
             mObservers.clear();
+            mObservers = null;
         }
     }
 
@@ -58,32 +67,45 @@ public class CallObserver {
 
     public static void stopUI() {
         processAll(UIObserver::stopServiceAndExit);
+        removeAllObservers();
     }
 
+    /**
+     * 根据条件执行
+     * */
     private static void process(SubFunction<UIObserver> observerSubFunction) {
-        int size;
-        if (mObservers != null && (size = mObservers.size()) > 0) {
+        if (!isNeedCallObserver()) {
+            return;
+        }
 
-            for (int i = 0; i < size; i++) {
-                UIObserver observer = mObservers.get(i);
-                if (observer != null && observer.getObserverEnabled()) {
-                    observerSubFunction.processor(observer);
-                }
+        int size = size();
+        for (int i = 0; i < size; i++) {
+            UIObserver observer = mObservers.get(i);
+            if (observer != null && observer.getObserverEnabled()) {
+                observerSubFunction.processor(observer);
             }
         }
     }
 
+    /**
+     * 无条件执行
+     * */
     private static void processAll(SubFunction<UIObserver> observerSubFunction) {
-        int size;
-        if (mObservers != null && (size = mObservers.size()) > 0) {
+        if (!isNeedCallObserver()) {
+            return;
+        }
 
-            for (int i = 0; i < size; i++) {
-                UIObserver observer = mObservers.get(i);
-                if (observer != null) {
-                    observerSubFunction.processor(observer);
-                }
+        int size = size();
+        for (int i = 0; i < size; i++) {
+            UIObserver observer = mObservers.get(i);
+            if (observer != null) {
+                observerSubFunction.processor(observer);
             }
         }
+    }
+
+    private static int size(){
+        return mObservers.size();
     }
 
     private static class ValueBean {

@@ -638,7 +638,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         });
 
         mObserver = new UIUpdateObserver();
-        CallObserver.setObserver(mObserver);
+        CallObserver.registerObserver(mObserver);
     }
 
     /**

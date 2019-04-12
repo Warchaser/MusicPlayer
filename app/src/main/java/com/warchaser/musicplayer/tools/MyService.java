@@ -40,6 +40,12 @@ import androidx.core.app.NotificationCompat;
 public class MyService extends Service {
 
     private MediaPlayer mMediaPlayer;
+
+    /**
+     * MediaPlayer是否正在播放音乐
+     * 这里增设标志位是因为MediaPlayer.isPlaying()方法在部分魔改ROM下
+     * 无法正常返回状态且有时会抛异常
+     * */
     private boolean mIsPlaying = false;
 
     private final String CHANNEL_ID = "com.warchaser.MusicPlayer.notification";
@@ -204,6 +210,41 @@ public class MyService extends Service {
         }
     }
 
+    /**
+     * 向MessageHandler发送消息
+     * */
+    private void sendMessage(int what, Object object, int arg1, int arg2){
+        if(mMessageHandler == null){
+            return;
+        }
+
+        if(object == null){
+
+            if(arg1 == -1 && arg2 == -1){
+                mMessageHandler.obtainMessage(what).sendToTarget();
+            } else {
+                mMessageHandler.obtainMessage(what, arg1, arg2);
+            }
+
+        } else {
+            mMessageHandler.obtainMessage(what, object).sendToTarget();
+        }
+    }
+
+    /**
+     * 向MessageHandler发送延迟消息
+     * */
+    private void sendMessageDelayed(int what, final long delayed){
+        if(mMessageHandler == null){
+            return;
+        }
+
+        mMessageHandler.sendEmptyMessageDelayed(what, delayed);
+    }
+
+    /**
+     * MessageHandler
+     * */
     private static class MessageHandler extends Handler {
 
         private WeakReference<MyService> mServiceWeakReference;
@@ -243,20 +284,20 @@ public class MyService extends Service {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 setRemoteViewPlayOrPause();
-                if (!CallObserver.callPlay(1)) {
+                if (CallObserver.callPlay(1)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 setRemoteViewPlayOrPause();
-                if (!CallObserver.callPlay(1)) {
+                if (CallObserver.callPlay(1)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 setRemoteViewPlayOrPause();
-                if (!CallObserver.callPlay(1)) {
-                    if (mMyBinder.getIsPlaying()) {
+                if (CallObserver.callPlay(1)) {
+                    if (isPlaying()) {
                         stop();
                     } else {
                         startPlayNormal();
@@ -269,7 +310,7 @@ public class MyService extends Service {
     }
 
     private void toUpdateProgress() {
-        if (mMediaPlayer != null && mIsPlaying && CallObserver.isNeedCallObserver()) {
+        if (mMediaPlayer != null && isPlaying() && CallObserver.isNeedCallObserver()) {
             int currentPosition = mMediaPlayer.getCurrentPosition();
             Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
@@ -278,7 +319,7 @@ public class MyService extends Service {
             CallObserver.callObserver(intent);
 
             //每1秒发送一次广播，进度条每秒更新
-            mMessageHandler.sendEmptyMessageDelayed(UPDATE_PROGRESS, 1000);
+            sendMessageDelayed(UPDATE_PROGRESS, 1000);
         }
     }
 
@@ -324,7 +365,7 @@ public class MyService extends Service {
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivPauseOrPlay, pausePendingIntent);
 
-        mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+        mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
 
         Intent nextIntent = new Intent(NEXT_ACTION);
         nextIntent.putExtra("FLAG", NEXT_FLAG);
@@ -382,7 +423,8 @@ public class MyService extends Service {
                 mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 NLog.e("MyService", "play.start " + System.currentTimeMillis());
                 mMediaPlayer.start();
-                mMessageHandler.sendEmptyMessage(UPDATE_DURATION);
+
+                sendMessage(UPDATE_DURATION, null, -1, -1);
             }
         });
 
@@ -441,11 +483,15 @@ public class MyService extends Service {
     }
 
     private void setCurrentMusic() {
-        mMessageHandler.sendEmptyMessage(UPDATE_CURRENT_MUSIC);
+        sendMessage(UPDATE_CURRENT_MUSIC, null, -1, -1);
     }
 
     private int getRandomPosition() {
         return (int) (Math.random() * (MusicList.size() - 1));
+    }
+
+    private boolean isPlaying(){
+        return mIsPlaying;
     }
 
     private void play(int currentMusic, int currentPosition) {
@@ -468,7 +514,7 @@ public class MyService extends Service {
                 mMediaPlayer.prepareAsync();
                 mIsPreparing = true;
                 NLog.e("MyService", "play.prepareAsync " + System.currentTimeMillis());
-                mMessageHandler.sendEmptyMessage(UPDATE_PROGRESS);
+                sendMessage(UPDATE_PROGRESS, null, -1, -1);
                 mIsPlaying = true;
                 updatePlaybackState();
                 updateMetaData(MusicList.getCurrentMusic());
@@ -568,7 +614,7 @@ public class MyService extends Service {
      */
     private void setRemoteViewPlayOrPause() {
         if (mNotificationRemoteView != null) {
-            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
         if (mNotificationManager != null && mNotification != null) {
@@ -581,7 +627,7 @@ public class MyService extends Service {
      * */
     private void setRemoteViewPlayOrPausePassive() {
         if (mNotificationRemoteView != null) {
-            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, mMyBinder.getIsPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
+            mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
         if (mNotificationManager != null && mNotification != null) {
@@ -601,13 +647,13 @@ public class MyService extends Service {
         final String action = intent.getAction();
         if (NEXT_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(DOUBLE_CLICK)) {
+            if (CallObserver.callPlay(DOUBLE_CLICK)) {
                 next();
             }
         } else if (PAUSE_OR_PLAY_ACTION.equals(action)) {
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(SINGLE_CLICK)) {
-                if (mMyBinder.getIsPlaying()) {
+            if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (isPlaying()) {
                     stop();
                 } else {
                     startPlayNormal();
@@ -623,7 +669,7 @@ public class MyService extends Service {
 
             StatusBarUtil.collapseStatusBar(AppData.getApp().getApplicationContext());
         } else if(AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)){
-            if(mMyBinder.getIsPlaying()){
+            if(isPlaying()){
                 setRemoteViewPlayOrPause();
                 if(CallObserver.isNeedCallObserver()){
                     CallObserver.callObserver(new Intent().setAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
@@ -638,14 +684,12 @@ public class MyService extends Service {
 
         @Override
         public void onAudioFocusChange(final int focusChange) {
-            if (mMessageHandler != null) {
-                mMessageHandler.obtainMessage(FOCUS_CHANGE, focusChange, 0).sendToTarget();
-            }
+            sendMessage(FOCUS_CHANGE, null, focusChange, 0);
         }
     };
 
     public void updatePlaybackState(){
-        int state = (mMyBinder.getIsPlaying() || mIsPreparing) ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
+        int state = (isPlaying() || mIsPreparing) ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
 
         if(mMediaSessionCompat != null){
             mMediaSessionCompat.setPlaybackState(
@@ -687,8 +731,8 @@ public class MyService extends Service {
         public void onPlay() {
             super.onPlay();
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(SINGLE_CLICK)) {
-                if (mMyBinder.getIsPlaying()) {
+            if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (isPlaying()) {
                     stop();
                 } else {
                     startPlayNormal();
@@ -700,8 +744,8 @@ public class MyService extends Service {
         public void onPause() {
             super.onPause();
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(SINGLE_CLICK)) {
-                if (mMyBinder.getIsPlaying()) {
+            if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (isPlaying()) {
                     stop();
                 } else {
                     startPlayNormal();
@@ -713,7 +757,7 @@ public class MyService extends Service {
         public void onSkipToNext() {
             super.onSkipToNext();
             setRemoteViewPlayOrPause();
-            if (!CallObserver.callPlay(DOUBLE_CLICK)) {
+            if (CallObserver.callPlay(DOUBLE_CLICK)) {
                 next();
             }
         }
@@ -773,7 +817,7 @@ public class MyService extends Service {
         }
 
         public synchronized boolean getIsPlaying() {
-            return mIsPlaying;
+            return isPlaying();
         }
 
         /**
