@@ -17,7 +17,7 @@ import static com.warchaser.musicplayer.tools.CoverLoader.MAX_CACHE;
  */
 public class MusicList {
 
-    private static final List<MusicInfo> musicInfoList = new ArrayList<MusicInfo>();
+    private static final List<MusicInfo> MUSIC_INFO_LIST = new ArrayList<MusicInfo>();
     private static MusicList mInstance;
     private static ContentResolver contentResolver;
     private final Uri CONTENT_URI = Media.EXTERNAL_CONTENT_URI;
@@ -118,7 +118,7 @@ public class MusicList {
 //                    musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0,1).toUpperCase());
                     musicInfo.setPinyinInitial(StringHelper.getPingYin(title).substring(0, 1));
                     if (musicInfo.getDuration() / 1000 > 60) {
-                        musicInfoList.add(musicInfo);
+                        MUSIC_INFO_LIST.add(musicInfo);
                     }
 
                     if(i <= MAX_CACHE){
@@ -137,7 +137,7 @@ public class MusicList {
     }
 
     public List<MusicInfo> getMusicList() {
-        return musicInfoList;
+        return MUSIC_INFO_LIST;
     }
 
     public Uri getMusicUriById(long id) {
@@ -150,15 +150,15 @@ public class MusicList {
     }
 
     public static boolean isListEmpty(){
-        return musicInfoList.isEmpty();
+        return MUSIC_INFO_LIST.isEmpty();
     }
 
     public static MusicInfo getCurrentMusic(){
-        return musicInfoList.get(mCurrentMusic);
+        return MUSIC_INFO_LIST.get(mCurrentMusic);
     }
 
     public static MusicInfo getMusicWithPosition(int position){
-        return musicInfoList.get(position);
+        return MUSIC_INFO_LIST.get(position);
     }
 
     public static Uri getMediaStoreAlbumCoverUri(long albumId) {
@@ -168,29 +168,29 @@ public class MusicList {
 
     public static int size(){
 
-        if(musicInfoList == null){
+        if(MUSIC_INFO_LIST == null){
             return 0;
         }
 
-        return musicInfoList.size();
+        return MUSIC_INFO_LIST.size();
     }
 
     public static void add(MusicInfo bean){
 
-        if(musicInfoList == null){
+        if(MUSIC_INFO_LIST == null){
             return;
         }
 
-        musicInfoList.add(bean);
+        MUSIC_INFO_LIST.add(bean);
     }
 
     public static void remove(int position){
 
-        if(musicInfoList == null || musicInfoList.isEmpty()){
+        if(MUSIC_INFO_LIST == null || MUSIC_INFO_LIST.isEmpty()){
             return;
         }
 
-        musicInfoList.remove(position);
+        MUSIC_INFO_LIST.remove(position);
     }
 
     public synchronized static void setCurrentPosition(int currentPosition){
@@ -226,4 +226,38 @@ public class MusicList {
         return mCurrentMax;
     }
 
+    /**
+     * 是否最后一首
+     * */
+    public static boolean isLastMusic(){
+        return getCurrentMusicInt() == size() - 1;
+    }
+
+    /**
+     * 获取下一首位置
+     * */
+    public static int getNextPosition(){
+        return getCurrentMusicInt() + 1;
+    }
+
+    /**
+     * 是否第一首
+     * */
+    public static boolean isFirstMusic(){
+        return getCurrentMusicInt() == 0;
+    }
+
+    /**
+     * 获取前一首位置
+     * */
+    public static int getPreviousPosition(){
+        return getCurrentMusicInt() - 1;
+    }
+
+    /**
+     * 获取最后一首位置
+     * */
+    public static int getLastPosition(){
+        return size() - 1;
+    }
 }

@@ -54,15 +54,15 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         if(isFullRefresh){
             MusicInfo bean = MusicList.getMusicWithPosition(position);
 
-            Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(holder.gfGo);
+            Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(holder.mIvGo);
 
-            holder.tvItemTitle.setText(bean.getTitle());
-            holder.tvItemDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
+            holder.mTvTitle.setText(bean.getTitle());
+            holder.mTvDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
 
-            holder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
-            holder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvTitle.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvDuration.setTextColor(Color.argb(255, 0, 0, 0));
 
-            holder.gfGo.setVisibility(View.INVISIBLE);
+            holder.mIvGo.setVisibility(View.INVISIBLE);
 
             holder.mLyRoot.setTag(position);
             holder.mLyRoot.setOnClickListener(mOnItemClickListener);
@@ -72,14 +72,14 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         }
 
         if (position == MusicList.getCurrentMusicInt()) {
-            holder.tvItemTitle.setTextColor(Color.RED);
-            holder.tvItemDuration.setTextColor(Color.RED);
-            holder.gfGo.setVisibility(View.VISIBLE);
+            holder.mTvTitle.setTextColor(Color.RED);
+            holder.mTvDuration.setTextColor(Color.RED);
+            holder.mIvGo.setVisibility(View.VISIBLE);
         } else {
-            holder.tvItemTitle.setTextColor(Color.argb(255, 0, 0, 0));
-            holder.tvItemDuration.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvTitle.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvDuration.setTextColor(Color.argb(255, 0, 0, 0));
 
-            holder.gfGo.setVisibility(View.INVISIBLE);
+            holder.mIvGo.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -148,19 +148,19 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
          * TextView, Music Title
          */
         @BindView(R.id.tvItemTitle)
-        TextView tvItemTitle;
+        TextView mTvTitle;
 
         /**
          * TextView, Music Duration
          */
         @BindView(R.id.tvItemDuration)
-        TextView tvItemDuration;
+        TextView mTvDuration;
 
         /**
          * GifView, Tag a Gif on Current Music which is Playing
          */
         @BindView(R.id.gfGo)
-        ImageView gfGo;
+        ImageView mIvGo;
 
         /**
          * 右侧菜单按钮
@@ -168,6 +168,9 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
         @BindView(R.id.mBtnMenu)
         Button mBtnMenu;
 
+        /**
+         * 根布局
+         * */
         @BindView(R.id.mLyRoot)
         RelativeLayout mLyRoot;
 

@@ -432,7 +432,7 @@ public class MyService extends Service {
 
             @Override
             public void onCompletion(MediaPlayer pMediaPlayer) {
-                if (mIsPlaying) {
+                if (isPlaying()) {
 
                     int currentPosition = mMediaPlayer.getCurrentPosition();
 
@@ -447,13 +447,13 @@ public class MyService extends Service {
                             mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((MusicList.getCurrentMusicInt() + 1) % MusicList.size(), 0);
+                            play((MusicList.getNextPosition()) % MusicList.size(), 0);
                             break;
                         case MODE_RANDOM:
                             play(getRandomPosition(), 0);
                             break;
                         case MODE_SEQUENCE:
-                            if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
+                            if (MusicList.isLastMusic()) {
                                 play(0, 0);
                             } else {
                                 next();
@@ -542,25 +542,25 @@ public class MyService extends Service {
     private void next() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
+                if (MusicList.isLastMusic()) {
                     play(0, 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() + 1, 0);
+                    play(MusicList.getNextPosition(), 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
+                if (MusicList.isLastMusic()) {
                     play(0, 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() + 1, 0);
+                    play(MusicList.getNextPosition(), 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if (MusicList.getCurrentMusicInt() == MusicList.size() - 1) {
+                if (MusicList.isLastMusic()) {
                     CommonUtils.showShortToast(R.string.last_song_tip);
                     play(0, 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() + 1, 0);
+                    play(MusicList.getNextPosition(), 0);
                 }
                 break;
             case MODE_RANDOM:
@@ -572,25 +572,25 @@ public class MyService extends Service {
     private void previous() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
-                if (MusicList.getCurrentMusicInt() == 0) {
-                    play(MusicList.size() - 1, 0);
+                if (MusicList.isFirstMusic()) {
+                    play(MusicList.getLastPosition(), 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() - 1, 0);
+                    play(MusicList.getPreviousPosition(), 0);
                 }
                 break;
             case MODE_ALL_LOOP:
-                if (MusicList.getCurrentMusicInt() == 0) {
-                    play(MusicList.size() - 1, 0);
+                if (MusicList.isFirstMusic()) {
+                    play(MusicList.getLastPosition(), 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() - 1, 0);
+                    play(MusicList.getPreviousPosition(), 0);
                 }
                 break;
             case MODE_SEQUENCE:
-                if (MusicList.getCurrentMusicInt() == 0) {
+                if (MusicList.isFirstMusic()) {
                     CommonUtils.showShortToast(R.string.first_song_tip);
-                    play(MusicList.size() - 1, 0);
+                    play(MusicList.getLastPosition(), 0);
                 } else {
-                    play(MusicList.getCurrentMusicInt() - 1, 0);
+                    play(MusicList.getPreviousPosition(), 0);
                 }
                 break;
             case MODE_RANDOM:
@@ -617,9 +617,7 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, !isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
-        if (mNotificationManager != null && mNotification != null) {
-            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
-        }
+        notifyNotification();
     }
 
     /**
@@ -630,6 +628,10 @@ public class MyService extends Service {
             mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
         }
 
+        notifyNotification();
+    }
+
+    private void notifyNotification(){
         if (mNotificationManager != null && mNotification != null) {
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
@@ -834,7 +836,7 @@ public class MyService extends Service {
         public void changeProgress(int progress) {
             if (mMediaPlayer != null) {
                 MusicList.setCurrentPosition(progress * 1000);
-                if (mIsPlaying) {
+                if (isPlaying()) {
                     mMediaPlayer.seekTo(MusicList.getCurrentPosition());
                 } else {
                     startPlayNormal();
