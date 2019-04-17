@@ -19,13 +19,13 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        checkUriPermission();
-        AppManager.addActivity(this);
+        AppManager.getInstance().addActivity(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AppManager.removeActivity(this);
+        AppManager.getInstance().removeActivity(this);
         clearMember();
     }
 

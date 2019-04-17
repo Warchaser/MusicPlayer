@@ -1,13 +1,15 @@
 package com.warchaser.musicplayer.global;
 
+import android.app.Activity;
+
 import java.util.Stack;
 
 /**
  * 堆栈式管理Activity
- * */
+ */
 public class AppManager {
 
-    private static Stack<BaseActivity> mActivityStack;
+    private Stack<Activity> mActivityStack;
 
     private AppManager() {
 
@@ -27,9 +29,9 @@ public class AppManager {
     /**
      * 添加Activity到堆栈
      */
-    public static void addActivity(BaseActivity activity) {
+    public void addActivity(Activity activity) {
         if (mActivityStack == null) {
-            mActivityStack = new Stack<BaseActivity>();
+            mActivityStack = new Stack<Activity>();
         }
         mActivityStack.add(activity);
     }
@@ -37,8 +39,8 @@ public class AppManager {
     /**
      * 移除Activity
      */
-    public static void removeActivity(BaseActivity activity) {
-        if(mActivityStack != null && !mActivityStack.isEmpty()){
+    public void removeActivity(Activity activity) {
+        if (mActivityStack != null && !mActivityStack.isEmpty()) {
             mActivityStack.remove(activity);
         }
     }
@@ -46,37 +48,54 @@ public class AppManager {
     /**
      * 获取指定的Activity
      */
-    public static BaseActivity getActivity(Class<?> cls) {
-        if (mActivityStack != null)
-            for (BaseActivity activity : mActivityStack) {
+    public Activity getActivity(Class<?> cls) {
+        if (mActivityStack != null) {
+            for (Activity activity : mActivityStack) {
                 if (activity.getClass().equals(cls)) {
                     return activity;
                 }
             }
+        }
         return null;
     }
 
     /**
      * 获取当前显示Activity（堆栈中最后一个传入的activity）
      */
-    public static BaseActivity getLastActivity() {
-        if(mActivityStack != null && !mActivityStack.isEmpty()){
+    public Activity getLastActivity() {
+        if (mActivityStack != null && !mActivityStack.isEmpty()) {
             return mActivityStack.lastElement();
         }
         return null;
     }
 
     /**
+     * 将Stack中的Activity强转为Class<?>的实例
+     * @param cls 继承自Activity的Class
+     * @return 能转换的情况下，转换为Class<?>
+     * */
+    public <T extends Activity> T getLastActivity(Class<T> cls){
+
+        Activity activity = getLastActivity();
+
+        if(cls.isInstance(activity)){
+            return cls.cast(activity);
+        }
+
+        return null;
+    }
+
+    /**
      * 获取所有Activity
      */
-    public Stack<BaseActivity> getAllActivityStacks() {
+    public Stack<Activity> getAllActivityStacks() {
         return mActivityStack;
     }
 
     /**
      * 结束指定的Activity
      */
-    public void finishActivity(BaseActivity activity) {
+    public void finishActivity(Activity activity) {
         if (activity != null) {
             if (!activity.isFinishing()) {
                 activity.finish();
@@ -89,7 +108,7 @@ public class AppManager {
      * 结束指定类名的Activity
      */
     public void finishActivity(Class<?> cls) {
-        for (BaseActivity activity : mActivityStack) {
+        for (Activity activity : mActivityStack) {
             if (activity.getClass().equals(cls)) {
                 finishActivity(activity);
                 break;
@@ -102,7 +121,7 @@ public class AppManager {
      */
     public void finishOthersActivity(Class<?> cls) {
         if (mActivityStack != null)
-            for (BaseActivity activity : mActivityStack) {
+            for (Activity activity : mActivityStack) {
                 if (!activity.getClass().equals(cls)) {
                     activity.finish();
                 }
@@ -112,17 +131,15 @@ public class AppManager {
     /**
      * 结束所有Activity
      */
-    public static void finishAllActivity() {
+    public void finishAllActivity() {
 
-        if (mActivityStack != null){
-            for (BaseActivity activity : mActivityStack) {
+        if (mActivityStack != null) {
+            for (Activity activity : mActivityStack) {
                 activity.finish();
             }
             mActivityStack.clear();
         }
-
     }
-
 
     /**
      * 退出应用程序
@@ -136,5 +153,4 @@ public class AppManager {
             e.printStackTrace();
         }
     }
-
 }
