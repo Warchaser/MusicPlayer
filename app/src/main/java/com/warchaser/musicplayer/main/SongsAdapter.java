@@ -59,8 +59,8 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
             holder.mTvTitle.setText(bean.getTitle());
             holder.mTvDuration.setText(FormatHelper.formatDuration(bean.getDuration()));
 
-            holder.mTvTitle.setTextColor(Color.argb(255, 0, 0, 0));
-            holder.mTvDuration.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvTitle.setTextColor(Color.BLACK);
+            holder.mTvDuration.setTextColor(Color.BLACK);
 
             holder.mIvGo.setVisibility(View.INVISIBLE);
 
@@ -76,8 +76,8 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
             holder.mTvDuration.setTextColor(Color.RED);
             holder.mIvGo.setVisibility(View.VISIBLE);
         } else {
-            holder.mTvTitle.setTextColor(Color.argb(255, 0, 0, 0));
-            holder.mTvDuration.setTextColor(Color.argb(255, 0, 0, 0));
+            holder.mTvTitle.setTextColor(Color.BLACK);
+            holder.mTvDuration.setTextColor(Color.BLACK);
 
             holder.mIvGo.setVisibility(View.INVISIBLE);
         }

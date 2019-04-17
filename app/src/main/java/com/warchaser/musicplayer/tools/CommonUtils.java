@@ -1,8 +1,11 @@
 package com.warchaser.musicplayer.tools;
 
+import android.content.Context;
 import android.widget.Toast;
 
 import com.warchaser.musicplayer.global.AppData;
+
+import androidx.core.content.ContextCompat;
 
 public class CommonUtils {
     private CommonUtils() {
@@ -10,18 +13,26 @@ public class CommonUtils {
     }
 
     public static void showShortToast(int resId) {
-        Toast.makeText(AppData.getApp().getApplicationContext(), resId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), resId, Toast.LENGTH_SHORT).show();
     }
 
     public static void showShortToast(String message) {
-        Toast.makeText(AppData.getApp().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     public static void showLongToast(int resId) {
-        Toast.makeText(AppData.getApp().getApplicationContext(), resId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), resId, Toast.LENGTH_SHORT).show();
     }
 
     public static void showLongToast(String message) {
-        Toast.makeText(AppData.getApp().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    public static int getColor(int resId){
+        return ContextCompat.getColor(getContext(), resId);
+    }
+
+    private static Context getContext(){
+        return AppData.getApp().getApplicationContext();
     }
 }

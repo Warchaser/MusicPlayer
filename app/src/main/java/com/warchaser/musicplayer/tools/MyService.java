@@ -223,7 +223,7 @@ public class MyService extends Service {
             if(arg1 == -1 && arg2 == -1){
                 mMessageHandler.obtainMessage(what).sendToTarget();
             } else {
-                mMessageHandler.obtainMessage(what, arg1, arg2);
+                mMessageHandler.obtainMessage(what, arg1, arg2).sendToTarget();
             }
 
         } else {
