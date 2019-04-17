@@ -421,7 +421,6 @@ public class MyService extends Service {
             public void onPrepared(MediaPlayer pMediaPlayer) {
                 mIsPreparing = false;
                 mMediaPlayer.seekTo(MusicList.getCurrentPosition());
-                NLog.e("MyService", "play.start " + System.currentTimeMillis());
                 mMediaPlayer.start();
 
                 sendMessage(UPDATE_DURATION, null, -1, -1);
@@ -469,9 +468,7 @@ public class MyService extends Service {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-
-                NLog.e("MyService", "MediaPlayer has met a problem!" + i);
-
+                NLog.e("MyService", "MediaPlayer has met a problem! what: " + i + " extra: " + i2);
                 return false;
             }
         });
@@ -513,7 +510,6 @@ public class MyService extends Service {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
                 mIsPreparing = true;
-                NLog.e("MyService", "play.prepareAsync " + System.currentTimeMillis());
                 sendMessage(UPDATE_PROGRESS, null, -1, -1);
                 mIsPlaying = true;
                 updatePlaybackState();
