@@ -6,55 +6,45 @@
     android:orientation="vertical"
     tools:context=".main.OnAirActivity">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="10"
-        android:orientation="horizontal">
+        android:layout_weight="1">
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cacheColorHint="#00000000" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:cacheColorHint="#00000000"/>
+        <TextView
+            android:id="@+id/tvFloatLetter"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:background="#BB000000"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tvFloatLetter"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_gravity="center"
-                android:background="#BB000000"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="40sp"
-                android:visibility="gone" />
+        <com.warchaser.musicplayer.main.SlideBar
+            android:id="@+id/slideBar"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom" />
 
-            <com.warchaser.musicplayer.main.SlideBar
-                android:id="@+id/slideBar"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|bottom" />
-
-        </FrameLayout>
-
-
-    </LinearLayout>
-
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/bottomBar"
-        android:layout_width="fill_parent"
-        android:layout_height="80dp"
-        android:layout_weight="0.25"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         android:background="#EDEDED"
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:paddingLeft="5dip">
+        android:paddingLeft="@dimen/common_padding">
 
         <ImageView
             android:id="@+id/bottomBar_disc"
@@ -64,24 +54,24 @@
             android:transitionName="cover" />
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <SeekBar
                 android:id="@+id/progress"
                 style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="15dip"
                 android:layout_marginTop="3dip"
                 android:indeterminate="false"
                 android:maxHeight="6dip"
                 android:minHeight="6dip"
                 android:progressDrawable="@drawable/progress_style"
+                android:splitTrack="false"
                 android:thumb="@mipmap/thumb"
                 android:thumbOffset="0dip"
-                android:transitionName="seek_bar"
-                android:splitTrack="false"/>
+                android:transitionName="seek_bar" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -120,7 +110,7 @@
                 <LinearLayout
                     android:id="@+id/ly_operation"
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
+                    android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
                     android:orientation="horizontal">
 
