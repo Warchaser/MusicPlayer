@@ -119,6 +119,11 @@ public class NLog {
         }
     }
 
+    public synchronized static void eWithFile(String tag, String msg){
+        e(tag, msg);
+        writeLog2File(tag, msg);
+    }
+
     private static String getLogPath() {
         return mLogPath;
     }
@@ -196,7 +201,7 @@ public class NLog {
     /**
      * 将Throwable打印至logcat并根据开关写文件
      */
-    private static void writeLog2File(String tag, String msg) {
+    public static void writeLog2File(String tag, String msg) {
         if (TextUtils.isEmpty(getLogPath())) {
             e(tag, "LOG_PATH is empty!");
             return;

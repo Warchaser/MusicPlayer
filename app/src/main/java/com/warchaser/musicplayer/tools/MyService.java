@@ -284,19 +284,19 @@ public class MyService extends Service {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(1)) {
+                if (CallObserver.callPlay(SINGLE_CLICK)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(1)) {
+                if (CallObserver.callPlay(SINGLE_CLICK)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(1)) {
+                if (CallObserver.callPlay(SINGLE_CLICK)) {
                     if (isPlaying()) {
                         stop();
                     } else {
@@ -468,7 +468,7 @@ public class MyService extends Service {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-                NLog.e("MyService", "MediaPlayer has met a problem! what: " + i + " extra: " + i2);
+                NLog.eWithFile("MyService", "MediaPlayer has met a problem! what: " + i + " extra: " + i2);
                 return false;
             }
         });
