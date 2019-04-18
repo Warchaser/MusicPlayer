@@ -23,7 +23,7 @@ public class AppManager {
     }
 
     public static class SingleApp {
-        public static AppManager INSTANCE = new AppManager();
+        public final static AppManager INSTANCE = new AppManager();
     }
 
     /**

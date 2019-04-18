@@ -484,7 +484,7 @@ public class MyService extends Service {
     }
 
     private int getRandomPosition() {
-        return (int) (Math.random() * (MusicList.size() - 1));
+        return (int) (Math.random() * (MusicList.getLastPosition()));
     }
 
     private boolean isPlaying(){

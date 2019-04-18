@@ -261,7 +261,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             if (!isFileFound) {
                 getMetaData(mPath);
                 updateDataBase(mPath);
-                MusicList.setCurrentMusic(MusicList.size() - 1);
+                MusicList.setCurrentMusic(MusicList.getLastPosition());
             }
         }
 
