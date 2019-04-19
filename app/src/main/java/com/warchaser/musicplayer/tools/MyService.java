@@ -339,7 +339,7 @@ public class MyService extends Service {
 
         MusicInfo bean;
 
-        if (MusicList.isListEmpty()) {
+        if (!MusicList.isListNotEmpty()) {
             notificationTitle = "Mr.Song is not here for now……";
             mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
         } else {
@@ -506,7 +506,7 @@ public class MyService extends Service {
         mMediaPlayer.reset();
 
         try {
-            if (!MusicList.isListEmpty()) {
+            if (MusicList.isListNotEmpty()) {
                 mMediaPlayer.setDataSource(MusicList.getCurrentMusic().getUrl());
                 mMediaPlayer.prepareAsync();
                 mIsPreparing = true;

@@ -6,7 +6,6 @@ import android.content.Intent;
  * Created by Wucn on 2017/1/26.
  * 观察者类
  */
-
 public interface UIObserver {
     /**
      * 通知UI更新进度条进度

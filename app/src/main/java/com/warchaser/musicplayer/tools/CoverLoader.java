@@ -26,7 +26,7 @@ public class CoverLoader {
     public static final int MAX_CACHE = 20;
 
     private Context context;
-    private Map<Type, LruCache<String, Bitmap>> cacheMap;
+    private Map<Type, LruCache<String, Bitmap>> mCacheMap;
 
     private int THUMB_WIDTH;
     private int COVER_WIDTH;
@@ -72,10 +72,10 @@ public class CoverLoader {
         LruCache<String, Bitmap> roundCache = new LruCache<>(10);
         LruCache<String, Bitmap> blurCache = new LruCache<>(10);
 
-        cacheMap = new HashMap<>(3);
-        cacheMap.put(Type.THUMB, thumbCache);
-        cacheMap.put(Type.COVER, roundCache);
-        cacheMap.put(Type.BOTTOM_THUMB, blurCache);
+        mCacheMap = new HashMap<>(3);
+        mCacheMap.put(Type.THUMB, thumbCache);
+        mCacheMap.put(Type.COVER, roundCache);
+        mCacheMap.put(Type.BOTTOM_THUMB, blurCache);
     }
 
 
@@ -94,7 +94,7 @@ public class CoverLoader {
     private Bitmap loadCover(long albumId, Type type) {
         Bitmap bitmap;
         String key = String.valueOf(albumId);
-        LruCache<String, Bitmap> cache = cacheMap.get(type);
+        LruCache<String, Bitmap> cache = mCacheMap.get(type);
         if (TextUtils.isEmpty(key) || "-1".equals(key)) {
             bitmap = cache.get(KEY_NULL);
             if (bitmap != null) {
@@ -173,5 +173,13 @@ public class CoverLoader {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         return BitmapFactory.decodeFile(path, options);
+    }
+
+    public int currentCacheSize(){
+        if(mCacheMap != null){
+            return mCacheMap.size();
+        }
+
+        return 0;
     }
 }

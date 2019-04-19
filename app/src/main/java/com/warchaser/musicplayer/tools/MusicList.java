@@ -19,7 +19,7 @@ public class MusicList {
 
     private static final List<MusicInfo> MUSIC_INFO_LIST = new ArrayList<MusicInfo>();
     private static MusicList mInstance;
-    private static ContentResolver contentResolver;
+    private static ContentResolver mContentResolver;
     private final Uri CONTENT_URI = Media.EXTERNAL_CONTENT_URI;
     private final String ORDER = "title COLLATE LOCALIZED";
 
@@ -54,7 +54,7 @@ public class MusicList {
 
     public static MusicList instance(ContentResolver pContentResolver) {
         if (null == mInstance) {
-            contentResolver = pContentResolver;
+            mContentResolver = pContentResolver;
             mInstance = new MusicList();
         }
         return mInstance;
@@ -70,7 +70,7 @@ public class MusicList {
 
             int i = 0;
 
-            cursor = contentResolver.query(CONTENT_URI, null, null, null, ORDER);
+            cursor = mContentResolver.query(CONTENT_URI, null, null, null, ORDER);
             if (null == cursor) {
                 return;
             } else if (!cursor.moveToFirst()) {
@@ -129,6 +129,7 @@ public class MusicList {
                     i++;
 
                 } while (cursor.moveToNext());
+
                 cursor.close();
             }
         } catch (Exception e) {
@@ -141,16 +142,15 @@ public class MusicList {
     }
 
     public Uri getMusicUriById(long id) {
-        Uri uri = ContentUris.withAppendedId(CONTENT_URI, id);
-        return uri;
+        return ContentUris.withAppendedId(CONTENT_URI, id);
     }
 
     public static boolean deleteSingleMusicFile(String uri){
         return new File(uri).delete();
     }
 
-    public static boolean isListEmpty(){
-        return MUSIC_INFO_LIST.isEmpty();
+    public static boolean isListNotEmpty(){
+        return !MUSIC_INFO_LIST.isEmpty();
     }
 
     public static MusicInfo getCurrentMusic(){

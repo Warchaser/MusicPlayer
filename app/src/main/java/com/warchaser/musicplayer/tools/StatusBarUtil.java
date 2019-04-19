@@ -1,5 +1,6 @@
 package com.warchaser.musicplayer.tools;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.lang.reflect.Method;
@@ -16,10 +17,15 @@ public final class StatusBarUtil {
     /**
      * 收起通知栏
      * */
+    @SuppressLint("WrongConstant")
     public static void collapseStatusBar(Context context) {
+        //Context.STATUS_BAR_SERVICE = "statusbar"
+        //注释为hide，只能反射
         Object service = context.getSystemService("statusbar");
-        if (null == service)
+        if (null == service){
             return;
+        }
+
         try {
             Class<?> clazz = Class.forName("android.app.StatusBarManager");
             int sdkVersion = android.os.Build.VERSION.SDK_INT;

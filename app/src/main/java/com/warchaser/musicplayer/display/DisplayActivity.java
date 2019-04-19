@@ -120,6 +120,8 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
             case MyService.MODE_SEQUENCE:
                 mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
                 break;
+            default:
+                break;
         }
     }
 
@@ -222,7 +224,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     }
 
     private void initComponent() {
-        if (!MusicList.isListEmpty()) {
+        if (MusicList.isListNotEmpty()) {
             mTvTitle.setText(FormatHelper.formatTitle(MusicList.getCurrentMusic().getTitle(), 25));
         }
 
@@ -313,7 +315,7 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
                 refreshCover(bean.getAlbumId());
             } else if (MyService.ACTION_UPDATE_DURATION.equals(action)) {
                 //Receive the duration and show under the progress bar
-                //Why do this ? because from the ContentResolver, the duration is zero.
+                //Why do this? because from the ContentResolver, the duration is zero.
                 int duration = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
                 mTvDuration.setText(FormatHelper.formatDuration(duration));
                 mSeekProgress.setMax(duration / 1000);

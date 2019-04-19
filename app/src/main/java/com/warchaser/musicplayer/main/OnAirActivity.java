@@ -411,7 +411,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
             case R.id.bottomBar:
 
-                if(MusicList.isListEmpty()){
+                if(!MusicList.isListNotEmpty()){
                     break;
                 }
 
@@ -553,7 +553,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
         mSeekBarProgress.setThumb(thumbDrawable);
 
-        if (!MusicList.isListEmpty()) {
+        if (MusicList.isListNotEmpty()) {
             final MusicInfo bean = MusicList.getCurrentMusic();
             mTvBottomTitle.setText(bean.getTitle());
             mTvBottomArtist.setText(bean.getArtist());
@@ -693,7 +693,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
                 int position = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 mAdapter.notifyItemsChanged(position);
-                if (!MusicList.isListEmpty()) {
+                if (MusicList.isListNotEmpty()) {
                     MusicInfo bean = MusicList.getCurrentMusic();
                     refreshBottomThumb(bean.getAlbumId());
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));

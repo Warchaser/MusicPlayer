@@ -57,14 +57,10 @@ public class NLog {
             // 优先保存到SD卡中
             mLogPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()
                     + File.separator
-                    + context.getPackageName()
-                    + File.separator
                     + "Log"
                     + File.separator;
         } else {
             mLogPath = context.getFilesDir().getAbsolutePath()
-                    + File.separator
-                    + context.getPackageName()
                     + File.separator
                     + "Log"
                     + File.separator;
@@ -145,7 +141,6 @@ public class NLog {
         final long time2 = cal.getTimeInMillis();
         final long betweenDays = (time2 - time1) / (1000 * 3600 * 24);
         return Integer.parseInt(String.valueOf(betweenDays));
-
     }
 
     private static void deleteOldFiles(int days, File[] files, Date todayDate) throws Exception {
@@ -227,8 +222,13 @@ public class NLog {
             e.printStackTrace();
         } finally {
             try {
-                bw.close();
-                fos.close();
+                if(bw != null){
+                    bw.close();
+                }
+
+                if(fos != null){
+                    fos.close();
+                }
             } catch (Exception | Error e) {
                 e.printStackTrace();
             }
