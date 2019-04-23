@@ -446,14 +446,14 @@ public class MyService extends Service {
                             mMediaPlayer.start();
                             break;
                         case MODE_ALL_LOOP:
-                            play((MusicList.getNextPosition()) % MusicList.size(), 0);
+                            play((MusicList.getNextPosition()) % MusicList.size(), MusicList.FIRST_PROGRESS);
                             break;
                         case MODE_RANDOM:
-                            play(getRandomPosition(), 0);
+                            play(getRandomPosition(), MusicList.FIRST_PROGRESS);
                             break;
                         case MODE_SEQUENCE:
                             if (MusicList.isLastMusic()) {
-                                play(0, 0);
+                                play(MusicList.FIRST_POSITION, MusicList.FIRST_PROGRESS);
                             } else {
                                 next();
                             }
@@ -491,7 +491,7 @@ public class MyService extends Service {
         return mIsPlaying;
     }
 
-    private void play(int currentMusic, int currentPosition) {
+    private void play(int currentMusic, int currentProgress) {
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
@@ -499,7 +499,7 @@ public class MyService extends Service {
             return;
         }
 
-        MusicList.setCurrentPosition(currentPosition);
+        MusicList.setCurrentPosition(currentProgress);
         MusicList.setCurrentMusic(currentMusic);
 
         mMediaPlayer.stop();
@@ -532,35 +532,35 @@ public class MyService extends Service {
     }
 
     private void nextOnDelete(){
-        play(MusicList.getCurrentMusicInt(), 0);
+        play(MusicList.getCurrentMusicInt(), MusicList.FIRST_PROGRESS);
     }
 
     private void next() {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
                 if (MusicList.isLastMusic()) {
-                    play(0, 0);
+                    play(MusicList.FIRST_POSITION, MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getNextPosition(), 0);
+                    play(MusicList.getNextPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_ALL_LOOP:
                 if (MusicList.isLastMusic()) {
-                    play(0, 0);
+                    play(MusicList.FIRST_POSITION, MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getNextPosition(), 0);
+                    play(MusicList.getNextPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_SEQUENCE:
                 if (MusicList.isLastMusic()) {
                     CommonUtils.showShortToast(R.string.last_song_tip);
-                    play(0, 0);
+                    play(MusicList.FIRST_POSITION, MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getNextPosition(), 0);
+                    play(MusicList.getNextPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_RANDOM:
-                play(getRandomPosition(), 0);
+                play(getRandomPosition(), MusicList.FIRST_PROGRESS);
                 break;
         }
     }
@@ -569,28 +569,28 @@ public class MyService extends Service {
         switch (mCurrentMode) {
             case MODE_ONE_LOOP:
                 if (MusicList.isFirstMusic()) {
-                    play(MusicList.getLastPosition(), 0);
+                    play(MusicList.getLastPosition(), MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getPreviousPosition(), 0);
+                    play(MusicList.getPreviousPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_ALL_LOOP:
                 if (MusicList.isFirstMusic()) {
-                    play(MusicList.getLastPosition(), 0);
+                    play(MusicList.getLastPosition(), MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getPreviousPosition(), 0);
+                    play(MusicList.getPreviousPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_SEQUENCE:
                 if (MusicList.isFirstMusic()) {
                     CommonUtils.showShortToast(R.string.first_song_tip);
-                    play(MusicList.getLastPosition(), 0);
+                    play(MusicList.getLastPosition(), MusicList.FIRST_PROGRESS);
                 } else {
-                    play(MusicList.getPreviousPosition(), 0);
+                    play(MusicList.getPreviousPosition(), MusicList.FIRST_PROGRESS);
                 }
                 break;
             case MODE_RANDOM:
-                play(getRandomPosition(), 0);
+                play(getRandomPosition(), MusicList.FIRST_PROGRESS);
                 break;
         }
     }
@@ -774,8 +774,8 @@ public class MyService extends Service {
     };
 
     public class MyBinder extends Binder {
-        public void startPlay(int CurrentMusic, int CurrentPosition) {
-            play(CurrentMusic, CurrentPosition);
+        public void startPlay(int currentMusic, int currentPosition) {
+            play(currentMusic, currentPosition);
             updateNotification();
         }
 

@@ -40,6 +40,9 @@ public class MusicList {
 
     public static MyService.MyBinder mMyBinder;
 
+    public static final int FIRST_POSITION = 0;
+    public static final int FIRST_PROGRESS = 0;
+
     private String[] projection = {
             Media._ID,
             Media.TITLE,
@@ -260,4 +263,5 @@ public class MusicList {
     public static int getLastPosition(){
         return size() - 1;
     }
+
 }
