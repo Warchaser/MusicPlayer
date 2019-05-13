@@ -115,6 +115,12 @@ public class NLog {
         }
     }
 
+    public synchronized static void wtf(String tag, String msg){
+        if(IS_DEBUG){
+            Log.wtf(tag, msg);
+        }
+    }
+
     public synchronized static void eWithFile(String tag, String msg){
         e(tag, msg);
         writeLog2File(tag, msg);

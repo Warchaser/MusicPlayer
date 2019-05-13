@@ -7,7 +7,8 @@ import com.warchaser.musicplayer.tools.CrashHandler;
 import com.warchaser.musicplayer.tools.NLog;
 
 /**
- * Created by Administrator on 2014/12/26.
+ * Created by Wucn on 2014/12/26.
+ * Application
  */
 public class AppData extends Application {
 
@@ -19,7 +20,9 @@ public class AppData extends Application {
 
         mThis = this;
 
-        CoverLoader.get().init(mThis);
+        SemEmergencyManagerLeakingActivity.applyFix(this);
+
+        CoverLoader.get().init(this);
         NLog.initLogFile(this);
         //全局Crash捕获(无法捕获RuntimeError)
         CrashHandler.getInstance().init();

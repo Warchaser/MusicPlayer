@@ -532,9 +532,9 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         mSeekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (b) {
-                    mMyBinder.changeProgress(i);
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mMyBinder.changeProgress(progress);
                 }
             }
 
@@ -549,6 +549,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
+        //Initialize SeekBar's thumb
         final int width = ImageUtil.dp2Px(this, getResources().getDimension(R.dimen.seek_bar_thumb_width));
         Drawable thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width);
         mSeekBarProgress.setThumb(thumbDrawable);
@@ -644,7 +645,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     /**
      * return binder's statutes.
      *
-     * @retrun binder is not null.
+     * @return binder is not null.
      */
     private boolean getBinderStatute() {
         return mMyBinder != null;
@@ -652,7 +653,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
 
     private void onSongsItemClick(int position){
         MusicList.setCurrentMusic(position);
-        mMyBinder.startPlay(MusicList.getCurrentMusicInt(), 0);
+        mMyBinder.startPlay(MusicList.getCurrentMusicInt(), MusicList.FIRST_POSITION);
         if (mMyBinder.getIsPlaying()) {
             mBtnState.setBackgroundResource(R.mipmap.pausedetail);
         } else {
