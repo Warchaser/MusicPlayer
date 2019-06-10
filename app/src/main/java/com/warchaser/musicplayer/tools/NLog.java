@@ -91,6 +91,10 @@ public class NLog {
         }
     }
 
+    public synchronized static void i(String tag, String format, Object ... objects){
+        i(tag, String.format(format, objects));
+    }
+
     public synchronized static void e(String tag, String msg) {
         if (IS_DEBUG) {
             Log.e(tag, msg);
@@ -101,6 +105,10 @@ public class NLog {
         if (IS_DEBUG) {
             Log.d(tag, msg);
         }
+    }
+
+    public synchronized static void d(String tag, String format, Object ... objects){
+        d(tag, String.format(format, objects));
     }
 
     public synchronized static void v(String tag, String msg) {
