@@ -12,7 +12,7 @@ import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.global.BaseActivity;
 import com.warchaser.musicplayer.main.OnAirActivity;
 import com.warchaser.musicplayer.tools.CommonUtils;
-import com.warchaser.musicplayer.tools.MyService;
+import com.warchaser.musicplayer.tools.MediaControllerService;
 
 import androidx.annotation.NonNull;
 
@@ -70,7 +70,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startOnAirActivity() {
-        Intent startService = new Intent(this, MyService.class);
+        Intent startService = new Intent(this, MediaControllerService.class);
         startService(startService);
 
         Uri uri = getIntent().getData();

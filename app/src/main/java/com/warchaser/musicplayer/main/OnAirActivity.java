@@ -35,10 +35,10 @@ import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
+import com.warchaser.musicplayer.tools.MediaControllerService;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
-import com.warchaser.musicplayer.tools.MyService;
-import com.warchaser.musicplayer.tools.MyService.MyBinder;
+import com.warchaser.musicplayer.tools.MediaControllerService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
 import com.warchaser.musicplayer.view.ConfirmDeleteDialog;
 import com.warchaser.musicplayer.view.OnAirListMenu;
@@ -195,7 +195,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     };
 
     private void connectToMyService() {
-        Intent intent = new Intent(this, MyService.class);
+        Intent intent = new Intent(this, MediaControllerService.class);
         mIsBind = this.getApplicationContext().bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
@@ -385,7 +385,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     public void destroyWholeApp(){
         finish();
         destroyServiceBinder();
-        stopService(new Intent(this, MyService.class));
+        stopService(new Intent(this, MediaControllerService.class));
     }
 
     public void destroyServiceBinder(){
@@ -685,14 +685,14 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         @Override
         public void notifySeekBar2Update(Intent intent) {
             String sAction = intent.getAction();
-            if (MyService.ACTION_UPDATE_PROGRESS.equals(sAction)) {
-                int iProgress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, 0);
+            if (MediaControllerService.ACTION_UPDATE_PROGRESS.equals(sAction)) {
+                int iProgress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, 0);
                 if (iProgress > 0) {
                     MusicList.setCurrentPosition(iProgress);
                     mSeekBarProgress.setProgress(MusicList.getCurrentPosition() / 1000);
                 }
-            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
-                int position = intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+            } else if (MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC.equals(sAction)) {
+                int position = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0);
                 mAdapter.notifyItemsChanged(position);
                 if (MusicList.isListNotEmpty()) {
                     MusicInfo bean = MusicList.getCurrentMusic();
@@ -700,8 +700,8 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                     mTvBottomTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 35));
                     mTvBottomArtist.setText(bean.getArtist());
                 }
-            } else if (MyService.ACTION_UPDATE_DURATION.equals(sAction)) {
-                MusicList.setCurrentMusicMax(intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0));
+            } else if (MediaControllerService.ACTION_UPDATE_DURATION.equals(sAction)) {
+                MusicList.setCurrentMusicMax(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0));
                 mSeekBarProgress.setMax(MusicList.getCurrentMusicMax() / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(sAction)) {
                 if(mMyBinder.getIsPlaying()){
@@ -714,10 +714,10 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         @Override
         public void notify2Play(int repeatTime) {
             switch (repeatTime) {
-                case MyService.SINGLE_CLICK:
+                case MediaControllerService.SINGLE_CLICK:
                     play();
                     break;
-                case MyService.DOUBLE_CLICK:
+                case MediaControllerService.DOUBLE_CLICK:
                     playNext();
                     break;
                 default:

@@ -39,7 +39,7 @@ import hugo.weaving.DebugLog;
  * Created by Wu on 2014/10/20.
  * Playing-Service
  */
-public class MyService extends Service {
+public class MediaControllerService extends Service {
 
     private MediaPlayer mMediaPlayer;
 
@@ -51,6 +51,11 @@ public class MyService extends Service {
     private boolean mIsPlaying = false;
 
     private final String CHANNEL_ID = "com.warchaser.MusicPlayer.notification";
+
+    /**
+     * 进度条刷新间隔
+     * */
+    private final int REFRESH_TIME = 1000;
 
     /**
      * 用于Handler
@@ -69,7 +74,7 @@ public class MyService extends Service {
     public static final String NEXT_ACTION = "com.warchaser.MusicPlayer.next";
     public static final String STOP_ACTION = "com.warchaser.MusicPlayer.close";
 
-    private final String MEDIA_SESSION_TAG = "com.warchaser.MusicPlayer.tools.MyService";
+    private final String MEDIA_SESSION_TAG = "com.warchaser.MusicPlayer.tools.MediaControllerService";
 
     private final int PAUSE_FLAG = 0x11;
     private final int NEXT_FLAG = 0x12;
@@ -162,7 +167,7 @@ public class MyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mMediaPlayer != null) {
+        if (isMediaPlayerNotNull()) {
             mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
@@ -249,14 +254,14 @@ public class MyService extends Service {
      * */
     private static class MessageHandler extends Handler {
 
-        private WeakReference<MyService> mServiceWeakReference;
+        private WeakReference<MediaControllerService> mServiceWeakReference;
 
-        MessageHandler(MyService service) {
+        MessageHandler(MediaControllerService service) {
             mServiceWeakReference = new WeakReference<>(service);
         }
 
         public void handleMessage(Message msg) {
-            final MyService service = mServiceWeakReference.get();
+            final MediaControllerService service = mServiceWeakReference.get();
 
             switch (msg.what) {
                 case UPDATE_PROGRESS:
@@ -312,22 +317,21 @@ public class MyService extends Service {
     }
 
     private void toUpdateProgress() {
-        if (mMediaPlayer != null && isPlaying() && CallObserver.isNeedCallObserver()) {
-            int currentPosition = mMediaPlayer.getCurrentPosition();
-            Intent intent = new Intent();
+        if (isMediaPlayerNotNull() && isPlaying() && CallObserver.isNeedCallObserver()) {
+            final Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
-            intent.putExtra(ACTION_UPDATE_PROGRESS, currentPosition);
+            intent.putExtra(ACTION_UPDATE_PROGRESS, mMediaPlayer.getCurrentPosition());
 
             CallObserver.callObserver(intent);
 
             //每1秒发送一次广播，进度条每秒更新
-            sendMessageDelayed(UPDATE_PROGRESS, 1000);
+            sendMessageDelayed(UPDATE_PROGRESS, REFRESH_TIME);
         }
     }
 
     @DebugLog
     private void toUpdateCurrentMusic() {
-        Intent intent = new Intent();
+        final Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
         intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, MusicList.getCurrentMusicInt());
 
@@ -341,7 +345,7 @@ public class MyService extends Service {
         final String notificationTitle;
         mNotificationRemoteView = new RemoteViews(this.getPackageName(), R.layout.notification);
 
-        MusicInfo bean;
+        final MusicInfo bean;
 
         if (!MusicList.isListNotEmpty()) {
             notificationTitle = "Mr.Song is not here for now……";
@@ -353,7 +357,7 @@ public class MyService extends Service {
             if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
-                Bitmap bitmap = CoverLoader.get().loadThumb(bean.getAlbumId());
+                final Bitmap bitmap = CoverLoader.get().loadThumb(bean.getAlbumId());
                 if (bitmap == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {
@@ -364,36 +368,36 @@ public class MyService extends Service {
 
         mNotificationRemoteView.setTextViewText(R.id.fileName, notificationTitle);
 
-        Intent pauseIntent = new Intent(PAUSE_OR_PLAY_ACTION);
+        final Intent pauseIntent = new Intent(PAUSE_OR_PLAY_ACTION);
         pauseIntent.putExtra("FLAG", PAUSE_FLAG);
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivPauseOrPlay, pausePendingIntent);
 
         mNotificationRemoteView.setImageViewResource(R.id.ivPauseOrPlay, isPlaying() ? R.mipmap.pausedetail : R.mipmap.run);
 
-        Intent nextIntent = new Intent(NEXT_ACTION);
+        final Intent nextIntent = new Intent(NEXT_ACTION);
         nextIntent.putExtra("FLAG", NEXT_FLAG);
         PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivNext, nextPendingIntent);
 
-        Intent closeIntent = new Intent(STOP_ACTION);
+        final Intent closeIntent = new Intent(STOP_ACTION);
         closeIntent.putExtra("FLAG", STOP_FLAG);
         PendingIntent closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.ivClose, closePendingIntent);
 
-        Intent activityIntent = new Intent(MyService.this, OnAirActivity.class);
+        final Intent activityIntent = new Intent(MediaControllerService.this, OnAirActivity.class);
         //clear the top of the stack, this flag can forbid the possibility of the two activities
         //existing at the same time
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(MyService.this, 0, activityIntent, 0);
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(MediaControllerService.this, 0, activityIntent, 0);
         mNotificationRemoteView.setOnClickPendingIntent(R.id.lyRoot, activityPendingIntent);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContent(mNotificationRemoteView)
                 .setSmallIcon(R.mipmap.notification);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MyService", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MediaControllerService", NotificationManager.IMPORTANCE_LOW);
             channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
         }
@@ -406,11 +410,10 @@ public class MyService extends Service {
     }
 
     private void toUpdateDuration() {
-        if (mMediaPlayer != null) {
-            int duration = mMediaPlayer.getDuration();
-            Intent intent = new Intent();
+        if (isMediaPlayerNotNull()) {
+            final Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_DURATION);
-            intent.putExtra(ACTION_UPDATE_DURATION, duration);
+            intent.putExtra(ACTION_UPDATE_DURATION, mMediaPlayer.getDuration());
 
             CallObserver.callObserver(intent);
         }
@@ -472,7 +475,7 @@ public class MyService extends Service {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-                NLog.eWithFile("MyService", "MediaPlayer has met a problem! what: " + i + " extra: " + i2);
+                NLog.eWithFile("MediaControllerService", "MediaPlayer has met a problem! what: " + i + " extra: " + i2);
                 return false;
             }
         });
@@ -496,7 +499,12 @@ public class MyService extends Service {
     }
 
     private void play(int currentMusic, int currentProgress) {
-        int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
+
+        if(!isMediaPlayerNotNull()){
+            return;
+        }
+
+        final int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -528,11 +536,12 @@ public class MyService extends Service {
     }
 
     private void stop() {
+        if(isMediaPlayerNotNull()){
+            MusicList.setCurrentPosition(mMediaPlayer.getCurrentPosition());
 
-        MusicList.setCurrentPosition(mMediaPlayer.getCurrentPosition());
-
-        mMediaPlayer.stop();
-        mIsPlaying = false;
+            mMediaPlayer.stop();
+            mIsPlaying = false;
+        }
     }
 
     private void nextOnDelete(){
@@ -727,6 +736,10 @@ public class MyService extends Service {
         }
     }
 
+    private boolean isMediaPlayerNotNull(){
+        return mMediaPlayer != null;
+    }
+
     private final MediaSessionCompat.Callback mMediaSessionCompatCallback = new MediaSessionCompat.Callback() {
 
         @Override
@@ -837,7 +850,7 @@ public class MyService extends Service {
          * seekBar action
          */
         public void changeProgress(int progress) {
-            if (mMediaPlayer != null) {
+            if (isMediaPlayerNotNull()) {
                 MusicList.setCurrentPosition(progress * 1000);
                 if (isPlaying()) {
                     mMediaPlayer.seekTo(MusicList.getCurrentPosition());

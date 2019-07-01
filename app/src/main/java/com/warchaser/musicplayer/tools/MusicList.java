@@ -38,7 +38,7 @@ public class MusicList {
      */
     private static int mCurrentMax;
 
-    public static MyService.MyBinder mMyBinder;
+    public static MediaControllerService.MyBinder mMyBinder;
 
     public static final int FIRST_POSITION = 0;
     public static final int FIRST_PROGRESS = 0;

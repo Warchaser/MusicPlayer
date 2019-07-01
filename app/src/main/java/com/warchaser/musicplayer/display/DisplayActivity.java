@@ -21,10 +21,10 @@ import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
+import com.warchaser.musicplayer.tools.MediaControllerService;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
-import com.warchaser.musicplayer.tools.MyService;
-import com.warchaser.musicplayer.tools.MyService.MyBinder;
+import com.warchaser.musicplayer.tools.MediaControllerService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
 
 import butterknife.BindView;
@@ -102,22 +102,22 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
     };
 
     private void connectToMyService() {
-        Intent intent = new Intent(DisplayActivity.this, MyService.class);
+        Intent intent = new Intent(DisplayActivity.this, MediaControllerService.class);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     private void refreshModeButton(){
         switch (mMyBinder.getCurrentMode()) {
-            case MyService.MODE_ONE_LOOP:
+            case MediaControllerService.MODE_ONE_LOOP:
                 mIvMode.setBackgroundResource(R.mipmap.mode_loop_for_one);
                 break;
-            case MyService.MODE_ALL_LOOP:
+            case MediaControllerService.MODE_ALL_LOOP:
                 mIvMode.setBackgroundResource(R.mipmap.mode_loop);
                 break;
-            case MyService.MODE_RANDOM:
+            case MediaControllerService.MODE_RANDOM:
                 mIvMode.setBackgroundResource(R.mipmap.mode_random);
                 break;
-            case MyService.MODE_SEQUENCE:
+            case MediaControllerService.MODE_SEQUENCE:
                 mIvMode.setBackgroundResource(R.mipmap.mode_sequence);
                 break;
             default:
@@ -300,23 +300,23 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         @Override
         public void notifySeekBar2Update(Intent intent) {
             String action = intent.getAction();
-            if (MyService.ACTION_UPDATE_PROGRESS.equals(action)) {
-                int progress = intent.getIntExtra(MyService.ACTION_UPDATE_PROGRESS, MusicList.getCurrentPosition());
+            if (MediaControllerService.ACTION_UPDATE_PROGRESS.equals(action)) {
+                int progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, MusicList.getCurrentPosition());
                 if (progress > 0) {
                     MusicList.setCurrentPosition(progress);// Remember the current position
                     mTvTimeElapsed.setText(FormatHelper.formatDuration(progress));
                     mSeekProgress.setProgress(progress / 1000);
                 }
-            } else if (MyService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.size() != 0) {
+            } else if (MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC.equals(action) && MusicList.size() != 0) {
                 //Retrieve the current music and get the title to show on top of the screen.
-                MusicList.setCurrentMusic(intent.getIntExtra(MyService.ACTION_UPDATE_CURRENT_MUSIC, 0));
+                MusicList.setCurrentMusic(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0));
                 MusicInfo bean = MusicList.getCurrentMusic();
                 mTvTitle.setText(FormatHelper.formatTitle(bean.getTitle(), 25));
                 refreshCover(bean.getAlbumId());
-            } else if (MyService.ACTION_UPDATE_DURATION.equals(action)) {
+            } else if (MediaControllerService.ACTION_UPDATE_DURATION.equals(action)) {
                 //Receive the duration and show under the progress bar
                 //Why do this? because from the ContentResolver, the duration is zero.
-                int duration = intent.getIntExtra(MyService.ACTION_UPDATE_DURATION, 0);
+                int duration = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0);
                 mTvDuration.setText(FormatHelper.formatDuration(duration));
                 mSeekProgress.setMax(duration / 1000);
             } else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
@@ -330,10 +330,10 @@ public class DisplayActivity extends BaseActivity implements OnClickListener {
         @Override
         public void notify2Play(int repeatTime) {
             switch (repeatTime) {
-                case MyService.SINGLE_CLICK:
+                case MediaControllerService.SINGLE_CLICK:
                     play();
                     break;
-                case MyService.DOUBLE_CLICK:
+                case MediaControllerService.DOUBLE_CLICK:
                     playNext();
                     break;
                 default:
