@@ -768,6 +768,9 @@ public class MyService extends Service {
         public void onSkipToPrevious() {
             super.onSkipToPrevious();
             setRemoteViewPlayOrPause();
+            if(CallObserver.callPlay(DOUBLE_CLICK)){
+                previous();
+            }
         }
 
         @Override
