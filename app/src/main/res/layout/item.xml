@@ -3,7 +3,7 @@
     android:id="@+id/mLyRoot"
     android:layout_width="match_parent"
     android:layout_height="@dimen/on_air_list_height"
-    android:background="@color/white"
+    android:background="@drawable/water_bg"
     android:minHeight="@dimen/on_air_list_height"
     android:paddingLeft="@dimen/common_padding"
     android:paddingRight="@dimen/common_padding"
