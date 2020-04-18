@@ -103,6 +103,8 @@ public class MediaControllerService extends Service {
             | PlaybackStateCompat.ACTION_STOP
             | PlaybackStateCompat.ACTION_SEEK_TO;
 
+    private PlaybackStateCompat mPlayBackState;
+
     private MyBinder mMyBinder = new MyBinder();
     private MessageHandler mMessageHandler;
 
@@ -202,9 +204,15 @@ public class MediaControllerService extends Service {
     }
 
     private void initializeMediaSessionCompat(){
+
+        mPlayBackState = new PlaybackStateCompat.Builder()
+                .setState(PlaybackStateCompat.STATE_NONE,0,1.0f)
+                .build();
+
         mMediaSessionCompat = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
         mMediaSessionCompat.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS | MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
         mMediaSessionCompat.setCallback(mMediaSessionCompatCallback);
+        mMediaSessionCompat.setPlaybackState(mPlayBackState);
         mMediaSessionCompat.setActive(true);
     }
 
@@ -745,7 +753,14 @@ public class MediaControllerService extends Service {
         @Override
         public void onPlay() {
             super.onPlay();
+
+//            mPlayBackState = new PlaybackStateCompat.Builder()
+//                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f)
+//                    .build();
+//            mMediaSessionCompat.setPlaybackState(mPlayBackState);
+
             setRemoteViewPlayOrPause();
+
             if (CallObserver.callPlay(SINGLE_CLICK)) {
                 if (isPlaying()) {
                     stop();
@@ -758,6 +773,12 @@ public class MediaControllerService extends Service {
         @Override
         public void onPause() {
             super.onPause();
+
+//            mPlayBackState = new PlaybackStateCompat.Builder()
+//                    .setState(PlaybackStateCompat.STATE_PAUSED,0,1.0f)
+//                    .build();
+//            mMediaSessionCompat.setPlaybackState(mPlayBackState);
+
             setRemoteViewPlayOrPause();
             if (CallObserver.callPlay(SINGLE_CLICK)) {
                 if (isPlaying()) {
