@@ -664,38 +664,49 @@ public class MediaControllerService extends Service {
         }
 
         final String action = intent.getAction();
-        if (NEXT_ACTION.equals(action)) {
-            setRemoteViewPlayOrPause();
-            if (CallObserver.callPlay(DOUBLE_CLICK)) {
-                next();
-            }
-        } else if (PAUSE_OR_PLAY_ACTION.equals(action)) {
-            setRemoteViewPlayOrPause();
-            if (CallObserver.callPlay(SINGLE_CLICK)) {
-                if (isPlaying()) {
-                    stop();
-                } else {
-                    startPlayNormal();
-                }
-            }
+        if(action == null){
+            return;
+        }
 
-        } else if (STOP_ACTION.equals(action)) {
-            if(CallObserver.isNeedCallObserver()){
-                CallObserver.stopUI();
-            } else {
-                stopSelf();
-            }
-
-            StatusBarUtil.collapseStatusBar(AppData.getApp().getApplicationContext());
-        } else if(AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)){
-            if(isPlaying()){
+        switch (action){
+            case NEXT_ACTION:
                 setRemoteViewPlayOrPause();
-                if(CallObserver.isNeedCallObserver()){
-                    CallObserver.callObserver(new Intent().setAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-                } else {
-                    stop();
+                if (CallObserver.callPlay(DOUBLE_CLICK)) {
+                    next();
                 }
-            }
+                break;
+            case PAUSE_OR_PLAY_ACTION:
+                setRemoteViewPlayOrPause();
+                if (CallObserver.callPlay(SINGLE_CLICK)) {
+                    if (isPlaying()) {
+                        stop();
+                    } else {
+                        startPlayNormal();
+                    }
+                }
+                break;
+            case STOP_ACTION:
+                if(CallObserver.isNeedCallObserver()){
+                    CallObserver.stopUI();
+                } else {
+                    stopSelf();
+                }
+
+                StatusBarUtil.collapseStatusBar(AppData.getApp().getApplicationContext());
+                break;
+            case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
+                if(isPlaying()){
+                    setRemoteViewPlayOrPause();
+                    if(CallObserver.isNeedCallObserver()){
+                        CallObserver.callObserver(intent);
+                    } else {
+                        stop();
+                    }
+                }
+                break;
+            default:
+                break;
+
         }
     }
 
