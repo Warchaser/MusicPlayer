@@ -1,4 +1,4 @@
-package com.warchaser.musicplayer.main;
+package com.warchaser.musicplayer.splash;
 
 import android.app.ActivityOptions;
 import android.content.ComponentName;
@@ -27,18 +27,24 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.display.DisplayActivity;
 import com.warchaser.musicplayer.global.BaseActivity;
+import com.warchaser.musicplayer.main.SlideBar;
+import com.warchaser.musicplayer.main.SongsAdapter;
 import com.warchaser.musicplayer.tools.CallObserver;
 import com.warchaser.musicplayer.tools.CommonUtils;
 import com.warchaser.musicplayer.tools.CoverLoader;
 import com.warchaser.musicplayer.tools.FormatHelper;
 import com.warchaser.musicplayer.tools.ImageUtil;
 import com.warchaser.musicplayer.tools.MediaControllerService;
+import com.warchaser.musicplayer.tools.MediaControllerService.MyBinder;
 import com.warchaser.musicplayer.tools.MusicInfo;
 import com.warchaser.musicplayer.tools.MusicList;
-import com.warchaser.musicplayer.tools.MediaControllerService.MyBinder;
 import com.warchaser.musicplayer.tools.UIObserver;
 import com.warchaser.musicplayer.view.ConfirmDeleteDialog;
 import com.warchaser.musicplayer.view.OnAirListMenu;
@@ -46,9 +52,6 @@ import com.warchaser.musicplayer.view.OnAirListMenu;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -75,19 +78,19 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     /**
      * Layout BottomBar
      */
-    @BindView(R.id.bottomBar)
+    @BindView(R.id.mBottomBar)
     LinearLayout mLyBottomBar;
 
     /**
      * Layout Playing State
      */
-    @BindView(R.id.lyBtnState)
+    @BindView(R.id.mLyBtnState)
     LinearLayout mLyBtnState;
 
     /**
      * Layout Button Play Next
      */
-    @BindView(R.id.lyBtnNext)
+    @BindView(R.id.mLyBtnNext)
     LinearLayout mLyBtnNext;
 
     private SongsAdapter mAdapter;
@@ -95,56 +98,56 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
     /**
      * TextView, Music Title on BottomBar
      */
-    @BindView(R.id.bottomBarTvTitle)
+    @BindView(R.id.mTvBottomTitle)
     TextView mTvBottomTitle;
 
     /**
      * TextView, Music Artist on BottomBar
      */
-    @BindView(R.id.bottomBarTvArtist)
+    @BindView(R.id.mTvBottomArtist)
     TextView mTvBottomArtist;
 
     /**
      * ImageView, Music Cover on BottomBar
      */
-    @BindView(R.id.bottomBar_disc)
+    @BindView(R.id.mBottomBarDisc)
     ImageView mBottomBarDisc;
 
     /**
      * ListView, Songs List
      */
-    @BindView(R.id.listView)
+    @BindView(R.id.mListViewSongs)
     RecyclerView mListViewSongs;
 
     /**
      * SeekBar, Playing Progress
      */
-    @BindView(R.id.progress)
+    @BindView(R.id.mSeekBarProgress)
     SeekBar mSeekBarProgress;
 
     /**
      * Button, Playing State
      */
-    @BindView(R.id.btnState)
+    @BindView(R.id.mBtnState)
     Button mBtnState;
 
     /**
      * Button, Play Next
      */
-    @BindView(R.id.btnNext)
+    @BindView(R.id.mBtnNext)
     Button mBtnNext;
 
     /**
      * SlideBar, A IndexBar on Right;
      * Allow Users to Drag
      */
-    @BindView(R.id.slideBar)
+    @BindView(R.id.mSlideBar)
     SlideBar mSlideBar;
 
     /**
      * TextView, A Floating Text, Which is Showing he Current Index.
      */
-    @BindView(R.id.tvFloatLetter)
+    @BindView(R.id.mTvFloatLetter)
     TextView mTvFloatLetter;
 
     private boolean mIsBind = false;
@@ -395,21 +398,21 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    @OnClick({R.id.bottomBar, R.id.lyBtnState, R.id.btnState, R.id.lyBtnNext, R.id.btnNext})
+    @OnClick({R.id.mBottomBar, R.id.mLyBtnState, R.id.mBtnState, R.id.mLyBtnNext, R.id.mBtnNext})
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.lyBtnState:
-            case R.id.btnState:
+            case R.id.mLyBtnState:
+            case R.id.mBtnState:
                 play();
                 break;
 
-            case R.id.lyBtnNext:
-            case R.id.btnNext:
+            case R.id.mLyBtnNext:
+            case R.id.mBtnNext:
                 playNext();
                 break;
 
-            case R.id.bottomBar:
+            case R.id.mBottomBar:
 
                 if(!MusicList.isListNotEmpty()){
                     break;
@@ -418,7 +421,7 @@ public class OnAirActivity extends BaseActivity implements View.OnClickListener 
                 Intent intent = new Intent(this, DisplayActivity.class);
                 MusicInfo bean = MusicList.getCurrentMusic();
                 intent.putExtra("albumId", bean.getAlbumId());
-                int sdk = android.os.Build.VERSION.SDK_INT;
+                int sdk = Build.VERSION.SDK_INT;
                 if (sdk >= Build.VERSION_CODES.LOLLIPOP) {
                     Pair p1 = Pair.create(mBottomBarDisc, "cover");
                     Pair p2 = Pair.create(mBtnState, "btn_state");

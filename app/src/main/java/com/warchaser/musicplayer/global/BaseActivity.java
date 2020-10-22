@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.warchaser.musicplayer.tools.PackageUtil;
+
 /**
  * Created by Warchaser on 2017/8/5.
  * 基类，
@@ -14,11 +16,13 @@ import androidx.core.app.ActivityCompat;
 public class BaseActivity extends AppCompatActivity {
 
     protected final int CODE_FOR_WRITE_PERMISSION = 1;
+    protected String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        checkUriPermission();
+        TAG = PackageUtil.getSimpleClassName(this);
         AppManager.getInstance().addActivity(this);
     }
 

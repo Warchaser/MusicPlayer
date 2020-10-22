@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,13 +13,13 @@
         android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/listView"
+            android:id="@+id/mListViewSongs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:cacheColorHint="#00000000" />
 
         <TextView
-            android:id="@+id/tvFloatLetter"
+            android:id="@+id/mTvFloatLetter"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
@@ -29,7 +30,7 @@
             android:visibility="gone" />
 
         <com.warchaser.musicplayer.main.SlideBar
-            android:id="@+id/slideBar"
+            android:id="@+id/mSlideBar"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom" />
@@ -37,7 +38,7 @@
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/bottomBar"
+        android:id="@+id/mBottomBar"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:background="#EDEDED"
@@ -47,7 +48,7 @@
         android:paddingLeft="@dimen/common_padding">
 
         <ImageView
-            android:id="@+id/bottomBar_disc"
+            android:id="@+id/mBottomBarDisc"
             android:layout_width="@dimen/bottom_bar_disc_width_and_height"
             android:layout_height="@dimen/bottom_bar_disc_width_and_height"
             android:layout_gravity="start|center"
@@ -59,7 +60,7 @@
             android:orientation="vertical">
 
             <SeekBar
-                android:id="@+id/progress"
+                android:id="@+id/mSeekBarProgress"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="15dip"
@@ -87,7 +88,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/bottomBarTvTitle"
+                        android:id="@+id/mTvBottomTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
@@ -96,7 +97,7 @@
                         android:text="@string/song_title_place_holder" />
 
                     <TextView
-                        android:id="@+id/bottomBarTvArtist"
+                        android:id="@+id/mTvBottomArtist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
@@ -115,7 +116,7 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:id="@+id/lyBtnState"
+                        android:id="@+id/mLyBtnState"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -125,7 +126,7 @@
                         android:padding="10dp">
 
                         <Button
-                            android:id="@+id/btnState"
+                            android:id="@+id/mBtnState"
                             android:layout_width="37dip"
                             android:layout_height="44dip"
                             android:background="@mipmap/run"
@@ -135,7 +136,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/lyBtnNext"
+                        android:id="@+id/mLyBtnNext"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -145,7 +146,7 @@
                         android:padding="10dp">
 
                         <Button
-                            android:id="@+id/btnNext"
+                            android:id="@+id/mBtnNext"
                             android:layout_width="@dimen/action_button_width"
                             android:layout_height="@dimen/action_button_height"
                             android:background="@mipmap/next"

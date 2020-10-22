@@ -36,7 +36,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolderIt
 
     private int mCurrentPosition = MusicList.getCurrentMusicInt();
 
-    SongsAdapter(Context context) {
+    public SongsAdapter(Context context) {
         mContext = context;
         mOnItemClickListener = new OnItemClickListener();
     }
