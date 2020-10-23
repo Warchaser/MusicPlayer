@@ -524,7 +524,8 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                         val progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, 0)
                         if (progress > 0) {
                             MusicList.setCurrentPosition(progress)
-                            mSeekBarProgress.progress = MusicList.getCurrentPosition() / 1000
+                            val seekBarProgress = MusicList.getCurrentPosition() / 1000
+                            mSeekBarProgress.progress = seekBarProgress
                         }
                     }
                     MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC -> {
@@ -538,7 +539,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                         }
                     }
                     MediaControllerService.ACTION_UPDATE_DURATION -> {
-                        MusicList.setCurrentPosition(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0))
+                        MusicList.setCurrentMusicMax(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0))
                         mSeekBarProgress.max = MusicList.getCurrentMusicMax() / 1000
                     }
                     AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
