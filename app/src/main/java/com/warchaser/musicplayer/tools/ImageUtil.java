@@ -14,11 +14,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.warchaser.musicplayer.global.AppData;
-
 import java.io.InputStream;
 
 import androidx.core.content.ContextCompat;
+
+import com.warchaser.musicplayer.global.AppData;
 
 /**
  * Created by Wucn on 2017/2/3.

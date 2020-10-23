@@ -3,9 +3,9 @@ package com.warchaser.musicplayer.tools;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.warchaser.musicplayer.global.AppData;
-
 import androidx.core.content.ContextCompat;
+
+import com.warchaser.musicplayer.global.AppData;
 
 public class CommonUtils {
     private CommonUtils() {
