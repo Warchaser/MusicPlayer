@@ -11,7 +11,7 @@
         android:layout_weight="0.25">
 
         <TextView
-            android:id="@+id/tvDisplayCurrentTitle"
+            android:id="@+id/mTvTitle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center"
@@ -22,7 +22,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/iv_cover"
+        android:id="@+id/mIvCover"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="@dimen/display_cover_width"
@@ -36,17 +36,17 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvDisplayTimeElapsed"
+            android:id="@+id/mTvTimeElapsed"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
-            android:gravity="right"
+            android:gravity="end"
             android:layout_weight="1"
             android:text="00:00"
             android:textColor="@color/black"/>
 
         <SeekBar
-            android:id="@+id/progress"
+            android:id="@+id/mSeekProgress"
             android:layout_width="0dp"
             android:layout_height="15dip"
             android:layout_weight="6"
@@ -62,7 +62,7 @@
             android:splitTrack="false"/>
 
         <TextView
-            android:id="@+id/tvDisplayDuration"
+            android:id="@+id/mTvDuration"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
@@ -79,18 +79,17 @@
         android:background="#EDEDED"
         android:orientation="horizontal">
 
-
         <LinearLayout
+            android:id="@+id/mLyIvMode"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:clickable="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:id="@+id/lyIvMode">
+            android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/ivMode"
+                android:id="@+id/mIvMode"
                 android:layout_width="45dp"
                 android:layout_height="33dp"
                 android:background="@mipmap/mode_sequence"/>
@@ -98,16 +97,16 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/mLyBtnDisplayPrevious"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:clickable="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:id="@+id/lyBtnDisplayPrevious">
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnDisplayPrevious"
+                android:id="@+id/mBtnDisplayPrevious"
                 android:layout_width="@dimen/action_button_width"
                 android:layout_height="@dimen/action_button_height"
                 android:layout_gravity="center"
@@ -116,16 +115,16 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/mLyBtnDisplayState"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:clickable="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:id="@+id/lyBtnDisplayState">
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnDisplayState"
+                android:id="@+id/mBtnState"
                 android:layout_width="37dip"
                 android:layout_height="44dip"
                 android:layout_gravity="center"
@@ -135,16 +134,16 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/mLyBtnDisplayNext"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:clickable="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:id="@+id/lyBtnDisplayNext">
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnDisplayNext"
+                android:id="@+id/mBtnDisplayNext"
                 android:layout_width="@dimen/action_button_width"
                 android:layout_height="@dimen/action_button_height"
                 android:layout_gravity="center"
