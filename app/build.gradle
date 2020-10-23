@@ -1,6 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.jakewharton.hugo'
-
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -37,8 +35,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
     implementation files('libs/pinyin4j-2.5.0.jar')
-    implementation 'com.jakewharton:butterknife:10.2.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
 
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'

@@ -122,7 +122,6 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         super.onDestroy()
         destroyServiceBinder()
         CallObserver.removeSingleObserver(mObserver)
-        clearOnDestroy()
     }
 
     private fun initComponent(){
@@ -154,11 +153,11 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
 
         mAdapter?.setOnItemClickDelegate(object : SongsAdapter.OnItemClickDelegate {
-            override fun onItemClick(position: Int, bean: MusicInfo?) {
+            override fun onItemClick(position: Int, bean: MusicInfo) {
                 onSongsItemClick(position)
             }
 
-            override fun onMenuClick(position: Int, bean: MusicInfo?) {
+            override fun onMenuClick(position: Int, bean: MusicInfo) {
                 showSongListMenu(bean, position)
             }
         })
@@ -438,7 +437,8 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         stopService(Intent(this, MediaControllerService::class.java))
     }
 
-    private fun clearOnDestroy(){
+    override fun clearMember() {
+        super.clearMember()
         mMusicListTmps?.run {
             clear()
         }

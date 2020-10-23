@@ -28,12 +28,8 @@ import android.widget.RemoteViews;
 import com.warchaser.musicplayer.R;
 import com.warchaser.musicplayer.global.AppData;
 import com.warchaser.musicplayer.main.OnAirActivity;
-
 import java.lang.ref.WeakReference;
-
 import androidx.core.app.NotificationCompat;
-
-import hugo.weaving.DebugLog;
 
 /**
  * Created by Wu on 2014/10/20.
@@ -337,7 +333,6 @@ public class MediaControllerService extends Service {
         }
     }
 
-    @DebugLog
     private void toUpdateCurrentMusic() {
         final Intent intent = new Intent();
         intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
@@ -348,7 +343,6 @@ public class MediaControllerService extends Service {
         CallObserver.callObserver(intent);
     }
 
-    @DebugLog
     private Notification getNotification() {
         final String notificationTitle;
         mNotificationRemoteView = new RemoteViews(this.getPackageName(), R.layout.notification);
