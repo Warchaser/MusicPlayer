@@ -392,6 +392,8 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         mMyBinder?.run {
             if(mIsBound){
                 applicationContext.unbindService(mServiceConnection)
+                mMyBinder = null
+                mIsBound = false
             }
         }
     }
