@@ -27,7 +27,7 @@ class SlideBar : View {
     /**
      * SlideBar中的元素
      * */
-    val mLetters : Array<String> = arrayOf("#", "A", "B", "C", "D", "E", "F", "G",
+    private val mLetters : Array<String> = arrayOf("#", "A", "B", "C", "D", "E", "F", "G",
             "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
             "U", "V", "W", "X", "Y", "Z")
 
