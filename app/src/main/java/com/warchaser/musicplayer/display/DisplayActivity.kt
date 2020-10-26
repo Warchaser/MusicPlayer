@@ -53,8 +53,10 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
         val thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width)
         mSeekProgress.thumb = thumbDrawable
         mTvTimeElapsed.text = FormatHelper.formatDuration(MusicList.getCurrentPosition())
-        mObserver = UIUpdateObserver()
-        CallObserver.registerObserver(mObserver)
+
+        mObserver = UIUpdateObserver().apply {
+            CallObserver.instance.registerObserver(this)
+        }
 
         val intent = intent
         intent?.run {
@@ -103,7 +105,10 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
             unbindService(mServiceConnection)
         }
 
-        CallObserver.removeSingleObserver(mObserver)
+        mObserver?.run {
+            CallObserver.instance.removeSingleObserver(this)
+        }
+
     }
 
     override fun onClick(v: View?) {

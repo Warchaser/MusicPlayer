@@ -295,19 +295,19 @@ public class MediaControllerService extends Service {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                     stop();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                     if (isPlaying()) {
                         stop();
                     } else {
@@ -321,12 +321,12 @@ public class MediaControllerService extends Service {
     }
 
     private void toUpdateProgress() {
-        if (isMediaPlayerNotNull() && isPlaying() && CallObserver.isNeedCallObserver()) {
+        if (isMediaPlayerNotNull() && isPlaying() && CallObserver.getInstance().isNeedCallObserver()) {
             final Intent intent = new Intent();
             intent.setAction(ACTION_UPDATE_PROGRESS);
             intent.putExtra(ACTION_UPDATE_PROGRESS, mMediaPlayer.getCurrentPosition());
 
-            CallObserver.callObserver(intent);
+            CallObserver.getInstance().callObserver(intent);
 
             //每1秒发送一次广播，进度条每秒更新
             sendMessageDelayed(UPDATE_PROGRESS, REFRESH_TIME);
@@ -340,7 +340,7 @@ public class MediaControllerService extends Service {
 
         startForeground(NOTIFICATION_ID, getNotification());
 
-        CallObserver.callObserver(intent);
+        CallObserver.getInstance().callObserver(intent);
     }
 
     private Notification getNotification() {
@@ -417,7 +417,7 @@ public class MediaControllerService extends Service {
             intent.setAction(ACTION_UPDATE_DURATION);
             intent.putExtra(ACTION_UPDATE_DURATION, mMediaPlayer.getDuration());
 
-            CallObserver.callObserver(intent);
+            CallObserver.getInstance().callObserver(intent);
         }
     }
 
@@ -665,13 +665,13 @@ public class MediaControllerService extends Service {
         switch (action){
             case NEXT_ACTION:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(DOUBLE_CLICK)) {
+                if (CallObserver.getInstance().callPlay(DOUBLE_CLICK)) {
                     next();
                 }
                 break;
             case PAUSE_OR_PLAY_ACTION:
                 setRemoteViewPlayOrPause();
-                if (CallObserver.callPlay(SINGLE_CLICK)) {
+                if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                     if (isPlaying()) {
                         stop();
                     } else {
@@ -680,8 +680,8 @@ public class MediaControllerService extends Service {
                 }
                 break;
             case STOP_ACTION:
-                if(CallObserver.isNeedCallObserver()){
-                    CallObserver.stopUI();
+                if(CallObserver.getInstance().isNeedCallObserver()){
+                    CallObserver.getInstance().stopUI();
                 } else {
                     stopSelf();
                 }
@@ -691,8 +691,8 @@ public class MediaControllerService extends Service {
             case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
                 if(isPlaying()){
                     setRemoteViewPlayOrPause();
-                    if(CallObserver.isNeedCallObserver()){
-                        CallObserver.callObserver(intent);
+                    if(CallObserver.getInstance().isNeedCallObserver()){
+                        CallObserver.getInstance().callObserver(intent);
                     } else {
                         stop();
                     }
@@ -766,7 +766,7 @@ public class MediaControllerService extends Service {
 
             setRemoteViewPlayOrPause();
 
-            if (CallObserver.callPlay(SINGLE_CLICK)) {
+            if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                 if (isPlaying()) {
                     stop();
                 } else {
@@ -785,7 +785,7 @@ public class MediaControllerService extends Service {
 //            mMediaSessionCompat.setPlaybackState(mPlayBackState);
 
             setRemoteViewPlayOrPause();
-            if (CallObserver.callPlay(SINGLE_CLICK)) {
+            if (CallObserver.getInstance().callPlay(SINGLE_CLICK)) {
                 if (isPlaying()) {
                     stop();
                 } else {
@@ -798,7 +798,7 @@ public class MediaControllerService extends Service {
         public void onSkipToNext() {
             super.onSkipToNext();
             setRemoteViewPlayOrPause();
-            if (CallObserver.callPlay(DOUBLE_CLICK)) {
+            if (CallObserver.getInstance().callPlay(DOUBLE_CLICK)) {
                 next();
             }
         }
@@ -807,7 +807,7 @@ public class MediaControllerService extends Service {
         public void onSkipToPrevious() {
             super.onSkipToPrevious();
             setRemoteViewPlayOrPause();
-            if(CallObserver.callPlay(DOUBLE_CLICK)){
+            if(CallObserver.getInstance().callPlay(DOUBLE_CLICK)){
                 previous();
             }
         }

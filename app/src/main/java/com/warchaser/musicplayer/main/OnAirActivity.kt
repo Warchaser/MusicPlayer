@@ -121,7 +121,9 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     override fun onDestroy() {
         super.onDestroy()
         destroyServiceBinder()
-        CallObserver.removeSingleObserver(mObserver)
+        mObserver?.run {
+            CallObserver.instance.removeSingleObserver(this)
+        }
     }
 
     private fun initComponent(){
@@ -213,8 +215,9 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
             }
         })
 
-        mObserver = UIUpdateObserver()
-        CallObserver.registerObserver(mObserver)
+        mObserver = UIUpdateObserver().apply {
+            CallObserver.instance.registerObserver(this)
+        }
 
         mLyBtnState.setOnClickListener(this)
         mBtnState.setOnClickListener(this)
