@@ -55,11 +55,14 @@ class SplashActivity : BaseActivity() {
         val startService = Intent(this, MediaControllerService::class.java)
         startService(startService)
         val uri = intent.data
+
         if (uri != null) {
-            val startActivity = Intent(this, OnAirActivity::class.java)
-            startActivity.data = uri
-            startActivity.putExtra("isFromExternal", true)
-            startActivity(startActivity)
+            Intent(this, OnAirActivity::class.java).apply {
+                data = uri
+                putExtra("isFromExternal", true)
+                startActivity(this)
+            }
+
         } else {
             startCertainActivity(OnAirActivity::class.java)
         }

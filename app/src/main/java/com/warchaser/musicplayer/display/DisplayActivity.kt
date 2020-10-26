@@ -60,7 +60,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
         val intent = intent
         intent?.run {
-            val albumId = intent.getLongExtra("albumId", -1)
+            val albumId = getLongExtra("albumId", -1)
             refreshCover(albumId)
         }
 
@@ -124,8 +124,9 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
     }
 
     private fun connect2MediaService(){
-        val intent = Intent(this, MediaControllerService::class.java)
-        bindService(intent, mServiceConnection, BIND_AUTO_CREATE)
+        Intent(this, MediaControllerService::class.java).apply {
+            bindService(this, mServiceConnection, BIND_AUTO_CREATE)
+        }
     }
 
     private fun play(){
