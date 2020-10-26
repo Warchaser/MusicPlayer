@@ -21,12 +21,12 @@ open class BaseActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TAG = PackageUtil.getSimpleClassName(this)
-        AppManager.getInstance().addActivity(this)
+        AppManager.mInstance.addActivity(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        AppManager.getInstance().removeActivity(this)
+        AppManager.mInstance.removeActivity(this)
         clearMember()
     }
 
