@@ -187,6 +187,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
             mMyBinder = service as MyBinder
             updatePlayButton()
 
+            refreshModeButton()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -250,13 +251,11 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
             }
         }
 
-        override fun setObserverEnabled(enabled: Boolean) {
-            mIsEnable = enabled
-        }
-
-        override fun getObserverEnabled(): Boolean {
-            return mIsEnable
-        }
+        override var observerEnabled : Boolean
+            get() = mIsEnable
+            set(value) {
+                mIsEnable = value
+            }
 
         override fun stopServiceAndExit() {
             finish()
