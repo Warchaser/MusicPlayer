@@ -34,36 +34,36 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
     override fun onBindViewHolder(holder: ViewHolderItem, position: Int, payloads: MutableList<Any>) {
         val isFullRefresh = payloads.isEmpty()
 
-        val itemView = holder.itemView
+        holder.itemView.apply {
+            if(isFullRefresh){
+                val bean = MusicList.getMusicWithPosition(position)
+                Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(mIvGo)
 
-        if(isFullRefresh){
-            val bean = MusicList.getMusicWithPosition(position)
-            Glide.with(mContext).asGif().load(R.mipmap.moving_music).into(itemView.mIvGo)
+                mTvTitle.text = bean.title
+                mTvDuration.text = FormatHelper.formatDuration(bean.duration)
 
-            itemView.mTvTitle.text = bean.title
-            itemView.mTvDuration.text = FormatHelper.formatDuration(bean.duration)
+                mTvTitle.setTextColor(Color.BLACK)
+                mTvDuration.setTextColor(Color.BLACK)
 
-            itemView.mTvTitle.setTextColor(Color.BLACK)
-            itemView.mTvDuration.setTextColor(Color.BLACK)
+                mIvGo.visibility = View.INVISIBLE
 
-            itemView.mIvGo.visibility = View.INVISIBLE
+                mLyRoot.tag = position
+                mLyRoot.setOnClickListener(mOnItemClickListener)
 
-            itemView.mLyRoot.tag = position
-            itemView.mLyRoot.setOnClickListener(mOnItemClickListener)
+                mBtnMenu.tag = position
+                mBtnMenu.setOnClickListener(mOnItemClickListener)
 
-            itemView.mBtnMenu.tag = position
-            itemView.mBtnMenu.setOnClickListener(mOnItemClickListener)
+            }
 
-        }
-
-        if(position == MusicList.getCurrentMusicInt()){
-            itemView.mTvTitle.setTextColor(Color.RED)
-            itemView.mTvDuration.setTextColor(Color.RED)
-            itemView.mIvGo.visibility = View.VISIBLE
-        } else {
-            itemView.mTvTitle.setTextColor(Color.BLACK)
-            itemView.mTvDuration.setTextColor(Color.BLACK)
-            itemView.mIvGo.visibility = View.INVISIBLE
+            if(position == MusicList.getCurrentMusicInt()){
+                mTvTitle.setTextColor(Color.RED)
+                mTvDuration.setTextColor(Color.RED)
+                mIvGo.visibility = View.VISIBLE
+            } else {
+                mTvTitle.setTextColor(Color.BLACK)
+                mTvDuration.setTextColor(Color.BLACK)
+                mIvGo.visibility = View.INVISIBLE
+            }
         }
     }
 

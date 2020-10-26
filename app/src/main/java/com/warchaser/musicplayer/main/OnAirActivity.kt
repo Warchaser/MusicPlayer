@@ -171,15 +171,13 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         mListViewSongs.adapter = mAdapter
 
         mMenuPopupWindow = OnAirListMenu(this)
-        mMenuPopupWindow?.setOnMenuOptionsSelectedListener(object : OnAirListMenu.OnMenuOptionsSelectedListener {
-            override fun onDeleteSelected(songTitle: String, position: Int, currentUri: String, isDeleted: Boolean) {
-                if (isDeleted) {
-                    showConfirmDeleteDialog(songTitle, position, currentUri)
-                } else {
-                    CommonUtils.showShortToast(R.string.hint_file_can_not_be_deleted)
-                }
+        mMenuPopupWindow?.setOnMenuOptionsSelectedListener { songTitle, position, currentUri, isDeleted ->
+            if (isDeleted) {
+                showConfirmDeleteDialog(songTitle, position, currentUri)
+            } else {
+                CommonUtils.showShortToast(R.string.hint_file_can_not_be_deleted)
             }
-        })
+        }
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
         val alp = AlphaAnimation(1f, 0f)
@@ -190,15 +188,15 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
             }
 
             override fun onAnimationEnd(animation: Animation?) {
+                mTvFloatLetter.visibility = View.GONE
             }
 
             override fun onAnimationRepeat(animation: Animation?) {
-                mTvFloatLetter.visibility = View.GONE
             }
         })
 
-        mSlideBar.setOnLetterTouchChangeListener(object : SlideBar.OnLetterTouchChangeListener {
-            override fun onLetterTouchChange(isTouched: Boolean, s: String?) {
+        mSlideBar.setOnLetterTouchChangeListener(object : SlideBar.OnLetterTouchListener {
+            override fun onLetterTouchChange(isTouched: Boolean, s: String) {
                 val bean = MusicInfo()
                 bean.pinyinInitial = s
                 mTvFloatLetter.text = s
@@ -338,7 +336,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                     val intent = Intent(this, DisplayActivity::class.java)
                     val bean = MusicList.getCurrentMusic()
                     intent.putExtra("albumId", bean.albumId)
-                    val sdkVersion = android.os.Build.VERSION.SDK_INT
+                    val sdkVersion = Build.VERSION.SDK_INT
                     if (sdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
                         val p1 = Pair.create(mBottomBarDisc as View, "cover")
                         val p2 = Pair.create(mBtnState as View, "btn_state")
@@ -387,7 +385,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         return mMyBinder != null
     }
 
-    fun destroyServiceBinder(){
+    private fun destroyServiceBinder(){
         mMyBinder?.run {
             if(mIsBound){
                 applicationContext.unbindService(mServiceConnection)
@@ -397,7 +395,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
-    fun showConfirmDeleteDialog(songTitle: String, selectedPosition: Int, currentUri: String){
+    private fun showConfirmDeleteDialog(songTitle: String, selectedPosition: Int, currentUri: String){
         if(mConfirmDeleteDialog == null){
             mConfirmDeleteDialog = ConfirmDeleteDialog(this)
             mConfirmDeleteDialog!!.setOnConfirmClickListener(object : ConfirmDeleteDialog.OnConfirmListener {
@@ -423,7 +421,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
-    fun dismissConfirmDeleteDialog(){
+    private fun dismissConfirmDeleteDialog(){
         mConfirmDeleteDialog?.run {
             if(isShowing){
                 dismiss()
