@@ -12,10 +12,10 @@ import com.warchaser.musicplayer.tools.NLog
 class AppData : Application(){
 
     companion object{
-        private var mApp : AppData? = null
+        private lateinit var mApp : AppData
 
         @JvmStatic
-        fun getApp() : AppData?{
+        fun getApp() : AppData{
             return mApp
         }
     }

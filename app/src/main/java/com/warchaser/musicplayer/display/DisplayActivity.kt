@@ -49,7 +49,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
         mSeekProgress.max = MusicList.getCurrentMusicMax() / 1000
         mSeekProgress.progress = MusicList.getCurrentPosition() / 1000
 
-        val width = ImageUtil.dp2Px(this, resources.getDimension(R.dimen.seek_bar_thumb_width))
+        val width = ImageUtil.dp2PX(this, resources.getDimension(R.dimen.seek_bar_thumb_width))
         val thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width)
         mSeekProgress.thumb = thumbDrawable
         mTvTimeElapsed.text = FormatHelper.formatDuration(MusicList.getCurrentPosition())

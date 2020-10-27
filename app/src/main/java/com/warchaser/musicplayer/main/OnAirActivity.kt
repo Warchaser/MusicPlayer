@@ -143,7 +143,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         })
 
         //Initialize SeekBar's thumb
-        val width = ImageUtil.dp2Px(this, resources.getDimension(R.dimen.seek_bar_thumb_width))
+        val width = ImageUtil.dp2PX(this, resources.getDimension(R.dimen.seek_bar_thumb_width))
         val thumbDrawable = ImageUtil.getNewDrawable(this, R.mipmap.thumb, width)
         mSeekBarProgress.thumb = thumbDrawable
 

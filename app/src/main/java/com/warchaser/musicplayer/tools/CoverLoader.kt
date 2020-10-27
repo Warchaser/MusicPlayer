@@ -44,9 +44,9 @@ class CoverLoader private constructor(){
 
     fun init(context: Context){
         mContext = context.applicationContext
-        THUMB_WIDTH = ImageUtil.dp2Px(mContext, mContext.resources.getDimension(R.dimen.notification_cover_width))
-        COVER_WIDTH = ImageUtil.screenWidth() - ImageUtil.dp2Px(mContext, mContext.resources.getDimension(R.dimen.display_cover_width))
-        BOTTOM_THUMB_WIDTH = ImageUtil.dp2Px(mContext, mContext.resources.getDimension(R.dimen.bottom_bar_disc_width_and_height))
+        THUMB_WIDTH = ImageUtil.dp2PX(mContext, mContext.resources.getDimension(R.dimen.notification_cover_width))
+        COVER_WIDTH = ImageUtil.screenWidth() - ImageUtil.dp2PX(mContext, mContext.resources.getDimension(R.dimen.display_cover_width))
+        BOTTOM_THUMB_WIDTH = ImageUtil.dp2PX(mContext, mContext.resources.getDimension(R.dimen.bottom_bar_disc_width_and_height))
 
         // 获取当前进程的可用内存（单位KB）
         val maxMemory : Int = (Runtime.getRuntime().maxMemory() / 1024).toInt()
@@ -114,10 +114,10 @@ class CoverLoader private constructor(){
         return loadCover(-1, type)
     }
 
-    private fun getDefaultCover(type : Type) : Bitmap{
+    private fun getDefaultCover(type : Type) : Bitmap?{
         return when(type){
             Type.COVER -> {
-                var bitmap : Bitmap = BitmapFactory.decodeResource(mContext.resources, R.mipmap.disc)
+                var bitmap : Bitmap? = BitmapFactory.decodeResource(mContext.resources, R.mipmap.disc)
                 bitmap = ImageUtil.scaleBitmap(bitmap, COVER_WIDTH)
                 bitmap
             }
