@@ -20,6 +20,7 @@ interface UIObserver {
 
     /**
      * 设置是否当前Observer可用
+     *
      * 获取当前Observer是否可用
      */
     var observerEnabled : Boolean
