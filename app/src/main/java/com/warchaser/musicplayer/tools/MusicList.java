@@ -10,7 +10,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.warchaser.musicplayer.tools.CoverLoader.MAX_CACHE;
 
 /**
  * Created by Wu on 2014/10/20.
@@ -124,9 +123,9 @@ public class MusicList {
                         MUSIC_INFO_LIST.add(musicInfo);
                     }
 
-                    if(i <= MAX_CACHE){
-                        CoverLoader.get().loadThumb(albumId);
-                        CoverLoader.get().loadBottomThumb(albumId);
+                    if(i <= CoverLoader.getMAX_CACHE()){
+                        CoverLoader.getInstance().loadThumb(albumId);
+                        CoverLoader.getInstance().loadBottomThumb(albumId);
                     }
 
                     i++;

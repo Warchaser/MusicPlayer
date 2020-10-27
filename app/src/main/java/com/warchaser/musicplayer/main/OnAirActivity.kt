@@ -381,7 +381,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     }
 
     private fun refreshBottomThumb(albumId: Long){
-        mBottomBarDisc.setImageBitmap(CoverLoader.get().loadBottomThumb(albumId))
+        mBottomBarDisc.setImageBitmap(CoverLoader.instance.loadBottomThumb(albumId))
     }
 
     private fun getBinderState() : Boolean{

@@ -359,7 +359,7 @@ public class MediaControllerService extends Service {
             if (TextUtils.isEmpty(uriString)) {
                 mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
             } else {
-                final Bitmap bitmap = CoverLoader.get().loadThumb(bean.getAlbumId());
+                final Bitmap bitmap = CoverLoader.getInstance().loadThumb(bean.getAlbumId());
                 if (bitmap == null) {
                     mNotificationRemoteView.setImageViewResource(R.id.fileImage, R.mipmap.disc);
                 } else {
@@ -738,7 +738,7 @@ public class MediaControllerService extends Service {
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, music.getAlbum())
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, music.getArtist())
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, music.getDuration())
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, CoverLoader.get().loadThumb(music.getAlbumId()));
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, CoverLoader.getInstance().loadThumb(music.getAlbumId()));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             metaData.putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, MusicList.size());

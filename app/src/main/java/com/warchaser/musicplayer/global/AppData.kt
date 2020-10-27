@@ -26,7 +26,7 @@ class AppData : Application(){
 
         SemEmergencyManagerLeakingActivity.applyFix(this)
 
-        CoverLoader.get().init(this)
+        CoverLoader.instance.init(this)
 
         NLog.initLogFile(this)
         //全局Crash捕获(无法捕获RuntimeError)

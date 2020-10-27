@@ -2,7 +2,6 @@ package com.warchaser.musicplayer.tools
 
 import android.content.Context
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.warchaser.musicplayer.global.AppData.Companion.getApp
 
 object CommonUtils {

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import java.io.InputStream;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.warchaser.musicplayer.global.AppData;
@@ -146,7 +147,7 @@ public class ImageUtil {
                 (int) height, matrix, true);
     }
 
-    public static Bitmap scaleBitmap(Bitmap origin, int width){
+    public static Bitmap scaleBitmap(@Nullable Bitmap origin, int width){
 
         if(origin == null){
             return null;

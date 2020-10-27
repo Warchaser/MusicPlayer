@@ -179,7 +179,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private fun refreshCover(albumId : Long){
         mIvCover?.run {
-            setImageBitmap(CoverLoader.get().loadDisplayCover(albumId))
+            setImageBitmap(CoverLoader.instance.loadDisplayCover(albumId))
         }
     }
 
