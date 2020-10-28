@@ -233,7 +233,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         mMusicListTmps = ArrayList()
         val size = MusicList.size()
         for(i in 0 until size){
-            mMusicListTmps!! += MusicList.getMusicWithPosition(i).pinyinInitial
+            mMusicListTmps!! += MusicList.getMusicWithPosition(i).pinyinInitial!!
         }
     }
 

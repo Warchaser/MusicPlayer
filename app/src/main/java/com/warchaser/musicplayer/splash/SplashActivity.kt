@@ -26,7 +26,7 @@ class SplashActivity : BaseActivity() {
         // 然后经逻辑处理的一段时间之后(如网络请求CM页面数据)，
         // 再由此code覆盖启动页面
         //setContentView(R.layout.activity_splash_with_cm);
-        val SPLASH_DISPLAY_LENGTH = 2000
+        val SPLASH_DISPLAY_LENGTH = 1000
         Handler().postDelayed({
             if (checkUriPermission()) {
 //                    setContentView(R.layout.activity_splash_with_cm);
