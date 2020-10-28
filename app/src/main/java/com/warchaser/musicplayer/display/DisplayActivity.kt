@@ -29,7 +29,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private fun initComponent(){
         if(MusicList.isListNotEmpty()){
-            mTvTitle.text = FormatHelper.formatTitle(MusicList.getCurrentMusic().title, 25)
+            mTvTitle.text = FormatHelper.formatTitle(MusicList.getCurrentMusic().title!!, 25)
         }
 
         mTvDuration.text = FormatHelper.formatDuration(MusicList.getCurrentMusicMax())
@@ -217,7 +217,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
                         if(MusicList.size() != 0){
                             MusicList.setCurrentMusic(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0))
                             val bean = MusicList.getCurrentMusic()
-                            mTvTitle.text = FormatHelper.formatTitle(bean.title, 25)
+                            mTvTitle.text = FormatHelper.formatTitle(bean.title!!, 25)
                             refreshCover(bean.albumId)
                         } else {
 

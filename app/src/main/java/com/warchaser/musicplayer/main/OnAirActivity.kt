@@ -537,7 +537,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                         if (MusicList.isListNotEmpty()) {
                             val bean = MusicList.getCurrentMusic()
                             refreshBottomThumb(bean.albumId)
-                            mTvBottomTitle.text = FormatHelper.formatTitle(bean.title, 35)
+                            mTvBottomTitle.text = FormatHelper.formatTitle(bean.title!!, 35)
                             mTvBottomArtist.text = bean.artist
                         }
                     }

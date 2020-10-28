@@ -30,7 +30,7 @@ class AppData : Application(){
 
         NLog.initLogFile(this)
         //全局Crash捕获(无法捕获RuntimeError)
-        CrashHandler.getInstance().init()
+        CrashHandler.instance.init()
     }
 
 }
