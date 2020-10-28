@@ -16,7 +16,7 @@ class MusicList private constructor(){
     companion object{
         private val MUSIC_INFO_LIST : ArrayList<MusicInfo> = ArrayList()
         private val CONTENT_URI : Uri = Media.EXTERNAL_CONTENT_URI
-        private val ORDER : String = "title COLLATE LOCALIZED"
+        private const val ORDER : String = "title COLLATE LOCALIZED"
 
         private lateinit var mContentResolver : ContentResolver
 
