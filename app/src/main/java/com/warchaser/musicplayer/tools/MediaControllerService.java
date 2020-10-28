@@ -141,7 +141,7 @@ public class MediaControllerService extends Service {
 
     @Override
     public void onCreate() {
-        MusicList.instance(getContentResolver());
+        MusicList.init(getContentResolver());
 
         mMessageHandler = new MessageHandler(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -612,7 +612,7 @@ public class MediaControllerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        MusicList.mMyBinder = mMyBinder;
+//        MusicList.mMyBinder = mMyBinder;
         return mMyBinder;
     }
 
