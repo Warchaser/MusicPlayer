@@ -95,8 +95,8 @@ class MusicList private constructor(){
                                 musicInfo.uriWithCoverPic = ""
                             }
                         }
-//                    musicInfo.pinyinInitial = StringHelper.getPingYin(title).substring(0,1).toUpperCase(Locale.getDefault())
-                        musicInfo.pinyinInitial = StringHelper.getPingYin(title).substring(0, 1)
+//                    musicInfo.pinyinInitial = StringHelper.getPinYin(title).substring(0,1).toUpperCase(Locale.getDefault())
+                        musicInfo.pinyinInitial = StringHelper.getPinYin(title).substring(0, 1)
 
                         if(musicInfo.duration / 1000 > 60){
                             MUSIC_INFO_LIST.add(musicInfo)
