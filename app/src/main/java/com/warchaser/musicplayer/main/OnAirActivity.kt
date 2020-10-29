@@ -173,13 +173,15 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         mListViewSongs.adapter = mAdapter
 
         mMenuPopupWindow = OnAirListMenu(this)
-        mMenuPopupWindow?.setOnMenuOptionsSelectedListener { songTitle, position, currentUri, isDeleted ->
-            if (isDeleted) {
-                showConfirmDeleteDialog(songTitle, position, currentUri)
-            } else {
-                CommonUtils.showShortToast(R.string.hint_file_can_not_be_deleted)
+        mMenuPopupWindow?.setOnMenuOptionsSelectedListener(object : OnAirListMenu.OnMenuOptionsSelectedListener{
+            override fun onDeleteSelected(songTitle: String, position: Int, currentUri: String?, isDeleted: Boolean) {
+                if (isDeleted) {
+                    showConfirmDeleteDialog(songTitle, position, currentUri)
+                } else {
+                    CommonUtils.showShortToast(R.string.hint_file_can_not_be_deleted)
+                }
             }
-        }
+        })
 
         //SlideBar部分，tvFloatLetter+SlideBar，有渐变的动画效果
         val alp = AlphaAnimation(1f, 0f)
@@ -398,7 +400,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
-    private fun showConfirmDeleteDialog(songTitle: String, selectedPosition: Int, currentUri: String){
+    private fun showConfirmDeleteDialog(songTitle: String, selectedPosition: Int, currentUri: String?){
         if(mConfirmDeleteDialog == null){
             mConfirmDeleteDialog = ConfirmDeleteDialog(this)
             mConfirmDeleteDialog!!.setOnConfirmClickListener(object : ConfirmDeleteDialog.OnConfirmListener {
@@ -473,7 +475,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
 
         mMenuPopupWindow?.run {
-            show(bean.title, bean.url, position)
+            show(bean.title!!, bean.url, position)
         }
     }
 

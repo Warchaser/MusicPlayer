@@ -125,7 +125,10 @@ class MusicList private constructor(){
         }
 
         @JvmStatic
-        fun deleteSingleMusicFile(uri : String) : Boolean{
+        fun deleteSingleMusicFile(uri : String?) : Boolean{
+            if(uri == null){
+                return false
+            }
             return File(uri).delete()
         }
 
