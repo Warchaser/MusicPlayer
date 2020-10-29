@@ -93,7 +93,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     override fun onResume() {
         super.onResume()
         mMyBinder?.run {
-            mBtnState.setBackgroundResource(if (isPlaying) R.mipmap.pausedetail else R.mipmap.run)
+            mBtnState.setBackgroundResource(if (getIsPlaying()) R.mipmap.pausedetail else R.mipmap.run)
         }
 
         mObserver?.run {
@@ -295,7 +295,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                 startPlay(MusicList.getCurrentMusicInt(), 0)
             }
 
-            if(isPlaying){
+            if(getIsPlaying()){
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail)
             } else {
                 mBtnState.setBackgroundResource(R.mipmap.run)
@@ -363,7 +363,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
     private fun play(){
         mMyBinder?.run {
-            if(isPlaying){
+            if(getIsPlaying()){
                 stopPlay()
                 mBtnState.setBackgroundResource(R.mipmap.run)
             } else {
@@ -376,7 +376,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     private fun playNext(){
         mMyBinder?.run {
             playNext()
-            if(isPlaying){
+            if(getIsPlaying()){
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail)
             }
         }
@@ -465,7 +465,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         MusicList.setCurrentMusic(position)
         mMyBinder?.run {
             startPlay(MusicList.getCurrentMusicInt(), MusicList.FIRST_POSITION)
-            mBtnState.setBackgroundResource(if (isPlaying) R.mipmap.pausedetail else R.mipmap.run)
+            mBtnState.setBackgroundResource(if (getIsPlaying()) R.mipmap.pausedetail else R.mipmap.run)
         }
     }
 
@@ -504,7 +504,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
                 notifyProgress()
 
-                if(isPlaying){
+                if(getIsPlaying()){
                     mBtnState.setBackgroundResource(R.mipmap.pausedetail)
                 } else {
                     mBtnState.setBackgroundResource(R.mipmap.run)
@@ -549,7 +549,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
                     }
                     AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
                         mMyBinder?.run {
-                            if (isPlaying) {
+                            if (getIsPlaying()) {
                                 stopPlay()
                                 mBtnState.setBackgroundResource(R.mipmap.run)
                             }

@@ -131,7 +131,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private fun play(){
         mMyBinder?.run {
-            if (isPlaying){
+            if (getIsPlaying()){
                 stopPlay()
                 mBtnState.setBackgroundResource(R.mipmap.run)
             } else {
@@ -144,7 +144,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
     private fun playNext(){
         mMyBinder?.run {
             playNext()
-            if(isPlaying){
+            if(getIsPlaying()){
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail)
             }
         }
@@ -153,7 +153,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
     private fun playPrevious(){
         mMyBinder?.run {
             playPrevious()
-            if(isPlaying){
+            if(getIsPlaying()){
                 mBtnState.setBackgroundResource(R.mipmap.pausedetail)
             }
         }
@@ -161,7 +161,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private fun refreshModeButton(){
         mIvMode?.apply {
-            when(mMyBinder?.currentMode){
+            when(mMyBinder?.getCurrentMode()){
                 MediaControllerService.MODE_ONE_LOOP -> setBackgroundResource(R.mipmap.mode_loop_for_one)
                 MediaControllerService.MODE_ALL_LOOP -> setBackgroundResource(R.mipmap.mode_loop)
                 MediaControllerService.MODE_RANDOM -> setBackgroundResource(R.mipmap.mode_random)
@@ -173,7 +173,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private fun updatePlayButton(){
         mMyBinder?.run {
-            mBtnState.setBackgroundResource(if(isPlaying) R.mipmap.pausedetail else R.mipmap.run)
+            mBtnState.setBackgroundResource(if(getIsPlaying()) R.mipmap.pausedetail else R.mipmap.run)
         }
     }
 
@@ -232,7 +232,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
                     }
                     AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
                         mMyBinder?.run {
-                            if(isPlaying){
+                            if(getIsPlaying()){
                                 stopPlay()
                                 mBtnState.setBackgroundResource(R.mipmap.run)
                             }

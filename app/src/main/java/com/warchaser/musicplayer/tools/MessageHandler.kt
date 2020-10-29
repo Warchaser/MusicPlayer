@@ -11,7 +11,7 @@ abstract class MessageHandler<T>(t: T) : Handler(Looper.getMainLooper()) {
     private val mWeakReference: WeakReference<T> = WeakReference(t)
     protected val TAG: String
 
-    override fun handleMessage(msg: Message) {
+    override final fun handleMessage(msg: Message) {
         super.handleMessage(msg)
         handleMessage(get(), msg)
     }

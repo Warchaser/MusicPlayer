@@ -166,12 +166,6 @@ class MusicList private constructor(){
             MUSIC_INFO_LIST.removeAt(position)
         }
 
-        @Synchronized
-        @JvmStatic
-        fun setCurrentPosition(currentPosition : Int){
-            mCurrentPosition = currentPosition
-        }
-
         /**
          * 获取当前Music的播放进度
          * */
@@ -179,6 +173,12 @@ class MusicList private constructor(){
         @JvmStatic
         fun getCurrentPosition() : Int{
             return mCurrentPosition
+        }
+
+        @Synchronized
+        @JvmStatic
+        fun setCurrentPosition(currentPosition : Int){
+            mCurrentPosition = currentPosition
         }
 
         @Synchronized
