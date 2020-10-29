@@ -102,7 +102,7 @@ public class MediaControllerService extends Service {
     private PlaybackStateCompat mPlayBackState;
 
     private MyBinder mMyBinder = new MyBinder();
-    private MessageHandler mMessageHandler;
+    private MessageCallback mMessageCallback;
 
     private AudioManager mAudioManager;
 
@@ -143,7 +143,7 @@ public class MediaControllerService extends Service {
     public void onCreate() {
         MusicList.init(getContentResolver());
 
-        mMessageHandler = new MessageHandler(this);
+        mMessageCallback = new MessageCallback(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         initMediaPlayer();
@@ -171,9 +171,9 @@ public class MediaControllerService extends Service {
             mMediaPlayer = null;
         }
 
-        if (mMessageHandler != null) {
-            mMessageHandler.removeCallbacksAndMessages(null);
-            mMessageHandler = null;
+        if (mMessageCallback != null) {
+            mMessageCallback.destroy();
+            mMessageCallback = null;
         }
 
         if (mAudioManager != null) {
@@ -225,20 +225,20 @@ public class MediaControllerService extends Service {
      * 向MessageHandler发送消息
      * */
     private void sendMessage(int what, Object object, int arg1, int arg2){
-        if(mMessageHandler == null){
+        if(mMessageCallback == null){
             return;
         }
 
         if(object == null){
 
             if(arg1 == -1 && arg2 == -1){
-                mMessageHandler.obtainMessage(what).sendToTarget();
+                mMessageCallback.obtainMessage(what).sendToTarget();
             } else {
-                mMessageHandler.obtainMessage(what, arg1, arg2).sendToTarget();
+                mMessageCallback.obtainMessage(what, arg1, arg2).sendToTarget();
             }
 
         } else {
-            mMessageHandler.obtainMessage(what, object).sendToTarget();
+            mMessageCallback.obtainMessage(what, object).sendToTarget();
         }
     }
 
@@ -246,26 +246,28 @@ public class MediaControllerService extends Service {
      * 向MessageHandler发送延迟消息
      * */
     private void sendMessageDelayed(int what, final long delayed){
-        if(mMessageHandler == null){
+        if(mMessageCallback == null){
             return;
         }
 
-        mMessageHandler.sendEmptyMessageDelayed(what, delayed);
+        mMessageCallback.sendEmptyMessageDelayed(what, delayed);
     }
 
     /**
      * MessageHandler
      * */
-    private static class MessageHandler extends Handler {
+    private static class MessageCallback extends MessageHandler<MediaControllerService> {
 
-        private WeakReference<MediaControllerService> mServiceWeakReference;
-
-        MessageHandler(MediaControllerService service) {
-            mServiceWeakReference = new WeakReference<>(service);
+        public MessageCallback(MediaControllerService mediaControllerService) {
+            super(mediaControllerService);
         }
 
         public void handleMessage(Message msg) {
-            final MediaControllerService service = mServiceWeakReference.get();
+            final MediaControllerService service = get();
+
+            if(service == null){
+                return;
+            }
 
             switch (msg.what) {
                 case UPDATE_PROGRESS:
