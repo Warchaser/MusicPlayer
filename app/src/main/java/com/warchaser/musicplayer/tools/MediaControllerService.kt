@@ -312,7 +312,6 @@ class MediaControllerService : Service() {
 
     private fun toUpdateProgress(){
         mMediaPlayer?.run {
-            NLog.e("MediaControllerService", "toUpdateProgress()")
             if(this@MediaControllerService.isPlaying() && CallObserver.instance.isNeedCallObserver()){
                 Intent().apply {
                     action = ACTION_UPDATE_PROGRESS
@@ -338,7 +337,7 @@ class MediaControllerService : Service() {
     private fun getNotification() : Notification?{
         val notificationTitle : String
         val bean : MusicInfo
-        mNotificationRemoteView = RemoteViews(packageName, R.layout.notification).apply {
+        mNotificationRemoteView = RemoteViews(this.packageName, R.layout.notification).apply {
             if(!MusicList.isListNotEmpty()){
                 notificationTitle = "Mr.Song is not here for now……"
                 setImageViewResource(R.id.fileImage, R.mipmap.disc)
@@ -585,7 +584,7 @@ class MediaControllerService : Service() {
         }
     }
 
-    fun updatePlaybackState(){
+    private fun updatePlaybackState(){
         val state = if(isPlaying() || mIsPreparing) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED
         mMediaSessionCompat?.run {
             setPlaybackState(
@@ -596,7 +595,7 @@ class MediaControllerService : Service() {
         }
     }
 
-    fun updateMetaData(music: MusicInfo?){
+    private fun updateMetaData(music: MusicInfo?){
         if(music == null){
             mMediaSessionCompat?.run {
                 setMetadata(null)
