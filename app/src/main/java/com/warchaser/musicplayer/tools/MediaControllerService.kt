@@ -199,7 +199,7 @@ class MediaControllerService : Service() {
             setAudioStreamType(AudioManager.STREAM_MUSIC)
             setOnPreparedListener(object : MediaPlayer.OnPreparedListener {
                 override fun onPrepared(mp: MediaPlayer?) {
-                    mIsPlaying = false
+                    mIsPreparing = false
                     seekTo(MusicList.getCurrentPosition())
                     start()
 
@@ -312,15 +312,16 @@ class MediaControllerService : Service() {
 
     private fun toUpdateProgress(){
         mMediaPlayer?.run {
+            NLog.e("MediaControllerService", "toUpdateProgress()")
             if(this@MediaControllerService.isPlaying() && CallObserver.instance.isNeedCallObserver()){
                 Intent().apply {
                     action = ACTION_UPDATE_PROGRESS
                     putExtra(ACTION_UPDATE_PROGRESS, currentPosition)
                     CallObserver.instance.callObserver(this)
-                }
 
-                //每1秒发送一次广播，进度条每秒更新
-                sendMessageDelayed(UPDATE_PROGRESS, REFRESH_TIME.toLong())
+                    //每1秒发送一次广播，进度条每秒更新
+                    sendMessageDelayed(UPDATE_PROGRESS, REFRESH_TIME.toLong())
+                }
             }
         }
     }
@@ -577,8 +578,10 @@ class MediaControllerService : Service() {
     }
 
     private fun notifyNotification(){
-        if (mNotificationManager != null && mNotification != null) {
-            mNotificationManager!!.notify(NOTIFICATION_ID, mNotification)
+        mNotificationManager?.run {
+            mNotification?.run {
+                notify(NOTIFICATION_ID, this)
+            }
         }
     }
 
