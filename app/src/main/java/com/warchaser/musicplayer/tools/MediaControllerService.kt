@@ -483,6 +483,8 @@ class MediaControllerService : Service() {
             MusicList.setCurrentPosition(currentPosition)
             stop()
             mIsPlaying = false
+            updatePlaybackState()
+            updateMetaData(MusicList.getCurrentMusic())
         }
     }
 
