@@ -14,10 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_gravity="left"
+        android:layout_gravity="end"
         android:orientation="vertical"
-        android:layout_toLeftOf="@id/mIvGo"
-        android:layout_alignParentLeft="true">
+        android:layout_toEndOf="@id/mIvGo"
+        android:layout_alignParentStart="true">
 
         <TextView
             android:id="@+id/mTvTitle"
@@ -39,16 +39,16 @@
         android:layout_width="@dimen/common_button_height"
         android:layout_height="@dimen/common_button_height"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/mBtnMenu"
+        android:layout_toEndOf="@id/mBtnMenu"
         android:visibility="invisible" />
 
     <Button
         android:id="@+id/mBtnMenu"
         android:layout_width="@dimen/common_button_height"
         android:layout_height="@dimen/common_button_height"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/common_padding"
+        android:layout_marginEnd="@dimen/common_padding"
         android:background="@mipmap/icon_menu_dots"
         android:focusable="false"/>
 

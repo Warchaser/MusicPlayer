@@ -52,7 +52,6 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
 
                 mBtnMenu.tag = position
                 mBtnMenu.setOnClickListener(mOnItemClickListener)
-
             }
 
             if(position == MusicList.getCurrentMusicInt()){
@@ -68,6 +67,7 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
     }
 
     override fun onBindViewHolder(holder: ViewHolderItem, position: Int) {
+        onBindViewHolder(holder, position, ArrayList())
     }
 
     override fun getItemCount(): Int {
@@ -84,7 +84,7 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
 
     fun notifyItemsChanged(position: Int){
         notifyItemChanged(mCurrentPosition, "local_refresh")
-        notifyItemChanged(position, "local_refresh");
+        notifyItemChanged(position, "local_refresh")
         mCurrentPosition = position
     }
 

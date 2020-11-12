@@ -20,7 +20,7 @@ class CoverLoader private constructor(){
     companion object{
         @JvmStatic
         val instance = SingletonHolder.mHolder
-        private val KEY_NULL : String = "null"
+        private const val KEY_NULL : String = "null"
         @JvmStatic
         val MAX_CACHE : Int = 20
     }
