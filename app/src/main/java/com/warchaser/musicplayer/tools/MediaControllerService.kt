@@ -284,17 +284,7 @@ class MediaControllerService : Service() {
      * 向MessageHandler发送消息
      * */
     private fun sendMessage(what: Int, `object`: Any?, arg1: Int, arg2: Int){
-        mMessageCallback?.run {
-            if(`object` == null){
-                if(arg1 == -1 && arg2 == -1){
-                    obtainMessage(what).sendToTarget()
-                } else {
-                    obtainMessage(what, arg1, arg2).sendToTarget()
-                }
-            } else {
-                obtainMessage(what, `object`).sendToTarget()
-            }
-        }
+        mMessageCallback?.sendMessage(what, `object`, arg1, arg2)
     }
 
     /**

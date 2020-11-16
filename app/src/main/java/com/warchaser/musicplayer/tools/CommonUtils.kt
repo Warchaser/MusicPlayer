@@ -34,5 +34,5 @@ object CommonUtils {
     }
 
     private val context: Context?
-        get() = getApp()?.applicationContext
+        get() = getApp().applicationContext
 }

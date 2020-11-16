@@ -11,7 +11,7 @@ class CrashHandler private constructor(): Thread.UncaughtExceptionHandler {
 
     companion object{
         @JvmStatic
-        val instance = Holder.mHolder
+        val instance: CrashHandler = Holder.mHolder
     }
 
     private object Holder{
