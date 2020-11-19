@@ -338,27 +338,30 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
             R.id.mLyBtnNext, R.id.mBtnNext -> playNext()
             R.id.mBottomBar -> {
                 if (MusicList.isListNotEmpty()) {
-                    val intent = Intent(this, DisplayActivity::class.java)
-                    val bean = MusicList.getCurrentMusic()
-                    intent.putExtra("albumId", bean.albumId)
-                    val sdkVersion = Build.VERSION.SDK_INT
-                    if (sdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
-                        val p1 = Pair.create(mBottomBarDisc as View, "cover")
-                        val p2 = Pair.create(mBtnState as View, "btn_state")
-                        val p3 = Pair.create(mBtnNext as View, "btn_next")
-                        val p4 = Pair.create(mSeekBarProgress as View, "seek_bar")
-                        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, p1, p2, p3, p4).toBundle())
-                    } else {
-                        startActivity(intent)
+                    Intent(this, DisplayActivity::class.java).apply {
+                        val bean = MusicList.getCurrentMusic()
+                        putExtra("albumId", bean.albumId)
+                        val sdkVersion = Build.VERSION.SDK_INT
+                        if (sdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
+                            val p1 = Pair.create(mBottomBarDisc as View, "cover")
+                            val p2 = Pair.create(mBtnState as View, "btn_state")
+                            val p3 = Pair.create(mBtnNext as View, "btn_next")
+                            val p4 = Pair.create(mSeekBarProgress as View, "seek_bar")
+                            startActivity(this, ActivityOptions.makeSceneTransitionAnimation(this@OnAirActivity, p1, p2, p3, p4).toBundle())
+                        } else {
+                            startActivity(this)
+                        }
                     }
+
                 }
             }
         }
     }
 
     private fun connect2MediaService(){
-        val intent = Intent(this, MediaControllerService::class.java)
-        mIsBound = applicationContext.bindService(intent, mServiceConnection, BIND_AUTO_CREATE)
+        Intent(this, MediaControllerService::class.java).apply {
+            mIsBound = applicationContext.bindService(this, mServiceConnection, BIND_AUTO_CREATE)
+        }
     }
 
     private fun play(){

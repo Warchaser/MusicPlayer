@@ -102,7 +102,7 @@ class SlideBar : View {
                     }
                     else -> {
                         mIsShowBg = false
-                        if(lastSelection != index && index >= 0 && index < mLetters.size){
+                        if(index in mLetters.indices && lastSelection != index){
                             onLetterTouchChange(mIsShowBg, mLetters[index])
                         }
                         invalidate()
@@ -116,7 +116,7 @@ class SlideBar : View {
     }
 
     private fun handleActionMoveNDown(lastSelection : Int, index : Int, onLetterTouchChange : (isShowBg : Boolean, s : String) -> Unit){
-        if(lastSelection != index && index >= 0 && index < mLetters.size){
+        if(lastSelection != index && index in mLetters.indices){
             mSelection = index
             onLetterTouchChange(mIsShowBg, mLetters[index])
             invalidate()
