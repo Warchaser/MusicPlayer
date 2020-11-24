@@ -75,7 +75,7 @@ class SlideBar : View {
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.run {
-            val y = event.y
+            val y = y
             //画出点击的字母的索引
             val index : Int = (y / height * mLetters.size).toInt()
             //保存上次点击的字母的索引
