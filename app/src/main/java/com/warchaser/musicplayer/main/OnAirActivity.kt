@@ -53,8 +53,6 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
     private var mIsBound : Boolean = false
 
-    private var mObserver : UIUpdateObserver? = null
-
     private var mPath : String? = null
 
     private var mIsFromExternal : Boolean = false
@@ -64,6 +62,10 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     private var mConfirmDeleteDialog : ConfirmDeleteDialog? = null
 
     private var mLayoutManager : LinearLayoutManager? = null
+
+    private var mObserverBuilder : UIObserverBuilder? = null
+
+    private var mIsObserverEnable : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,9 +87,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
     override fun onPause() {
         super.onPause()
-        mObserver?.run {
-            observerEnabled = false
-        }
+        mIsObserverEnable = false
     }
 
     override fun onResume() {
@@ -96,9 +96,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
             mBtnState.setBackgroundResource(if (getIsPlaying()) R.mipmap.pausedetail else R.mipmap.run)
         }
 
-        mObserver?.run {
-            observerEnabled = true
-        }
+        mIsObserverEnable = true
 
         mMyBinder?.run {
             notifyActivity()
@@ -121,8 +119,8 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
     override fun onDestroy() {
         super.onDestroy()
         destroyServiceBinder()
-        mObserver?.run {
-            CallObserver.instance.removeSingleObserver(this)
+        mObserverBuilder?.let {
+            CallObserver.instance.removeSingleObserver(it)
         }
     }
 
@@ -217,9 +215,23 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
             }
         })
 
-        mObserver = UIUpdateObserver().apply {
-            CallObserver.instance.registerObserver(this)
-        }
+        mObserverBuilder = registerUIObserver {
+            notifySeekBar2Update {
+                onNotifySeekBar2Update(it)
+            }
+
+            notify2Play {
+                onNotify2Play(it)
+            }
+
+            stopServiceAndExit {
+                destroyWholeApp()
+            }
+
+            setEnable {
+                mIsObserverEnable
+            }
+        }.apply { CallObserver.instance.registerObserver(this) }
 
         mLyBtnState.setOnClickListener(this)
         mBtnState.setOnClickListener(this)
@@ -272,7 +284,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
         mPath?.run {
             for(i in 0 until size){
-                if(MusicList.getMusicWithPosition(i).url == mPath){
+                if(MusicList.getMusicWithPosition(i).url == this){
                     MusicList.setCurrentMusic(i)
                     isFileFound = true
                 }
@@ -452,7 +464,7 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
 
         mAdapter = null
         mPath = null
-        mObserver = null
+        mObserverBuilder = null
 
         mMenuPopupWindow?.run {
             dismiss()
@@ -488,6 +500,50 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
+    private fun onNotifySeekBar2Update(intent: Intent?){
+        intent?.apply {
+            when(intent.action){
+                MediaControllerService.ACTION_UPDATE_PROGRESS -> {
+                    val progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, 0)
+                    if (progress > 0) {
+                        MusicList.setCurrentPosition(progress)
+                        val seekBarProgress = MusicList.getCurrentPosition() / 1000
+                        mSeekBarProgress.progress = seekBarProgress
+                    }
+                }
+                MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC -> {
+                    val position = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0)
+                    mAdapter?.notifyItemsChanged(position)
+                    if (MusicList.isListNotEmpty()) {
+                        val bean = MusicList.getCurrentMusic()
+                        refreshBottomThumb(bean.albumId)
+                        mTvBottomTitle.text = FormatHelper.formatTitle(bean.title!!, 35)
+                        mTvBottomArtist.text = bean.artist
+                    }
+                }
+                MediaControllerService.ACTION_UPDATE_DURATION -> {
+                    MusicList.setCurrentMusicMax(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0))
+                    mSeekBarProgress.max = MusicList.getCurrentMusicMax() / 1000
+                }
+                AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
+                    mMyBinder?.run {
+                        if (getIsPlaying()) {
+                            stopPlay()
+                            mBtnState.setBackgroundResource(R.mipmap.run)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun onNotify2Play(repeatTime: Int){
+        when(repeatTime){
+            MediaControllerService.SINGLE_CLICK -> play()
+            MediaControllerService.DOUBLE_CLICK -> playNext()
+        }
+    }
+
     /**
      * 绑定服务
      */
@@ -519,66 +575,6 @@ class OnAirActivity : BaseActivity(), View.OnClickListener{
         override fun onServiceDisconnected(name: ComponentName?) {
 
         }
-    }
-
-    private inner class UIUpdateObserver : UIObserver{
-
-        private var mIsEnable : Boolean = false
-
-        override fun notifySeekBar2Update(intent: Intent?) {
-            intent?.apply {
-                when(intent.action){
-                    MediaControllerService.ACTION_UPDATE_PROGRESS -> {
-                        val progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, 0)
-                        if (progress > 0) {
-                            MusicList.setCurrentPosition(progress)
-                            val seekBarProgress = MusicList.getCurrentPosition() / 1000
-                            mSeekBarProgress.progress = seekBarProgress
-                        }
-                    }
-                    MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC -> {
-                        val position = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0)
-                        mAdapter?.notifyItemsChanged(position)
-                        if (MusicList.isListNotEmpty()) {
-                            val bean = MusicList.getCurrentMusic()
-                            refreshBottomThumb(bean.albumId)
-                            mTvBottomTitle.text = FormatHelper.formatTitle(bean.title!!, 35)
-                            mTvBottomArtist.text = bean.artist
-                        }
-                    }
-                    MediaControllerService.ACTION_UPDATE_DURATION -> {
-                        MusicList.setCurrentMusicMax(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0))
-                        mSeekBarProgress.max = MusicList.getCurrentMusicMax() / 1000
-                    }
-                    AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
-                        mMyBinder?.run {
-                            if (getIsPlaying()) {
-                                stopPlay()
-                                mBtnState.setBackgroundResource(R.mipmap.run)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        override fun notify2Play(repeatTime: Int) {
-            when(repeatTime){
-                MediaControllerService.SINGLE_CLICK -> play()
-                MediaControllerService.DOUBLE_CLICK -> playNext()
-            }
-        }
-
-        override var observerEnabled: Boolean
-            get() = mIsEnable
-            set(value) {
-                mIsEnable = value
-            }
-
-        override fun stopServiceAndExit() {
-            destroyWholeApp()
-        }
-
     }
 
 }

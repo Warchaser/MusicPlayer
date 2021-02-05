@@ -18,7 +18,9 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
     private var mMyBinder : MyBinder? = null
 
-    private var mObserver : UIUpdateObserver? = null
+    private var mObserverBuilder : UIObserverBuilder? = null
+
+    private var mIsObserverEnable : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,15 +56,29 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
         mSeekProgress.thumb = thumbDrawable
         mTvTimeElapsed.text = FormatHelper.formatDuration(MusicList.getCurrentPosition())
 
-        mObserver = UIUpdateObserver().apply {
-            CallObserver.instance.registerObserver(this)
-        }
-
         val intent = intent
         intent?.run {
             val albumId = getLongExtra("albumId", -1)
             refreshCover(albumId)
         }
+
+        mObserverBuilder = registerUIObserver {
+            notifySeekBar2Update {
+                onNotifySeekBar2Update(it)
+            }
+
+            notify2Play {
+                onNotify2Play(it)
+            }
+
+            stopServiceAndExit {
+                finish()
+            }
+
+            setEnable {
+                mIsObserverEnable
+            }
+        }.apply { CallObserver.instance.registerObserver(this) }
 
         mLyBtnDisplayState.setOnClickListener(this)
         mBtnState.setOnClickListener(this)
@@ -82,9 +98,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
 
         updatePlayButton()
 
-        mObserver?.run {
-            observerEnabled = true
-        }
+        mIsObserverEnable = true
 
         mMyBinder?.run {
             notifyActivity()
@@ -94,9 +108,7 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
     override fun onPause() {
         super.onPause()
 
-        mObserver?.run {
-            observerEnabled = false
-        }
+        mIsObserverEnable = false
     }
 
     override fun onDestroy() {
@@ -105,9 +117,11 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
             unbindService(mServiceConnection)
         }
 
-        mObserver?.run {
-            CallObserver.instance.removeSingleObserver(this)
+        mObserverBuilder?.let {
+            CallObserver.instance.removeSingleObserver(it)
         }
+
+        mObserverBuilder = null
 
     }
 
@@ -183,6 +197,59 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
+    private fun onNotifySeekBar2Update(intent: Intent?){
+        intent?.run {
+            when(intent.action){
+                MediaControllerService.ACTION_UPDATE_PROGRESS -> {
+                    val progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, MusicList.getCurrentPosition())
+                    if(progress > 0){
+                        MusicList.setCurrentPosition(progress)// Remember the current position
+                        mTvTimeElapsed.text = FormatHelper.formatDuration(progress)
+                        mSeekProgress.progress = progress / 1000
+                    } else {
+
+                    }
+                }
+                MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC -> {
+                    //Retrieve the current music and get the title to show on top of the screen.
+                    if(MusicList.size() != 0){
+                        MusicList.setCurrentMusic(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0))
+                        val bean = MusicList.getCurrentMusic()
+                        mTvTitle.text = FormatHelper.formatTitle(bean.title!!, 25)
+                        refreshCover(bean.albumId)
+                    } else {
+
+                    }
+                }
+                MediaControllerService.ACTION_UPDATE_DURATION -> {
+                    //Receive the duration and show under the progress bar
+                    //Why do this? because from the ContentResolver, the duration is zero.
+                    val duration = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0)
+                    mTvDuration.text = FormatHelper.formatDuration(duration)
+                    mSeekProgress.max = duration / 1000
+                }
+                AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
+                    mMyBinder?.run {
+                        if(getIsPlaying()){
+                            stopPlay()
+                            mBtnState.setBackgroundResource(R.mipmap.run)
+                        }
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    private fun onNotify2Play(repeatTime: Int){
+        when(repeatTime){
+            MediaControllerService.SINGLE_CLICK -> play()
+            MediaControllerService.DOUBLE_CLICK -> playNext()
+        }
+    }
+
     private var mServiceConnection : ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             mMyBinder = service as MyBinder
@@ -195,71 +262,4 @@ class DisplayActivity : BaseActivity(), View.OnClickListener{
         }
     }
 
-    private inner class UIUpdateObserver : UIObserver{
-
-        private var mIsEnable : Boolean = false
-
-        override fun notifySeekBar2Update(intent: Intent?) {
-            intent?.run {
-                when(intent.action){
-                    MediaControllerService.ACTION_UPDATE_PROGRESS -> {
-                        val progress = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_PROGRESS, MusicList.getCurrentPosition())
-                        if(progress > 0){
-                            MusicList.setCurrentPosition(progress)// Remember the current position
-                            mTvTimeElapsed.text = FormatHelper.formatDuration(progress)
-                            mSeekProgress.progress = progress / 1000
-                        } else {
-
-                        }
-                    }
-                    MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC -> {
-                        //Retrieve the current music and get the title to show on top of the screen.
-                        if(MusicList.size() != 0){
-                            MusicList.setCurrentMusic(intent.getIntExtra(MediaControllerService.ACTION_UPDATE_CURRENT_MUSIC, 0))
-                            val bean = MusicList.getCurrentMusic()
-                            mTvTitle.text = FormatHelper.formatTitle(bean.title!!, 25)
-                            refreshCover(bean.albumId)
-                        } else {
-
-                        }
-                    }
-                    MediaControllerService.ACTION_UPDATE_DURATION -> {
-                        //Receive the duration and show under the progress bar
-                        //Why do this? because from the ContentResolver, the duration is zero.
-                        val duration = intent.getIntExtra(MediaControllerService.ACTION_UPDATE_DURATION, 0)
-                        mTvDuration.text = FormatHelper.formatDuration(duration)
-                        mSeekProgress.max = duration / 1000
-                    }
-                    AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
-                        mMyBinder?.run {
-                            if(getIsPlaying()){
-                                stopPlay()
-                                mBtnState.setBackgroundResource(R.mipmap.run)
-                            }
-                        }
-                    }
-                    else -> {
-
-                    }
-                }
-            }
-        }
-
-        override fun notify2Play(repeatTime: Int) {
-            when(repeatTime){
-                MediaControllerService.SINGLE_CLICK -> play()
-                MediaControllerService.DOUBLE_CLICK -> playNext()
-            }
-        }
-
-        override var observerEnabled : Boolean
-            get() = mIsEnable
-            set(value) {
-                mIsEnable = value
-            }
-
-        override fun stopServiceAndExit() {
-            finish()
-        }
-    }
 }
