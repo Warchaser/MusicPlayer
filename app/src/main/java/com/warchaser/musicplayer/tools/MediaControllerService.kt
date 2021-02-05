@@ -386,7 +386,7 @@ class MediaControllerService : Service() {
             }
 
             val builder = NotificationCompat.Builder(this@MediaControllerService, CHANNEL_ID)
-                    .setContent(mNotificationRemoteView)
+                    .setContent(this)
                     .setSmallIcon(R.mipmap.notification)
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

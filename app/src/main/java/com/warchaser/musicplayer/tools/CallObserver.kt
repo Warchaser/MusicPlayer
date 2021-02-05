@@ -8,12 +8,15 @@ import java.util.ArrayList
  * 观察者类
  * 双向通知
  * */
+
+private typealias Processor<T> = (t : T) -> Unit
+
 class CallObserver private constructor(){
 
     companion object{
         @JvmStatic
         val instance = Holder.mHolder
-        private val mObservers : ArrayList<UIObserver> = ArrayList()
+        private val mObservers : ArrayList<UIObserver?> = ArrayList()
 
         private class ValueBean{
             var isFlag : Boolean = false
@@ -52,12 +55,10 @@ class CallObserver private constructor(){
             return
         }
 
-        val size = size()
-        for(i in 0 until size){
-            val observer : UIObserver? = mObservers[i]
-            observer?.run {
+        mObservers.forEach {
+            it?.run {
                 if(observerEnabled){
-                    observerSubFunction.processor(observer)
+                    observerSubFunction.processor(this)
                 }
             }
         }
@@ -71,11 +72,9 @@ class CallObserver private constructor(){
             return
         }
 
-        val size = size()
-        for(i in 0 until size){
-            val observer : UIObserver? = mObservers[i]
-            observer?.run {
-                observerSubFunction.processor(observer)
+        mObservers.forEach {
+            it?.run {
+                observerSubFunction.processor(this)
             }
         }
     }
@@ -88,13 +87,12 @@ class CallObserver private constructor(){
      */
     fun callPlay(repeatTime : Int) : Boolean{
         val bean = ValueBean()
-        process(object  : SubFunction<UIObserver>{
-            override fun processor(t: UIObserver) {
-                t.notify2Play(repeatTime)
+        process(registerFunction {
+            processor {
+                it.notify2Play(repeatTime)
                 bean.isFlag = true
             }
         })
-
         return !bean.isFlag
     }
 
@@ -103,18 +101,14 @@ class CallObserver private constructor(){
      * */
     @Synchronized
     fun callObserver(intent: Intent){
-        process(object : SubFunction<UIObserver>{
-            override fun processor(t: UIObserver) {
-                t.notifySeekBar2Update(intent)
-            }
+        process(registerFunction {
+            processor { it.notifySeekBar2Update(intent) }
         })
     }
 
     fun stopUI(){
-        processAll(object : SubFunction<UIObserver>{
-            override fun processor(t: UIObserver) {
-                t.stopServiceAndExit()
-            }
+        processAll(registerFunction {
+            processor { it.stopServiceAndExit() }
         })
         removeAllObservers()
     }
@@ -122,5 +116,20 @@ class CallObserver private constructor(){
     private interface SubFunction<T>{
         fun processor(t : T)
     }
+
+    inner class SubFunctionDSL<T : UIObserver> : SubFunction<T>{
+
+        private var mProcessor : Processor<T>? = null
+
+        override fun processor(t: T) {
+            mProcessor?.invoke(t)
+        }
+
+        fun processor(processor: Processor<T>){
+            mProcessor = processor
+        }
+    }
+
+    private fun registerFunction(function : SubFunctionDSL<UIObserver>.() -> Unit) = SubFunctionDSL<UIObserver>().also(function)
 
 }
