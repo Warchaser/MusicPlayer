@@ -24,6 +24,8 @@ import com.warchaser.musicplayer.main.OnAirActivity
 
 class MediaControllerService : Service() {
 
+    private val TAG : String = "MediaControllerService"
+
     private var mMediaPlayer : MediaPlayer? = null
     private val mMyBinder : MyBinder = MyBinder()
 
@@ -145,6 +147,7 @@ class MediaControllerService : Service() {
     }
 
     override fun onCreate() {
+        NLog.e(TAG, "MediaControllerSerivce.onCreate()")
         MusicList.init(contentResolver)
 
         mMessageCallback = MessageCallback(this)
