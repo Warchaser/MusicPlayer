@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.warchaser.musicplayer.R
@@ -17,18 +19,20 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
 
     private val mContext : Context = context
 
-    private var mOnItemClickListener : OnItemClickListener? = null
-
     private var mOnItemClickDelegate : OnItemClickDelegate? = null
 
     private var mCurrentPosition : Int = MusicList.getCurrentMusicInt()
 
-    init {
-        mOnItemClickListener = OnItemClickListener()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderItem {
-        return ViewHolderItem(LayoutInflater.from(parent.context).inflate(R.layout.item, parent, false))
+        val rootView = LayoutInflater.from(parent.context).inflate(R.layout.item, parent, false)
+        return ViewHolderItem(rootView).apply {
+            val clickListener = OnItemClickListener(this)
+            rootView.run {
+                setOnClickListener(clickListener)
+                findViewById<RelativeLayout>(R.id.mLyRoot).setOnClickListener(clickListener)
+                findViewById<Button>(R.id.mBtnMenu).setOnClickListener(clickListener)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolderItem, position: Int, payloads: MutableList<Any>) {
@@ -46,12 +50,6 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
                 mTvDuration.setTextColor(Color.BLACK)
 
                 mIvGo.visibility = View.INVISIBLE
-
-                mLyRoot.tag = position
-                mLyRoot.setOnClickListener(mOnItemClickListener)
-
-                mBtnMenu.tag = position
-                mBtnMenu.setOnClickListener(mOnItemClickListener)
             }
 
             if(position == MusicList.getCurrentMusicInt()){
@@ -88,13 +86,17 @@ class SongsAdapter(context: Context) : RecyclerView.Adapter<SongsAdapter.ViewHol
         mCurrentPosition = position
     }
 
-    private inner class OnItemClickListener : View.OnClickListener{
+    private inner class OnItemClickListener(val mHolder : RecyclerView.ViewHolder) : View.OnClickListener{
+
         override fun onClick(v: View?) {
 
             mOnItemClickDelegate?.run {
-                val position = v?.tag as Int
+                val position = mHolder.adapterPosition
+                if(position == RecyclerView.NO_POSITION){
+                    return
+                }
                 val bean = MusicList.getMusicWithPosition(position)
-                when(v.id){
+                when(v!!.id){
                     R.id.mLyRoot -> {
                         notifyItemsChanged(position)
                         onItemClick(position, bean)
