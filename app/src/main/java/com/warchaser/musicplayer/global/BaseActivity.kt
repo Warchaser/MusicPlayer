@@ -3,6 +3,7 @@ package com.warchaser.musicplayer.global
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -19,6 +20,19 @@ open class BaseActivity : AppCompatActivity(){
     protected lateinit var TAG : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            val modes = window.windowManager.defaultDisplay.supportedModes
+            modes.sortBy {
+                it.refreshRate
+            }
+            window.let {
+                val lp = it.attributes
+                lp.preferredDisplayModeId = modes.last().modeId
+                it.attributes = lp
+            }
+        }
+
         super.onCreate(savedInstanceState)
         TAG = PackageUtil.getSimpleClassName(this)
         AppManager.mInstance.addActivity(this)
