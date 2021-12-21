@@ -285,4 +285,25 @@ object NLog {
         }
     }
 
+    /**
+     * 打印Html
+     * */
+    @JvmStatic
+    @Synchronized
+    fun printHtml(tag : String, msg : String){
+        if(TextUtils.isEmpty(msg) || !IS_DEBUG){
+            return
+        }
+
+        val lines : List<String> = msg.split("\r\n")
+        for(line : String in lines){
+            e(tag, line)
+
+            //写Log
+            if(ALLOW_WRITE_LOG){
+                writeLog2File(tag, line)
+            }
+        }
+    }
+
 }
